@@ -2,12 +2,12 @@
 
 # Introduction
 
-This directory contains WAVE software developed by Ultralytics LLC. For more information on Ultralytics projects please visit:
+This directory contains software developed by Ultralytics LLC. For more information on Ultralytics projects please visit:
 http://www.ultralytics.com  
 
 # WAVE
 
-The https://github.com/ultralytics/wave repo contains **WA**veform **V**ector **E**xploitation code, a new method for particle physics detector readout and reconstruction.
+The https://github.com/ultralytics/wave repo contains **WA**veform **V**ector **E**xploitation code, a new method for particle physics detector readout and reconstruction based on Machine Learning and Deep Neural Networks.
 
 # Requirements:
 

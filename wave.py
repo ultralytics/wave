@@ -58,7 +58,7 @@ def runexample(H, model):
     lr = 0.01
     eps = 0.002
     epochs = 250000
-    validation_checks = 5000
+    validations = 5000
     # batch_size = 10000
     name = data[:-4] + '%s%glr%geps.t' % (H[:], lr, eps)
 
@@ -136,11 +136,11 @@ def runexample(H, model):
         L[i, 1] = criteria(y_predv, yv).item()  # / yv.numel()  # validate
         # L[i, 2] = criteria(model(xt), yt).item() #/ yv.numel()  # test
 
-        if i > 2000:  # validation checks
+        if i > validations:  # validation checks
             if L[i, 1] < best[1]:
                 best = (i, L[i, 1], copy.deepcopy(model.state_dict()))
-            if (i - best[0]) > validation_checks:
-                print('\n%g validation checks exceeded at epoch %g.' % (validation_checks, i))
+            if (i - best[0]) > validations:
+                print('\n%g validation checks exceeded at epoch %g.' % (validations, i))
                 break
 
         if i % 1000 == 0:  # print and save progress

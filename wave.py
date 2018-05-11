@@ -169,7 +169,7 @@ def runexample(H, model):
         loss[i], std[i] = nnstd(model(xi) - yi, ys)
         print('%.5f %s %s' % (loss[i], std[i, :], labels[i]))
     scipy.io.savemat(path + name + '.mat', dict(bestepoch=best[0], loss=loss, std=std, L=L, name=name))
-    files.download(path + name + '.mat')
+    # files.download(path + name + '.mat')
 
     # data = []
     # for i, s in enumerate(labels):
@@ -198,11 +198,13 @@ class waveconv(torch.nn.Module):
         return y.view((r, y.numel() / r))
 
 
-H = [76, 23, 7]
-# model = torch.nn.Sequential(
-#        waveconv(),
-#        torch.nn.Linear(498, H[0]), torch.nn.Tanh(),
-#        torch.nn.Linear(H[0], H[1]), torch.nn.Tanh(),
-#        torch.nn.Linear(H[1], H[2]), torch.nn.Tanh(),
-#        torch.nn.Linear(H[2], 2))
-runexample(H, None)
+if __name__ == '__main__':
+    H = [76, 23, 7]
+    model = None
+    # model = torch.nn.Sequential(
+    #        waveconv(),
+    #        torch.nn.Linear(498, H[0]), torch.nn.Tanh(),
+    #        torch.nn.Linear(H[0], H[1]), torch.nn.Tanh(),
+    #        torch.nn.Linear(H[1], H[2]), torch.nn.Tanh(),
+    #        torch.nn.Linear(H[2], 2))
+    runexample(H, model)

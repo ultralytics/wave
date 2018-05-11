@@ -51,8 +51,8 @@ def nnstd(r, ys):
 def runexample(H, model):
     cuda = torch.cuda.is_available()
     torch.manual_seed(1)
-    #!mkdir - p drive/data/models
-    path = 'drive/data/'
+    path = 'data/'
+    os.makedirs(path + 'models', exist_ok=True)
     data = 'wavedata25ns.mat'
 
     lr = 0.01
@@ -67,7 +67,9 @@ def runexample(H, model):
     print('Running on %s\n%s' % (device.type, torch.cuda.get_device_properties(0) if cuda else ''))
 
     if not os.path.isfile(path + data):
-        eval('!wget -P drive/data/ https://storage.googleapis.com/ultralytics/' + data)
+        import subprocess
+        subprocess.call('wget -P data/ https://storage.googleapis.com/ultralytics/' + data, shell=True)
+        #eval('!wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
     mat = scipy.io.loadmat(path + data)
     x = mat['inputs']  # network inputs (nx512)
     y = mat['outputs'][:, 1:]  # network outputs (nx2) [position, time]
@@ -85,7 +87,7 @@ def runexample(H, model):
 
     class WAVE(torch.nn.Module):
         def __init__(self, nx, H):  # 512 in, 512 out
-            super(coarseTime, self).__init__()
+            super(WAVE, self).__init__()
             # H = [76, 23, 7]
             self.fc0 = LinearTanh(nx, H[0])
             self.fc1 = LinearTanh(H[0], H[1])

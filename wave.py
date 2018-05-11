@@ -1,13 +1,16 @@
 import copy
 import time
+import os
 
 import numpy as np
 import scipy.io
 import torch
 
+# set printoptions
 torch.set_printoptions(linewidth=320, precision=8)
 np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format})  # format short g, %precision=5
 
+# set path
 path = '/Users/glennjocher/Google Drive/data/'
 
 
@@ -48,72 +51,65 @@ def nnstd(r, ys):
 def runexample(H, model):
     cuda = torch.cuda.is_available()
     torch.manual_seed(1)
-    # !mkdir - p
-    # drive / data / models
+    #!mkdir - p drive/data/models
+    path = 'drive/data/'
+    data = 'wavedata25ns.mat'
 
-    lr = 0.002
-    eps = 0.001
-    batch_size = 10000
-    epochs = 500000
+    lr = 0.01
+    eps = 0.002
+    epochs = 250000
     validation_checks = 5000
-    name = 'nn%s%glr%geps25nsconv' % (H[:], lr, eps)
+    # batch_size = 10000
+    name = data[:-4] + '%s%glr%geps.t' % (H[:], lr, eps)
 
     tica = time.time()
     device = torch.device('cuda:0' if cuda else 'cpu')
     print('Running on %s\n%s' % (device.type, torch.cuda.get_device_properties(0) if cuda else ''))
 
-    # if not os.path.isfile(path + 'wavedata25ns.mat'):
-    # !wget -P drive/data/ https://storage.googleapis.com/ultralytics/wavedata25ns.mat
-    mat = scipy.io.loadmat(path + 'wavedata25ns.mat')
+    if not os.path.isfile(path + data):
+        eval('!wget -P drive/data/ https://storage.googleapis.com/ultralytics/' + data)
+    mat = scipy.io.loadmat(path + data)
     x = mat['inputs']  # network inputs (nx512)
-    y = mat['outputs']  # network outputs (nx2)
-    nb, D_in = x.shape
-    D_out = y.shape[1]
+    y = mat['outputs'][:, 1:]  # network outputs (nx2) [position, time]
+    nz, nx = x.shape
+    ny = y.shape[1]
 
     class LinearTanh(torch.nn.Module):
-        def __init__(self, D_in, D_out):
+        def __init__(self, nx, ny):
             super(LinearTanh, self).__init__()
-            self.linear1 = torch.nn.Linear(D_in, D_out)
+            self.Linear1 = torch.nn.Linear(nx, ny)
             self.Tanh = torch.nn.Tanh()
 
         def forward(self, x):
-            return self.Tanh(self.linear1(x))
+            return self.Tanh(self.Linear1(x))
 
-    class coarseTime(torch.nn.Module):
-        def __init__(self, D_in):  # 512 in, 512 out
+    class WAVE(torch.nn.Module):
+        def __init__(self, nx, H):  # 512 in, 512 out
             super(coarseTime, self).__init__()
-            H = [76, 23, 7]
-            self.l0 = LinearTanh(D_in, H[0])
-            self.l1 = LinearTanh(H[0], H[1])
-            self.l2 = LinearTanh(H[1], H[2])
-            self.l3 = torch.nn.Linear(H[2], 1)
-            self.p0 = LinearTanh(D_in, H[0])
-            self.p1 = LinearTanh(H[0], H[1])
-            self.p2 = LinearTanh(H[1], H[2])
-            self.p3 = torch.nn.Linear(H[2], 1)
+            # H = [76, 23, 7]
+            self.fc0 = LinearTanh(nx, H[0])
+            self.fc1 = LinearTanh(H[0], H[1])
+            self.fc2 = LinearTanh(H[1], H[2])
+            self.fc3 = torch.nn.Linear(H[2], 1)
 
         def forward(self, x):
-            p = self.p3(self.p2(self.p1(self.p0(x))))
-            t = self.l3(self.l2(self.l1(self.l0(x))))
-            return torch.cat((p, t), 1)
+            return self.fc3(self.fc2(self.fc1(self.fc0(x))))
 
     if model is None:
-        model = coarseTime(512)
+        model = WAVE(512, H)
 
     x, _, _ = normalize(x, 1)  # normalize each input row
     y, ymu, ys = normalize(y, 0)  # normalize each output column
-    x = torch.Tensor(x)
-    y = torch.Tensor(y)
+    x, y = torch.Tensor(x), torch.Tensor(y)
     x, y, xv, yv, xt, yt = splitdata(x, y, train=0.70, validate=0.15, test=0.15, shuffle=False)
     labels = ['train', 'validate', 'test']
 
-    # SubsetRandomSampler
     # train_dataset = data_utils.TensorDataset(x, y)
     # test_dataset = data_utils.TensorDataset(xt, yt)
     # train_loader = data_utils.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
     # test_loader = data_utils.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 
-    print(model)
+    print(name, model)
     if cuda:
         x, xv, xt = x.cuda(), xv.cuda(), xt.cuda()
         y, yv, yt = y.cuda(), yv.cuda(), yt.cuda()
@@ -147,8 +143,8 @@ def runexample(H, model):
                 print('\n%g validation checks exceeded at epoch %g.' % (validation_checks, i))
                 break
 
-        if i % 10 == 0:  # print and save progress
-            # scipy.io.savemat(path + name + '.mat', dict(bestepoch=best[0], loss=L[best[0]], L=L, name=name))
+        if i % 1000 == 0:  # print and save progress
+            scipy.io.savemat(path + name + '.mat', dict(bestepoch=best[0], loss=L[best[0]], L=L, name=name))
             _, std = nnstd(y_predv - yv, ys)
             print('%.3fs' % (time.time() - ticb), i, L[i], std)
             ticb = time.time()
@@ -164,7 +160,7 @@ def runexample(H, model):
     dt = time.time() - tica
 
     print('\nFinished %g epochs in %.3fs (%.3f epochs/s)\nBest results from epoch %g:' % (i + 1, dt, i / dt, best[0]))
-    loss, std = np.zeros(3), np.zeros((3, D_out))
+    loss, std = np.zeros(3), np.zeros((3, ny))
     for i, (xi, yi) in enumerate(((x, y), (xv, yv), (xt, yt))):
         loss[i], std[i] = nnstd(model(xi) - yi, ys)
         print('%.5f %s %s' % (loss[i], std[i, :], labels[i]))

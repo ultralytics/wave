@@ -60,15 +60,15 @@ def runexample(H, model):
 
     tica = time.time()
     device = torch.device('cuda:0' if cuda else 'cpu')
-    print('Running on %s\n%s' % (device.type, torch.cuda.get_device_properties(0) if cuda else ''))
+    print('Running %s on %s\n%s' %
+          (name, device.type, torch.cuda.get_device_properties(0) if cuda else ''))
 
     if not os.path.isfile(path + data):
         import subprocess
         subprocess.call('wget -P data/ https://storage.googleapis.com/ultralytics/' + data, shell=True)
-        #eval('!wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
     mat = scipy.io.loadmat(path + data)
-    x = mat['inputs']  # network inputs (nx512)
-    y = mat['outputs'][:, 1:]  # network outputs (nx2) [position, time]
+    x = mat['inputs']  # inputs (nx512) [waveform1 waveform2]
+    y = mat['outputs'][:, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
     nz, nx = x.shape
     ny = y.shape[1]
 
@@ -88,7 +88,7 @@ def runexample(H, model):
             self.fc0 = LinearTanh(nx, H[0])
             self.fc1 = LinearTanh(H[0], H[1])
             self.fc2 = LinearTanh(H[1], H[2])
-            self.fc3 = torch.nn.Linear(H[2], 1)
+            self.fc3 = torch.nn.Linear(H[2], 2)
 
         def forward(self, x):
             return self.fc3(self.fc2(self.fc1(self.fc0(x))))
@@ -107,7 +107,7 @@ def runexample(H, model):
     # train_loader = data_utils.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
     # test_loader = data_utils.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 
-    print(name, model)
+    print(model)
     if cuda:
         x, xv, xt = x.cuda(), xv.cuda(), xt.cuda()
         y, yv, yt = y.cuda(), yv.cuda(), yt.cuda()
@@ -164,6 +164,14 @@ def runexample(H, model):
         print('%.5f %s %s' % (loss[i], std[i, :], labels[i]))
     scipy.io.savemat(path + name + '.mat', dict(bestepoch=best[0], loss=loss, std=std, L=L, name=name))
     # files.download(path + name + '.mat')
+
+    # data = []
+    # for i, s in enumerate(labels):
+    #    data.append(go.Scatter(x=np.arange(epochs), y=L[:, i], mode='markers+lines', name=s))
+    # layout = go.Layout(xaxis=dict(type='log', autorange=True),
+    #                   yaxis=dict(type='log', autorange=True))
+    # configure_plotly_browser_state()
+    # iplot(go.Figure(data=data, layout=layout))
 
     # data = []
     # for i, s in enumerate(labels):

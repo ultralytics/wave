@@ -9,7 +9,7 @@ http://www.ultralytics.com  
 
 The https://github.com/ultralytics/wave repo contains **WA**veform **V**ector **E**xploitation code, a new method for particle physics detector readout and reconstruction based on Machine Learning and Deep Neural Networks.
 
-# Requirements:
+# Requirements
 
 Python 3.6 or later with the following packages installed:  
 
@@ -18,7 +18,7 @@ Python 3.6 or later with the following packages installed:
 - ```pytorch``` >= 0.4.0 
 - ```plotly``` (optional)
 
-# Running WAVE:
+# Running WAVE
 1. Install requirements
 ```!pip3 install numpy scipy pytorch plotly --update```
 

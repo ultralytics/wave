@@ -1,6 +1,6 @@
-import copy
-import time
 import os
+import time
+import copy
 
 import numpy as np
 import scipy.io

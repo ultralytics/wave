@@ -14,19 +14,16 @@ http://www.ultralytics.com/projects
 
 Python 3.6 or later with the following packages installed:  
 
-- numpy
-- pytorch 0.4.0 
-- copy
-- time
-- scipy.io  
+- ```numpy```
+- ```scipy```
+- ```pytorch``` >= 0.4.0 
+- ```plotly``` (optional)
 
 # Running WAVE:
-Make sure that all of the requirements are met prior to running WAVE:
-pip install numpy pytorch scipy.io
+1. Make sure that all of the requirements are met prior to running WAVE:
+```!pip3 install numpy scipy pytorch plotly --update```
 
-- Make sure that ```functions``` and ```neutrinos/nViewGUI``` are added to the Matlab path
-- Navigate to ```functions/GUI/MTC Viewer/>``` and open and run file ```MTCviewer.m```
-- A dialog will appear asking you to import a ```.glenn``` file. 
+2. Run ```wave.py```
 
 ![Alt](https://github.com/University-of-Hawaii-Physics/mtc/blob/master/Analysis/Ultralytics/mtcview.png "mtcView")
 

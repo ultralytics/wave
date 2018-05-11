@@ -19,7 +19,7 @@ Python 3.6 or later with the following packages installed:
 - ```plotly``` (optional)
 
 # Running WAVE:
-1. Make sure that all of the requirements are met prior to running WAVE:
+1. Install requirements
 ```!pip3 install numpy scipy pytorch plotly --update```
 
 2. Run ```wave.py```

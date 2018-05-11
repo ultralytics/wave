@@ -25,7 +25,7 @@ Python 3.6 or later with the following packages installed:
 2. Run ```wave.py```
 
 ![Alt](https://github.com/University-of-Hawaii-Physics/mtc/blob/master/Analysis/Ultralytics/mtcview.png "mtcView")
-![Alt](https://github.com/ultralytics/wave/blob/master/wave.png "training")
+![Alt](https://github.com/ultralytics/wave/blob/master/data/wave.png "training")
 
 
 # Contact

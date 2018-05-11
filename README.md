@@ -7,7 +7,7 @@ http://www.ultralytics.com  
 
 # WAVE
 
-The 'ultralytics/wave' repo contains **WA**veform **V**ector **E**xploitation code, a new method for particle physics detector readout and reconstruction.
+The https://github.com/ultralytics/wave repo contains **WA**veform **V**ector **E**xploitation code, a new method for particle physics detector readout and reconstruction.
 
 # Requirements:
 

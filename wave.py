@@ -10,12 +10,8 @@ import torch
 torch.set_printoptions(linewidth=320, precision=8)
 np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format})  # format short g, %precision=5
 
-# set path
-path = '/Users/glennjocher/Google Drive/data/'
 
-
-def normalize(x, axis=None):
-    # normalize NN inputs and outputs by column (axis=0)
+def normalize(x, axis=None):  # normalize x mean and std by axis
     if axis is None:
         mu, sigma = x.mean(), x.std()
     elif axis == 0:
@@ -25,23 +21,23 @@ def normalize(x, axis=None):
     return (x - mu) / sigma, mu, sigma
 
 
-def shuffledata(x, y):
+def shuffledata(x, y):  # randomly shuffle x and y by same axis=0 indices
     i = np.arange(x.shape[0])
     np.random.shuffle(i)
     return x[i], y[i]
 
 
-def splitdata(x, y, train=0.7, validate=0.15, test=0.15, shuffle=False):
+def splitdata(x, y, train=0.7, validate=0.15, test=0.15, shuffle=False):  # split training data
     n = x.shape[0]
     if shuffle:
         x, y = shuffledata(x, y)
-    i = round(n * train)
-    j = round(n * validate) + i
-    k = round(n * test) + j
+    i = round(n * train)  # train
+    j = round(n * validate) + i  # validate
+    k = round(n * test) + j  # test
     return x[:i], y[:i], x[i:j], y[i:j], x[j:k], y[j:k]  # xy train, xy validate, xy test
 
 
-def nnstd(r, ys):
+def nnstd(r, ys):  # output MSE with standard deviation of each output error
     r = r.detach()
     loss = (r ** 2).mean().cpu().numpy()
     std = r.std(0).cpu().numpy() * ys

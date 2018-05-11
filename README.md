@@ -2,13 +2,12 @@
 
 # Introduction
 
-This directory contains software developed by Ultralytics LLC.  
+This directory contains WAVE software developed by Ultralytics LLC. For more information on Ultralytics projects please visit:
 http://www.ultralytics.com  
 
-# Listing
+# WAVE
 
-The 'ultralytics/wave' repo contains WAVE code, an Ultralytics projects.  
-http://www.ultralytics.com/projects
+The 'ultralytics/wave' repo contains **WA**veform **V**ector **E**xploitation code, a new method for particle physics detector readout and reconstruction.
 
 # Requirements:
 

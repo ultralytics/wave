@@ -56,7 +56,7 @@ def runexample(H, model):
     epochs = 250000
     validations = 5000
     # batch_size = 10000
-    name = data[:-4] + '%s%glr%geps.t' % (H[:], lr, eps)
+    name = (data[:-4] + '%s%glr%geps' % (H[:], lr, eps)).replace(', ', '_')
 
     tica = time.time()
     device = torch.device('cuda:0' if cuda else 'cpu')

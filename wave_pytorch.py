@@ -1,62 +1,33 @@
+import copy
 import os
 import time
-import copy
 
-import numpy as np
 import scipy.io
 import torch
+from plotly.offline import plot
+import plotly.graph_objs as go
+
+from functions import *
 
 # set printoptions
 torch.set_printoptions(linewidth=320, precision=8)
 np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format})  # format short g, %precision=5
 
 
-def normalize(x, axis=None):  # normalize x mean and std by axis
-    if axis is None:
-        mu, sigma = x.mean(), x.std()
-    elif axis == 0:
-        mu, sigma = x.mean(0), x.std(0)
-    elif axis == 1:
-        mu, sigma = x.mean(1).reshape(x.shape[0], 1), x.std(1).reshape(x.shape[0], 1)
-    return (x - mu) / sigma, mu, sigma
+def runexample(H, model, str):
+    lr = 0.002
+    eps = 0.001
+    epochs = 300
+    validations = 5000
+    printInterval = 10
+    # batch_size = 10000
+    data = 'wavedata25ns.mat'
 
-
-def shuffledata(x, y):  # randomly shuffle x and y by same axis=0 indices
-    i = np.arange(x.shape[0])
-    np.random.shuffle(i)
-    return x[i], y[i]
-
-
-def splitdata(x, y, train=0.7, validate=0.15, test=0.15, shuffle=False):  # split training data
-    n = x.shape[0]
-    if shuffle:
-        x, y = shuffledata(x, y)
-    i = round(n * train)  # train
-    j = round(n * validate) + i  # validate
-    k = round(n * test) + j  # test
-    return x[:i], y[:i], x[i:j], y[i:j], x[j:k], y[j:k]  # xy train, xy validate, xy test
-
-
-def nnstd(r, ys):  # output MSE with standard deviation of each output error
-    r = r.detach()
-    loss = (r ** 2).mean().cpu().numpy()
-    std = r.std(0).cpu().numpy() * ys
-    return loss, std
-
-
-def runexample(H, model):
     cuda = torch.cuda.is_available()
     torch.manual_seed(1)
     path = 'data/'
     os.makedirs(path + 'models', exist_ok=True)
-    data = 'wavedata25ns.mat'
-
-    lr = 0.01
-    eps = 0.002
-    epochs = 250000
-    validations = 5000
-    # batch_size = 10000
-    name = (data[:-4] + '%s%glr%geps' % (H[:], lr, eps)).replace(', ','_').replace('[','_').replace(']','_')
+    name = (data[:-4] + '%s%glr%geps%s' % (H[:], lr, eps, str)).replace(', ', '_').replace('[', '_').replace(']', '_')
 
     tica = time.time()
     device = torch.device('cuda:0' if cuda else 'cpu')
@@ -141,9 +112,9 @@ def runexample(H, model):
                 print('\n%g validation checks exceeded at epoch %g.' % (validations, i))
                 break
 
-        if i % 1000 == 0:  # print and save progress
+        if i % printInterval == 0:  # print and save progress
             scipy.io.savemat(path + name + '.mat', dict(bestepoch=best[0], loss=L[best[0]], L=L, name=name))
-            _, std = nnstd(y_predv - yv, ys)
+            _, std = stdpt(y_predv - yv, ys)
             print('%.3fs' % (time.time() - ticb), i, L[i], std)
             ticb = time.time()
 
@@ -160,26 +131,18 @@ def runexample(H, model):
     print('\nFinished %g epochs in %.3fs (%.3f epochs/s)\nBest results from epoch %g:' % (i + 1, dt, i / dt, best[0]))
     loss, std = np.zeros(3), np.zeros((3, ny))
     for i, (xi, yi) in enumerate(((x, y), (xv, yv), (xt, yt))):
-        loss[i], std[i] = nnstd(model(xi) - yi, ys)
+        loss[i], std[i] = stdpt(model(xi) - yi, ys)
         print('%.5f %s %s' % (loss[i], std[i, :], labels[i]))
     scipy.io.savemat(path + name + '.mat', dict(bestepoch=best[0], loss=loss, std=std, L=L, name=name))
     # files.download(path + name + '.mat')
 
-    # data = []
-    # for i, s in enumerate(labels):
-    #    data.append(go.Scatter(x=np.arange(epochs), y=L[:, i], mode='markers+lines', name=s))
-    # layout = go.Layout(xaxis=dict(type='log', autorange=True),
-    #                   yaxis=dict(type='log', autorange=True))
+    data = []
+    for i, s in enumerate(labels):
+        data.append(go.Scatter(x=np.arange(epochs), y=L[:, i], mode='markers+lines', name=s))
+    layout = go.Layout(xaxis=dict(type='linear', autorange=True),
+                       yaxis=dict(type='log', autorange=True))
     # configure_plotly_browser_state()
-    # iplot(go.Figure(data=data, layout=layout))
-
-    # data = []
-    # for i, s in enumerate(labels):
-    #    data.append(go.Scatter(x=np.arange(epochs), y=L[:, i], mode='markers+lines', name=s))
-    # layout = go.Layout(xaxis=dict(type='log', autorange=True),
-    #                   yaxis=dict(type='log', autorange=True))
-    # configure_plotly_browser_state()
-    # iplot(go.Figure(data=data, layout=layout))
+    plot(go.Figure(data=data, layout=layout))
 
 
 class waveconv(torch.nn.Module):
@@ -201,12 +164,12 @@ class waveconv(torch.nn.Module):
 
 
 if __name__ == '__main__':
-    H = [76, 23, 7]
-    model = None
     # model = torch.nn.Sequential(
     #        waveconv(),
     #        torch.nn.Linear(498, H[0]), torch.nn.Tanh(),
     #        torch.nn.Linear(H[0], H[1]), torch.nn.Tanh(),
     #        torch.nn.Linear(H[1], H[2]), torch.nn.Tanh(),
     #        torch.nn.Linear(H[2], 2))
-    runexample(H, model)
+    H = [128, 32, 8]
+    for i in range(1):
+        runexample(H, None, '.' + str(i))

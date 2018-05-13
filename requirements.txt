@@ -1,0 +1,5 @@
+scipy
+torch
+torchvision
+tensorflow
+plotly

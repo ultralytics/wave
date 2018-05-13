@@ -1,6 +1,6 @@
-import copy
 import os
 import time
+import copy
 
 import scipy.io
 import torch

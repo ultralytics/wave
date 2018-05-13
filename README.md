@@ -15,12 +15,13 @@ Python 3.6 or later with the following packages installed:
 
 - ```numpy```
 - ```scipy```
-- ```pytorch``` >= 0.4.0 
+- ```pytorch``` >= 0.4.0
+- ```tensorflow``` >= 1.8.0
 - ```plotly``` (optional)
 
 # Running WAVE
 1. Install requirements
-```!pip3 install numpy scipy pytorch plotly --update```
+```!pip3 install numpy scipy pytorch tensorflow plotly --update```
 
 2. Run ```wave.py```
 

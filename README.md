@@ -36,6 +36,8 @@ Python 3.6 or later with the following packages installed:
 
     ```wave_tfeager.py```
 
+3. Fit particles better :)
+
 ![Alt](https://github.com/University-of-Hawaii-Physics/mtc/blob/master/Analysis/Ultralytics/mtcview.png "mtcView")
 ![Alt](https://github.com/ultralytics/wave/blob/master/data/wave.png "training")
 

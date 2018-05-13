@@ -22,11 +22,11 @@ Python 3.6 or later with the following packages installed:
 # Running WAVE
 1. Install and/or update requirements:
 
-    ```!pip3 install numpy scipy pytorch tensorflow plotly --update```
+    ```pip3 install numpy scipy pytorch tensorflow plotly --update```
     
     or
     
-    ```pip install -U -r requirements.txt```
+    ```pip3 install -U -r requirements.txt```
 
 2. Run WAVE in pytorch:
 

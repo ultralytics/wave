@@ -20,10 +20,21 @@ Python 3.6 or later with the following packages installed:
 - ```plotly``` (optional)
 
 # Running WAVE
-1. Install requirements
-```!pip3 install numpy scipy pytorch tensorflow plotly --update```
+1. Install requirements:
 
-2. Run pytorch or tensorflow WAVE implementations via ```wave_pytorch.py``` or ```wave_tfeager.py```.
+    ```!pip3 install numpy scipy pytorch tensorflow plotly --update```
+    
+    or
+    
+    ```!pip3 install -r requirements.txt --update```
+
+2. Run WAVE in pytorch:
+
+    ```wave_pytorch.py``` 
+
+    or tensorflow:
+
+    ```wave_tfeager.py```
 
 ![Alt](https://github.com/University-of-Hawaii-Physics/mtc/blob/master/Analysis/Ultralytics/mtcview.png "mtcView")
 ![Alt](https://github.com/ultralytics/wave/blob/master/data/wave.png "training")

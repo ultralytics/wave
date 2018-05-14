@@ -20,9 +20,9 @@ Python 3.6 or later with the following packages installed:
 - ```plotly``` (optional)
 
 # Running WAVE
-1. Install and/or update requirements:
+1. Install and/or upgrade requirements:
 
-    ```pip3 install numpy scipy torch tensorflow plotly --update```
+    ```pip3 install numpy scipy torch tensorflow plotly -U```
     
     or
     

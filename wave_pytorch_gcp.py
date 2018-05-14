@@ -1,11 +1,9 @@
+import copy
 import os
 import time
-import copy
 
 import scipy.io
 import torch
-from plotly.offline import plot
-import plotly.graph_objs as go
 
 from functions import *
 
@@ -154,8 +152,8 @@ if __name__ == '__main__':
     H = [128, 32, 8]
 
     activations = (
-    'Hardshrink', 'LeakyReLU', 'LogSigmoid', 'Softplus', 'Softshrink', 'PReLU', 'Softsign', 'Tanhshrink', 'Softmin',
-    'Softmax')
+        'Hardshrink', 'LeakyReLU', 'LogSigmoid', 'Softplus', 'Softshrink', 'PReLU', 'Softsign', 'Tanhshrink', 'Softmin',
+        'Softmax')
 
     for a in activations:
         class LinearTanh(torch.nn.Module):

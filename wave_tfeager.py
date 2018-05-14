@@ -13,15 +13,15 @@ torch.set_printoptions(linewidth=320, precision=8)
 np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format})  # format short g, %precision=5
 
 import tensorflow as tf
+import tensorflow.contrib.eager as tfe
 tf.enable_eager_execution()
-
 
 def runexample(H, model, str):
     lr = 0.002
     eps = 0.001
-    epochs = 300
+    epochs = 50000
     validations = 5000
-    printInterval = 10
+    printInterval = 1000
     # batch_size = 10000
     data = 'wavedata25ns.mat'
 

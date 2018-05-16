@@ -12,6 +12,7 @@ torch.set_printoptions(linewidth=320, precision=8)
 np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format})  # format short g, %precision=5
 
 path = 'data/'
+torch.manual_seed(1)
 
 def runexample(H, model, str, lr=0.001):
     epochs = 200000
@@ -144,17 +145,13 @@ def tslr():
 
             def forward(self, x):
                 return self.fc3(self.fc2(self.fc1(self.fc0(x))))
-
-        y = runexample(H, model=WAVE(H), str=('.' + 'Tanh'), lr=a)
-        tsy.append(y)
-    tsy = np.array(tsy)
-    scipy.io.savemat(path + 'TS.lr' + '.mat', dict(tsv=tsv, tsy=tsy))
+        for i in range(3):
+            tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh'), lr=a))
+    scipy.io.savemat(path + 'TS.lr' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
 
 
 if __name__ == '__main__':
     # def tsshape():
-    torch.manual_seed(1)
-
     class LinearAct(torch.nn.Module):
         def __init__(self, nx, ny):
             super(LinearAct, self).__init__()

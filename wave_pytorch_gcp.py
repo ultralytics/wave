@@ -32,7 +32,7 @@ def runexample(H, model, str, lr=0.001):
     print(path + data)
     print(not os.path.isfile(path + data))
     if not os.path.isfile(path + data):
-        os.system('wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
+        os.system('wget -P data https://storage.googleapis.com/ultralytics/' + data)
     mat = scipy.io.loadmat(path + data)
     x = mat['inputs']  # inputs (nx512) [waveform1 waveform2]
     y = mat['outputs'][:, 1:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]

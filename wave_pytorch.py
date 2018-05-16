@@ -31,8 +31,7 @@ def runexample(H, model, str):
 
     tica = time.time()
     if not os.path.isfile(path + data):
-        import subprocess
-        subprocess.call('wget -P data/ https://storage.googleapis.com/ultralytics/' + data, shell=True)
+        os.system('wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
     mat = scipy.io.loadmat(path + data)
     x = mat['inputs']  # inputs (nx512) [waveform1 waveform2]
     y = mat['outputs'][:, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]

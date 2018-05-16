@@ -22,7 +22,6 @@ def runexample(H, model, str, lr=0.001):
     data = 'wavedata25ns.mat'
 
     cuda = torch.cuda.is_available()
-    torch.manual_seed(1)
     os.makedirs(path + 'models', exist_ok=True)
     name = (data[:-4] + '%s%glr%s' % (H[:], lr, str)).replace(', ', '.').replace('[', '_').replace(']', '_')
 
@@ -156,6 +155,8 @@ def tslr():
 
 if __name__ == '__main__':
     # def tsshape():
+    torch.manual_seed(1)
+
     class LinearAct(torch.nn.Module):
         def __init__(self, nx, ny):
             super(LinearAct, self).__init__()
@@ -191,7 +192,8 @@ if __name__ == '__main__':
             self.fc1 = torch.nn.Linear(n[1], n[2])
         def forward(self, x):
             return self.fc1(self.fc0(x))
-    tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
+    for i in range(3):
+        tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
 
     H = tsv[1]
     class WAVE(torch.nn.Module):
@@ -202,7 +204,8 @@ if __name__ == '__main__':
             self.fc2 = torch.nn.Linear(n[2], n[3])
         def forward(self, x):
             return self.fc2(self.fc1(self.fc0(x)))
-    tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
+    for i in range(3):
+        tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
 
     H = tsv[2]
     class WAVE(torch.nn.Module):
@@ -214,7 +217,8 @@ if __name__ == '__main__':
             self.fc3 = torch.nn.Linear(n[3], n[4])
         def forward(self, x):
             return self.fc3(self.fc2(self.fc1(self.fc0(x))))
-    tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
+    for i in range(3):
+        tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
 
     H = tsv[3]
     class WAVE(torch.nn.Module):
@@ -227,7 +231,8 @@ if __name__ == '__main__':
             self.fc4 = torch.nn.Linear(n[4], n[5])
         def forward(self, x):
             return self.fc4(self.fc3(self.fc2(self.fc1(self.fc0(x)))))
-    tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
+    for i in range(3):
+        tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
 
     H = tsv[4]
     class WAVE(torch.nn.Module):
@@ -241,6 +246,7 @@ if __name__ == '__main__':
             self.fc5 = torch.nn.Linear(n[5], n[6])
         def forward(self, x):
             return self.fc5(self.fc4(self.fc3(self.fc2(self.fc1(self.fc0(x))))))
-    tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
+    for i in range(3):
+        tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
 
     scipy.io.savemat(path + 'TS.shape' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))

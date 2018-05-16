@@ -96,8 +96,8 @@ def runexample(H, model, str, lr=0.001):
         optimizer.step()
     else:
         print('WARNING: Validation loss still decreasing after %g epochs (train longer).' % (i + 1))
-    torch.save(best[2], path + 'models/' + name + '.pt')
-    #model.load_state_dict(best[2])
+    #torch.save(best[2], path + 'models/' + name + '.pt')
+    model.load_state_dict(best[2])
     dt = time.time() - tica
 
     print('\nFinished %g epochs in %.3fs (%.3f epochs/s)\nBest results from epoch %g:' % (i + 1, dt, i / dt, best[0]))

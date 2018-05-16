@@ -150,8 +150,7 @@ def tslr():
     scipy.io.savemat(path + 'TS.lr' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
 
 
-if __name__ == '__main__':
-    # def tsshape():
+def tsshape():
     class LinearAct(torch.nn.Module):
         def __init__(self, nx, ny):
             super(LinearAct, self).__init__()
@@ -246,3 +245,6 @@ if __name__ == '__main__':
 
     scipy.io.savemat(path + 'TS.shape' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
     # os.system('sleep 30s; sudo shutdown')
+
+if __name__ == '__main__':
+    tsshape()

@@ -250,3 +250,4 @@ if __name__ == '__main__':
         tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
 
     scipy.io.savemat(path + 'TS.shape' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
+    # os.system('sleep 30s; sudo shutdown')

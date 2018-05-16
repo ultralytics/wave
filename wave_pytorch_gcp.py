@@ -15,7 +15,7 @@ path = 'data/'
 
 
 def runexample(H, model, str, lr=0.001):
-    epochs = 200000
+    epochs = 200
     validations = 5000
     printInterval = 1000
     # batch_size = 10000
@@ -97,7 +97,7 @@ def runexample(H, model, str, lr=0.001):
     else:
         print('WARNING: Validation loss still decreasing after %g epochs (train longer).' % (i + 1))
     torch.save(best[2], path + 'models/' + name + '.pt')
-    model.load_state_dict(best[2])
+    #model.load_state_dict(best[2])
     dt = time.time() - tica
 
     print('\nFinished %g epochs in %.3fs (%.3f epochs/s)\nBest results from epoch %g:' % (i + 1, dt, i / dt, best[0]))

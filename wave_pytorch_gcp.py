@@ -11,11 +11,11 @@ from functions import *
 torch.set_printoptions(linewidth=320, precision=8)
 np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format})  # format short g, %precision=5
 
+path = 'data/'
 
-def runexample(H, model, str):
-    lr = 0.002
-    eps = 0.001
-    epochs = 50000
+
+def runexample(H, model, str, lr=0.001):
+    epochs = 200000
     validations = 5000
     printInterval = 1000
     # batch_size = 10000
@@ -23,9 +23,8 @@ def runexample(H, model, str):
 
     cuda = torch.cuda.is_available()
     torch.manual_seed(1)
-    path = 'data/'
     os.makedirs(path + 'models', exist_ok=True)
-    name = (data[:-4] + '%s%glr%geps%s' % (H[:], lr, eps, str)).replace(', ', '_').replace('[', '_').replace(']', '_')
+    name = (data[:-4] + '%s%glr%s' % (H[:], lr, str)).replace(', ', '.').replace('[', '_').replace(']', '_')
 
     tica = time.time()
     device = torch.device('cuda:0' if cuda else 'cpu')
@@ -37,33 +36,9 @@ def runexample(H, model, str):
         subprocess.call('wget -P data/ https://storage.googleapis.com/ultralytics/' + data, shell=True)
     mat = scipy.io.loadmat(path + data)
     x = mat['inputs']  # inputs (nx512) [waveform1 waveform2]
-    y = mat['outputs'][:, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
+    y = mat['outputs'][:, 1:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
     nz, nx = x.shape
     ny = y.shape[1]
-
-    class LinearTanh(torch.nn.Module):
-        def __init__(self, nx, ny):
-            super(LinearTanh, self).__init__()
-            self.Linear1 = torch.nn.Linear(nx, ny)
-            self.Tanh = torch.nn.SELU()
-            # LogSigmoid 0.02140!
-
-        def forward(self, x):
-            return self.Tanh(self.Linear1(x))
-
-    class WAVE(torch.nn.Module):
-        def __init__(self, nx, H):  # 512 in, 512 out
-            super(WAVE, self).__init__()
-            self.fc0 = LinearTanh(nx, H[0])
-            self.fc1 = LinearTanh(H[0], H[1])
-            self.fc2 = LinearTanh(H[1], H[2])
-            self.fc3 = torch.nn.Linear(H[2], 2)
-
-        def forward(self, x):
-            return self.fc3(self.fc2(self.fc1(self.fc0(x))))
-
-    # if model is None:
-    #    model = WAVE(512, H)
 
     x, _, _ = normalize(x, 1)  # normalize each input row
     y, ymu, ys = normalize(y, 0)  # normalize each output column
@@ -84,7 +59,7 @@ def runexample(H, model, str):
 
     # criteria and optimizer
     criteria = torch.nn.MSELoss(size_average=True)
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr, eps=eps, amsgrad=False)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=False)
 
     ticb = time.time()
     L = np.full((epochs, 3), np.nan)
@@ -111,7 +86,7 @@ def runexample(H, model, str):
                 break
 
         if i % printInterval == 0:  # print and save progress
-            scipy.io.savemat(path + name + '.mat', dict(bestepoch=best[0], loss=L[best[0]], L=L, name=name))
+            # scipy.io.savemat(path + name + '.mat', dict(bestepoch=best[0], loss=L[best[0]], L=L, name=name))
             _, std = stdpt(y_predv - yv, ys)
             print('%.3fs' % (time.time() - ticb), i, L[i], std)
             ticb = time.time()
@@ -131,7 +106,7 @@ def runexample(H, model, str):
     for i, (xi, yi) in enumerate(((x, y), (xv, yv), (xt, yt))):
         loss[i], std[i] = stdpt(model(xi) - yi, ys)
         print('%.5f %s %s' % (loss[i], std[i, :], labels[i]))
-    scipy.io.savemat(path + name + '.mat', dict(bestepoch=best[0], loss=loss, std=std, L=L, name=name))
+    # scipy.io.savemat(path + name + '.mat', dict(bestepoch=best[0], loss=loss, std=std, L=L, name=name))
     # files.download(path + name + '.mat')
 
     # data = []
@@ -142,41 +117,129 @@ def runexample(H, model, str):
     # configure_plotly_browser_state()
     # iplot(go.Figure(data=data, layout=layout))
 
+    return np.concatenate(([best[0]], np.array(loss), np.array(std.ravel())))
 
-if __name__ == '__main__':
-    # H = [32]
-    # H = [81, 13]
-    # H = [76, 23, 7]
-    # H = [128, 32, 8]
-    # H = [169, 56, 18, 6]
-    H = [128, 32, 8]
 
-    activations = (
-        'Hardshrink', 'LeakyReLU', 'LogSigmoid', 'Softplus', 'Softshrink', 'PReLU', 'Softsign', 'Tanhshrink', 'Softmin',
-        'Softmax')
+def tslr():
+    # if __name__ == '__main__':
+    H = [512, 108, 23, 5, 1]
+    # tsv = ['Tanh', 'LogSigmoid', 'Softsign', 'ELU']
+    tsv = np.logspace(-4, -2, 11)
+    tsy = []
 
-    for a in activations:
-        class LinearTanh(torch.nn.Module):
+    for a in tsv:
+        class LinearAct(torch.nn.Module):
             def __init__(self, nx, ny):
-                super(LinearTanh, self).__init__()
+                super(LinearAct, self).__init__()
                 self.Linear1 = torch.nn.Linear(nx, ny)
-                # self.Tanh = torch.nn.SELU()
-                self.Tanh = eval('torch.nn.' + a + '()')
+                self.act = eval('torch.nn.' + 'Tanh' + '()')
 
             def forward(self, x):
-                return self.Tanh(self.Linear1(x))
-
+                return self.act(self.Linear1(x))
 
         class WAVE(torch.nn.Module):
-            def __init__(self, nx, H):  # 512 in, 512 out
+            def __init__(self, n):  # n = [512, 108, 23, 5, 1]
                 super(WAVE, self).__init__()
-                self.fc0 = LinearTanh(nx, H[0])
-                self.fc1 = LinearTanh(H[0], H[1])
-                self.fc2 = LinearTanh(H[1], H[2])
-                self.fc3 = torch.nn.Linear(H[2], 2)
+                self.fc0 = LinearAct(n[0], n[1])
+                self.fc1 = LinearAct(n[1], n[2])
+                self.fc2 = LinearAct(n[2], n[3])
+                self.fc3 = torch.nn.Linear(n[3], n[4])
 
             def forward(self, x):
                 return self.fc3(self.fc2(self.fc1(self.fc0(x))))
 
+        y = runexample(H, model=WAVE(H), str=('.' + 'Tanh'), lr=a)
+        tsy.append(y)
+    tsy = np.array(tsy)
+    scipy.io.savemat(path + 'TS.lr' + '.mat', dict(tsv=tsv, tsy=tsy))
 
-        runexample(H, model=WAVE(512, H), str=('.' + a))
+
+def tsshape():
+    class LinearAct(torch.nn.Module):
+        def __init__(self, nx, ny):
+            super(LinearAct, self).__init__()
+            self.Linear1 = torch.nn.Linear(nx, ny)
+            self.act = eval('torch.nn.' + 'Tanh' + '()')
+
+        def forward(self, x):
+            return self.act(self.Linear1(x))
+
+
+    # H = [32] # 512 inputs, 2 outputs structures:
+    # H = [81, 13]
+    # H = [128, 32, 8]
+    # H = [169, 56, 18, 6]
+
+    # H = [23] # 512 inputs, 2 outputs structures:
+    # H = [64, 8]
+    # H = [108, 23, 5]
+    # H = [147, 42, 12, 3]
+    # H = [181, 64, 23, 8, 3]
+    # H = [512, 108, 23, 5, 1]
+
+    # tsv = ['Tanh', 'LogSigmoid', 'Softsign', 'ELU']
+    # tsv = np.logspace(-4, -2, 11)
+    tsv = [[512, 23, 1], [512, 64, 8, 1], [512, 108, 23, 5, 1], [512, 147, 42, 12, 3, 1], [512, 181, 64, 23, 8, 3, 1]]
+    tsy = []
+
+    H = tsv[0]
+    class WAVE(torch.nn.Module):
+        def __init__(self, n):  # n = [512, 108, 23, 5, 1]
+            super(WAVE, self).__init__()
+            self.fc0 = LinearAct(n[0], n[1])
+            self.fc1 = torch.nn.Linear(n[1], n[2])
+        def forward(self, x):
+            return self.fc1(self.fc0(x))
+    tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
+
+    H = tsv[1]
+    class WAVE(torch.nn.Module):
+        def __init__(self, n):  # n = [512, 108, 23, 5, 1]
+            super(WAVE, self).__init__()
+            self.fc0 = LinearAct(n[0], n[1])
+            self.fc1 = LinearAct(n[1], n[2])
+            self.fc2 = torch.nn.Linear(n[2], n[3])
+        def forward(self, x):
+            return self.fc2(self.fc1(self.fc0(x)))
+    tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
+
+    H = tsv[2]
+    class WAVE(torch.nn.Module):
+        def __init__(self, n):  # n = [512, 108, 23, 5, 1]
+            super(WAVE, self).__init__()
+            self.fc0 = LinearAct(n[0], n[1])
+            self.fc1 = LinearAct(n[1], n[2])
+            self.fc2 = LinearAct(n[2], n[3])
+            self.fc3 = torch.nn.Linear(n[3], n[4])
+        def forward(self, x):
+            return self.fc3(self.fc2(self.fc1(self.fc0(x))))
+    tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
+
+    H = tsv[3]
+    class WAVE(torch.nn.Module):
+        def __init__(self, n):  # n = [512, 108, 23, 5, 1]
+            super(WAVE, self).__init__()
+            self.fc0 = LinearAct(n[0], n[1])
+            self.fc1 = LinearAct(n[1], n[2])
+            self.fc2 = LinearAct(n[2], n[3])
+            self.fc3 = LinearAct(n[3], n[4])
+            self.fc4 = torch.nn.Linear(n[4], n[5])
+        def forward(self, x):
+            return self.fc4(self.fc3(self.fc2(self.fc1(self.fc0(x)))))
+    tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
+
+    H = tsv[4]
+    class WAVE(torch.nn.Module):
+        def __init__(self, n):  # n = [512, 108, 23, 5, 1]
+            super(WAVE, self).__init__()
+            self.fc0 = LinearAct(n[0], n[1])
+            self.fc1 = LinearAct(n[1], n[2])
+            self.fc2 = LinearAct(n[2], n[3])
+            self.fc3 = LinearAct(n[3], n[4])
+            self.fc4 = LinearAct(n[4], n[5])
+            self.fc5 = torch.nn.Linear(n[5], n[6])
+        def forward(self, x):
+            return self.fc5(self.fc4(self.fc3(self.fc2(self.fc1(self.fc0(x))))))
+    tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
+
+    scipy.io.savemat(path + 'TS.shape' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))

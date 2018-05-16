@@ -27,13 +27,9 @@ def runexample(H, model, str):
     torch.manual_seed(1)
     path = 'data/'
     os.makedirs(path + 'models', exist_ok=True)
-    name = (data[:-4] + '%s%glr%geps%s' % (H[:], lr, eps, str)).replace(', ', '_').replace('[', '_').replace(']', '_')
+    device = torch.device('cuda:0' if cuda else 'cpu')
 
     tica = time.time()
-    device = torch.device('cuda:0' if cuda else 'cpu')
-    print('Running %s on %s\n%s' %
-          (name, device.type, torch.cuda.get_device_properties(0) if cuda else ''))
-
     if not os.path.isfile(path + data):
         import subprocess
         subprocess.call('wget -P data/ https://storage.googleapis.com/ultralytics/' + data, shell=True)
@@ -42,6 +38,9 @@ def runexample(H, model, str):
     y = mat['outputs'][:, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
     nz, nx = x.shape
     ny = y.shape[1]
+
+    name = (data[:-4] + '%s%glr%geps%s' % (H[:], lr, eps, str)).replace(', ', '.').replace('[', '_').replace(']', '_')
+    print('Running %s on %s\n%s' % (name, device.type, torch.cuda.get_device_properties(0) if cuda else ''))
 
     class LinearTanh(torch.nn.Module):
         def __init__(self, nx, ny):

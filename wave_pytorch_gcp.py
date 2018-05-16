@@ -154,7 +154,8 @@ def tslr():
     scipy.io.savemat(path + 'TS.lr' + '.mat', dict(tsv=tsv, tsy=tsy))
 
 
-def tsshape():
+if __name__ == '__main__':
+    # def tsshape():
     class LinearAct(torch.nn.Module):
         def __init__(self, nx, ny):
             super(LinearAct, self).__init__()

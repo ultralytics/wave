@@ -13,7 +13,6 @@ np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format}) 
 
 path = 'data/'
 
-
 def runexample(H, model, str, lr=0.001):
     epochs = 400
     validations = 5000
@@ -30,6 +29,8 @@ def runexample(H, model, str, lr=0.001):
     print('Running %s on %s\n%s' %
           (name, device.type, torch.cuda.get_device_properties(0) if cuda else ''))
 
+    print(path + data)
+    print(not os.path.isfile(path + data))
     if not os.path.isfile(path + data):
         os.system('wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
     mat = scipy.io.loadmat(path + data)

@@ -15,7 +15,7 @@ pathd = 'data/'
 pathr = 'results/'
 torch.manual_seed(1)
 
-def runexample(H, model, str, lr=0.001):
+def runexample(H, model, str, lr=0.001, amsgrad=False):
     epochs = 200000
     validations = 5000
     printInterval = 1000
@@ -119,7 +119,28 @@ def runexample(H, model, str, lr=0.001):
     return np.concatenate(([best[0]], np.array(loss), np.array(std.ravel())))
 
 
-def tsact():
+H = [512, 64, 8, 1]
+class LinearAct(torch.nn.Module):
+    def __init__(self, nx, ny):
+        super(LinearAct, self).__init__()
+        self.Linear1 = torch.nn.Linear(nx, ny)
+        self.act = torch.nn.Tanh()
+
+    def forward(self, x):
+         return self.act(self.Linear1(x))
+
+class WAVE(torch.nn.Module):
+    def __init__(self, n):  # n = [512, 108, 23, 5, 1]
+        super(WAVE, self).__init__()
+        self.fc0 = LinearAct(n[0], n[1])
+        self.fc1 = LinearAct(n[1], n[2])
+        self.fc2 = torch.nn.Linear(n[2], n[3])
+
+    def forward(self, x):
+        return self.fc2(self.fc1(self.fc0(x)))
+
+
+def tsact():  # TS activation function
     H = [512, 64, 8, 1]
     tsv = ['Tanh', 'LogSigmoid', 'Softsign', 'ELU']
     # tsv = np.logspace(-4,-2,11)
@@ -150,48 +171,25 @@ def tsact():
     scipy.io.savemat(pathr + 'TS.act2layer' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
 
 
-def tslr():
-    # if __name__ == '__main__':
-    H = [512, 64, 8, 1]
-    # tsv = ['Tanh', 'LogSigmoid', 'Softsign', 'ELU']
+def tslr():  # TS learning rate
     tsv = np.logspace(-5, -2, 13)
     tsy = []
-
     for a in tsv:
-        class LinearAct(torch.nn.Module):
-            def __init__(self, nx, ny):
-                super(LinearAct, self).__init__()
-                self.Linear1 = torch.nn.Linear(nx, ny)
-                self.act = torch.nn.Tanh()
-
-            def forward(self, x):
-                return self.act(self.Linear1(x))
-
-        class WAVE(torch.nn.Module):
-            def __init__(self, n):  # n = [512, 108, 23, 5, 1]
-                super(WAVE, self).__init__()
-                self.fc0 = LinearAct(n[0], n[1])
-                self.fc1 = LinearAct(n[1], n[2])
-                self.fc2 = torch.nn.Linear(n[2], n[3])
-
-            def forward(self, x):
-                return self.fc2(self.fc1(self.fc0(x)))
         for i in range(3):
             tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh'), lr=a))
     scipy.io.savemat(pathr + 'TS.lr' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
 
 
-def tsshape():
-    class LinearAct(torch.nn.Module):
-        def __init__(self, nx, ny):
-            super(LinearAct, self).__init__()
-            self.Linear1 = torch.nn.Linear(nx, ny)
-            self.act = torch.nn.Tanh()
-
-        def forward(self, x):
-            return self.act(self.Linear1(x))
+def tsams():  # TS AMSgrad
+    tsv = [False, True]
+    tsy = []
+    for a in tsv:
+        for i in range(3):
+            tsy.append( runexample(H, model=WAVE(H), str=('.TanhAMS' + str(a)), amsgrad=a) )
+    scipy.io.savemat(pathr + 'TS.AMSgrad' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
 
 
+def tsshape():  # TS network shape
     # H = [32] # 512 inputs, 2 outputs structures:
     # H = [81, 13]
     # H = [128, 32, 8]
@@ -273,9 +271,8 @@ def tsshape():
             return self.fc5(self.fc4(self.fc3(self.fc2(self.fc1(self.fc0(x))))))
     for i in range(3):
         tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
-
     scipy.io.savemat(pathr + 'TS.shape' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
-    # os.system('sleep 30s; sudo shutdown')
+
 
 if __name__ == '__main__':
-    tsact()
+    tsams()

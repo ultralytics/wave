@@ -120,9 +120,9 @@ def runexample(H, model, str, lr=0.001):
 
 def tslr():
     # if __name__ == '__main__':
-    H = [512, 108, 23, 5, 1]
+    H = [512, 64, 8, 1]
     # tsv = ['Tanh', 'LogSigmoid', 'Softsign', 'ELU']
-    tsv = np.logspace(-4, -2, 11)
+    tsv = np.logspace(-5, -2, 13)
     tsy = []
 
     for a in tsv:
@@ -140,11 +140,10 @@ def tslr():
                 super(WAVE, self).__init__()
                 self.fc0 = LinearAct(n[0], n[1])
                 self.fc1 = LinearAct(n[1], n[2])
-                self.fc2 = LinearAct(n[2], n[3])
-                self.fc3 = torch.nn.Linear(n[3], n[4])
+                self.fc2 = torch.nn.Linear(n[2], n[3])
 
             def forward(self, x):
-                return self.fc3(self.fc2(self.fc1(self.fc0(x))))
+                return self.fc2(self.fc1(self.fc0(x)))
         for i in range(3):
             tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh'), lr=a))
     scipy.io.savemat(path + 'TS.lr' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
@@ -247,4 +246,4 @@ def tsshape():
     # os.system('sleep 30s; sudo shutdown')
 
 if __name__ == '__main__':
-    tsshape()
+    tslr()

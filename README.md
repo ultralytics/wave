@@ -5,7 +5,7 @@
 This directory contains software developed by Ultralytics LLC. For more information on Ultralytics projects please visit:
 http://www.ultralytics.com  
 
-# WAVE
+# Description
 
 The https://github.com/ultralytics/wave repo contains **WA**veform **V**ector **E**xploitation code, a new method for particle physics detector readout and reconstruction based on Machine Learning and Deep Neural Networks.
 
@@ -19,7 +19,7 @@ Python 3.6 or later with the following packages installed:
 - ```tensorflow``` >= 1.8.0
 - ```plotly``` (optional)
 
-# Running WAVE
+# Running
 1. Install and/or upgrade requirements:
 
     ```pip3 install numpy scipy torch tensorflow plotly -U```

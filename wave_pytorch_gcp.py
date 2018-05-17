@@ -118,6 +118,37 @@ def runexample(H, model, str, lr=0.001):
     return np.concatenate(([best[0]], np.array(loss), np.array(std.ravel())))
 
 
+def tsact():
+    H = [512, 64, 8, 1]
+    tsv = ['Tanh', 'LogSigmoid', 'Softsign', 'ELU']
+    # tsv = np.logspace(-4,-2,11)
+    tsy = []
+
+    for a in tsv:
+        class LinearAct(torch.nn.Module):
+            def __init__(self, nx, ny):
+                super(LinearAct, self).__init__()
+                self.Linear1 = torch.nn.Linear(nx, ny)
+                self.act = eval('torch.nn.' + a + '()')
+
+            def forward(self, x):
+                return self.act(self.Linear1(x))
+
+        class WAVE(torch.nn.Module):
+            def __init__(self, n):  # n = [512, 108, 23, 5, 1]
+                super(WAVE, self).__init__()
+                self.fc0 = LinearAct(n[0], n[1])
+                self.fc1 = LinearAct(n[1], n[2])
+                self.fc2 = torch.nn.Linear(n[2], n[3])
+
+            def forward(self, x):
+                return self.fc2(self.fc1(self.fc0(x)))
+
+        for i in range(3):
+            tsy.append(runexample(H, model=WAVE(H), str=('.' + a)))
+    scipy.io.savemat(path + 'TS.act2layer' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
+
+
 def tslr():
     # if __name__ == '__main__':
     H = [512, 64, 8, 1]
@@ -130,7 +161,7 @@ def tslr():
             def __init__(self, nx, ny):
                 super(LinearAct, self).__init__()
                 self.Linear1 = torch.nn.Linear(nx, ny)
-                self.act = eval('torch.nn.' + 'Tanh' + '()')
+                self.act = torch.nn.Tanh()
 
             def forward(self, x):
                 return self.act(self.Linear1(x))
@@ -154,7 +185,7 @@ def tsshape():
         def __init__(self, nx, ny):
             super(LinearAct, self).__init__()
             self.Linear1 = torch.nn.Linear(nx, ny)
-            self.act = eval('torch.nn.' + 'Tanh' + '()')
+            self.act = torch.nn.Tanh()
 
         def forward(self, x):
             return self.act(self.Linear1(x))
@@ -246,4 +277,4 @@ def tsshape():
     # os.system('sleep 30s; sudo shutdown')
 
 if __name__ == '__main__':
-    tslr()
+    tsact()

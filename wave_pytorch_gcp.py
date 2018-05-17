@@ -15,7 +15,7 @@ path = 'data/'
 torch.manual_seed(1)
 
 def runexample(H, model, str, lr=0.001):
-    epochs = 100
+    epochs = 200000
     validations = 5000
     printInterval = 1000
     # batch_size = 10000

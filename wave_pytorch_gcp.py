@@ -11,7 +11,8 @@ from functions import *
 torch.set_printoptions(linewidth=320, precision=8)
 np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format})  # format short g, %precision=5
 
-path = 'data/'
+pathd = 'data/'
+pathr = 'results/'
 torch.manual_seed(1)
 
 def runexample(H, model, str, lr=0.001):
@@ -22,7 +23,7 @@ def runexample(H, model, str, lr=0.001):
     data = 'wavedata25ns.mat'
 
     cuda = torch.cuda.is_available()
-    os.makedirs(path + 'models', exist_ok=True)
+    os.makedirs(pathr + 'models', exist_ok=True)
     name = (data[:-4] + '%s%glr%s' % (H[:], lr, str)).replace(', ', '.').replace('[', '_').replace(']', '_')
 
     tica = time.time()
@@ -30,9 +31,9 @@ def runexample(H, model, str, lr=0.001):
     print('Running %s on %s\n%s' %
           (name, device.type, torch.cuda.get_device_properties(0) if cuda else ''))
 
-    if not os.path.isfile(path + data):
+    if not os.path.isfile(pathd + data):
         os.system('wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
-    mat = scipy.io.loadmat(path + data)
+    mat = scipy.io.loadmat(pathd + data)
     x = mat['inputs']  # inputs (nx512) [waveform1 waveform2]
     y = mat['outputs'][:, 1:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
     nz, nx = x.shape
@@ -84,7 +85,7 @@ def runexample(H, model, str, lr=0.001):
                 break
 
         if i % printInterval == 0:  # print and save progress
-            # scipy.io.savemat(path + name + '.mat', dict(bestepoch=best[0], loss=L[best[0]], L=L, name=name))
+            # scipy.io.savemat(pathr + name + '.mat', dict(bestepoch=best[0], loss=L[best[0]], L=L, name=name))
             _, std = stdpt(y_predv - yv, ys)
             print('%.3fs' % (time.time() - ticb), i, L[i], std)
             ticb = time.time()
@@ -95,7 +96,7 @@ def runexample(H, model, str, lr=0.001):
         optimizer.step()
     else:
         print('WARNING: Validation loss still decreasing after %g epochs (train longer).' % (i + 1))
-    #torch.save(best[2], path + 'models/' + name + '.pt')
+    #torch.save(best[2], pathr + 'models/' + name + '.pt')
     model.load_state_dict(best[2])
     dt = time.time() - tica
 
@@ -104,8 +105,8 @@ def runexample(H, model, str, lr=0.001):
     for i, (xi, yi) in enumerate(((x, y), (xv, yv), (xt, yt))):
         loss[i], std[i] = stdpt(model(xi) - yi, ys)
         print('%.5f %s %s' % (loss[i], std[i, :], labels[i]))
-    # scipy.io.savemat(path + name + '.mat', dict(bestepoch=best[0], loss=loss, std=std, L=L, name=name))
-    # files.download(path + name + '.mat')
+    # scipy.io.savemat(pathr + name + '.mat', dict(bestepoch=best[0], loss=loss, std=std, L=L, name=name))
+    # files.download(pathr + name + '.mat')
 
     # data = []
     # for i, s in enumerate(labels):
@@ -146,7 +147,7 @@ def tsact():
 
         for i in range(3):
             tsy.append(runexample(H, model=WAVE(H), str=('.' + a)))
-    scipy.io.savemat(path + 'TS.act2layer' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
+    scipy.io.savemat(pathr + 'TS.act2layer' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
 
 
 def tslr():
@@ -177,7 +178,7 @@ def tslr():
                 return self.fc2(self.fc1(self.fc0(x)))
         for i in range(3):
             tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh'), lr=a))
-    scipy.io.savemat(path + 'TS.lr' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
+    scipy.io.savemat(pathr + 'TS.lr' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
 
 
 def tsshape():
@@ -273,7 +274,7 @@ def tsshape():
     for i in range(3):
         tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
 
-    scipy.io.savemat(path + 'TS.shape' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
+    scipy.io.savemat(pathr + 'TS.shape' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
     # os.system('sleep 30s; sudo shutdown')
 
 if __name__ == '__main__':

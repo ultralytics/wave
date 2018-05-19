@@ -166,7 +166,7 @@ def tsact():  # TS activation function
             def forward(self, x):
                 return self.fc2(self.fc1(self.fc0(x)))
 
-        for i in range(3):
+        for i in range(10):
             tsy.append(runexample(H, model=WAVE(H), str=('.' + a)))
     scipy.io.savemat(pathr + 'TS.act2layer' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
 

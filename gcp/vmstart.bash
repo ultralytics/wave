@@ -6,7 +6,6 @@
 rm -rf data
 rm -rf results
 rm -rf wave
-rm -rf nohup.out
 
 # 1. unmount, delete, and remount Google Drive
 fusermount -u drive
@@ -25,7 +24,7 @@ wget -P data https://storage.googleapis.com/ultralytics/wavedata25ns.mat
 
 # 4a. Run python and then copy results to drive
 # python3 wave/wave_pytorch_gcp.py; 
-python3 -c 'import sys; sys.path.append("/home/glenn_jocher1/wave"); import wave_pytorch_gcp as a; a.tsams()'
+python3 -c 'import sys; sys.path.append("/home/glenn_jocher1/wave"); import wave_pytorch_gcp as a; a.tsact()'
 cp -r results/. drive/data  #copy results to fused Google Drive
 
 # 4b. OR cd drive and then run python:

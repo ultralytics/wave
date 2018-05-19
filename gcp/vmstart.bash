@@ -33,4 +33,6 @@ cp -r results/. drive/data  #copy results to fused Google Drive
 
 # 5. Shut off instance
 sleep 10s  # to allow Google Drive to sync
+
+rm vmstart.bash
 sudo shutdown

@@ -42,7 +42,7 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     x, _, _ = normalize(x, 1)  # normalize each input row
     y, ymu, ys = normalize(y, 0)  # normalize each output column
     x, y = torch.Tensor(x), torch.Tensor(y)
-    x, y, xv, yv, xt, yt = splitdata(x, y, train=0.70, validate=0.15, test=0.15, shuffle=False)
+    x, y, xv, yv, xt, yt = splitdata(x, y, train=0.70, validate=0.15, test=0.15, shuffle=True)
     labels = ['train', 'validate', 'test']
 
     # train_dataset = data_utils.TensorDataset(x, y)

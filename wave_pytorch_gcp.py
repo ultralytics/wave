@@ -175,7 +175,7 @@ def tslr():  # TS learning rate
     tsv = np.logspace(-5, -2, 13)
     tsy = []
     for a in tsv:
-        for i in range(3):
+        for i in range(10):
             tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh'), lr=a))
     scipy.io.savemat(pathr + 'TS.lr' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
 

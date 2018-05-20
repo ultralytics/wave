@@ -78,7 +78,7 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
         loss = criteria(y_pred, y)
         L[i, 0] = loss.item()  # / y.numel()  # train
         L[i, 1] = criteria(y_predv, yv).item()  # / yv.numel()  # validate
-        L[i, 2] = criteria(model(xt), yt).item()  # / yv.numel()  # test
+        #L[i, 2] = criteria(model(xt), yt).item()  # / yv.numel()  # test
 
         if i > validations:  # validation checks
             if L[i, 1] < best[1]:

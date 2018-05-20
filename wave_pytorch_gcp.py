@@ -269,7 +269,7 @@ def tsshape():  # TS network shape
             self.fc5 = torch.nn.Linear(n[5], n[6])
         def forward(self, x):
             return self.fc5(self.fc4(self.fc3(self.fc2(self.fc1(self.fc0(x))))))
-    for i in range(3):
+    for i in range(10):
         tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
     scipy.io.savemat(pathr + 'TS.shape' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
 

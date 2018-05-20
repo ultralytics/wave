@@ -215,7 +215,7 @@ def tsshape():  # TS network shape
             self.fc1 = torch.nn.Linear(n[1], n[2])
         def forward(self, x):
             return self.fc1(self.fc0(x))
-    for i in range(3):
+    for i in range(10):
         tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
 
     H = tsv[1]
@@ -227,7 +227,7 @@ def tsshape():  # TS network shape
             self.fc2 = torch.nn.Linear(n[2], n[3])
         def forward(self, x):
             return self.fc2(self.fc1(self.fc0(x)))
-    for i in range(3):
+    for i in range(10):
         tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
 
     H = tsv[2]
@@ -240,7 +240,7 @@ def tsshape():  # TS network shape
             self.fc3 = torch.nn.Linear(n[3], n[4])
         def forward(self, x):
             return self.fc3(self.fc2(self.fc1(self.fc0(x))))
-    for i in range(3):
+    for i in range(10):
         tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
 
     H = tsv[3]
@@ -254,7 +254,7 @@ def tsshape():  # TS network shape
             self.fc4 = torch.nn.Linear(n[4], n[5])
         def forward(self, x):
             return self.fc4(self.fc3(self.fc2(self.fc1(self.fc0(x)))))
-    for i in range(3):
+    for i in range(10):
         tsy.append(runexample(H, model=WAVE(H), str=('.' + 'Tanh')))
 
     H = tsv[4]

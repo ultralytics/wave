@@ -1,11 +1,9 @@
+import copy
 import os
 import time
-import copy
 
 import scipy.io
 import torch
-from plotly.offline import plot
-import plotly.graph_objs as go
 
 from functions import *
 
@@ -48,10 +46,10 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     x, y, xv, yv, xt, yt = splitdata(x, y, train=0.70, validate=0.15, test=0.15, shuffle=False)
     labels = ['train', 'validate', 'test']
 
-    # train_dataset = data_utils.TensorDataset(x, y)
-    # test_dataset = data_utils.TensorDataset(xt, yt)
-    # train_loader = data_utils.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
-    # test_loader = data_utils.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
+    # train_dataset = torch.utils.data.TensorDataset(x, y)
+    # test_dataset = torch.utils.data.TensorDataset(xt, yt)
+    # train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
+    # test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 
     print(model)
     if cuda:
@@ -63,6 +61,7 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     criteria = torch.nn.MSELoss(size_average=True)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=amsgrad)
 
+    model.train()
     ticb = time.time()
     L = np.full((epochs, 3), np.nan)
     best = (0, 1E6, model.state_dict())  # best (epoch, validation loss, model)
@@ -70,15 +69,14 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
         # for j, (xj, yj) in enumerate(train_loader):
         #    print(xj.shape,time.time() - tic)
 
-        # Forward pass: Compute predicted y by passing x to the model
         y_pred = model(x)
         y_predv = model(xv)
 
-        # Compute and print loss
-        loss = criteria(y_pred, y)
+        # loss
+        loss = criteria(y_pred, y)  # / y.numel()
         L[i, 0] = loss.item()  # / y.numel()  # train
         L[i, 1] = criteria(y_predv, yv).item()  # / yv.numel()  # validate
-        #L[i, 2] = criteria(model(xt), yt).item()  # / yv.numel()  # test
+        # L[i, 2] = criteria(model(xt), yt).item() / yv.numel()  # test
 
         if i > validations:  # validation checks
             if L[i, 1] < best[1]:
@@ -87,13 +85,13 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
                 print('\n%g validation checks exceeded at epoch %g.' % (validations, i))
                 break
 
-        if i % printInterval == 0:  # print and save progress
+        if i % printInterval == 0:
             # scipy.io.savemat(pathr + name + '.mat', dict(bestepoch=best[0], loss=L[best[0]], L=L, name=name))
             _, std = stdpt(y_predv - yv, ys)
             print('%.3fs' % (time.time() - ticb), i, L[i], std)
             ticb = time.time()
 
-        # Zero gradients, perform a backward pass, and update the weights.
+        # Zero gradients, perform a backward pass, update parameters
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -103,6 +101,7 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     model.load_state_dict(best[2])
     dt = time.time() - tica
 
+    model.eval()
     print('\nFinished %g epochs in %.3fs (%.3f epochs/s)\nBest results from epoch %g:' % (i + 1, dt, i / dt, best[0]))
     loss, std = np.zeros(3), np.zeros((3, ny))
     for i, (xi, yi) in enumerate(((x, y), (xv, yv), (xt, yt))):
@@ -143,10 +142,9 @@ class WAVE(torch.nn.Module):
         self.fc2 = torch.nn.Linear(n[2], n[3])
 
     def forward(self, x):
-        return self.fc2(self.fc1(self.fc0(x)))
-
-
-
+        x = self.fc0(x)
+        x = self.fc1(x)
+        return self.fc2(x)
 
 
 if __name__ == '__main__':

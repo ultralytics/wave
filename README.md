@@ -11,32 +11,19 @@ The https://github.com/ultralytics/wave repo contains **WA**veform **V**ector **
 
 # Requirements
 
-Python 3.6 or later with the following packages installed:  
+Python 3.6 or later with the following `pip3 install -U -r requirements.txt` packages:
 
-- ```numpy```
-- ```scipy```
-- ```pytorch``` >= 0.4.0
-- ```tensorflow``` >= 1.8.0
-- ```plotly``` (optional)
+
+- `numpy`
+- `scipy`
+- `pytorch` >= 0.4.0
+- `tensorflow` >= 1.8.0
+- `plotly` (optional)
 
 # Running
-1. Install and/or upgrade requirements:
-
-    ```pip3 install numpy scipy torch tensorflow plotly -U```
-    
-    or
-    
-    ```pip3 install -U -r requirements.txt```
-
-2. Run WAVE in pytorch:
-
-    ```wave_pytorch.py``` 
-
-    or tensorflow:
-
-    ```wave_tfeager.py```
-
-3. Fit particles better :)
+- WAVE in pytorch: `wave_pytorch.py` 
+- WAVE in tensorflow: `wave_tf.py`
+- WAVE in pytorch on Google Cloud Platform: `gcp/wave_pytorch_gcp.py`
 
 ![Alt](https://github.com/University-of-Hawaii-Physics/mtc/blob/master/Analysis/Ultralytics/mtcview.png "mtcView")
 ![Alt](https://github.com/ultralytics/wave/blob/master/data/wave.png "training")

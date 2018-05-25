@@ -161,6 +161,27 @@ def tsact():  # TS activation function
             tsy.append(runexample(H, model=WAVE(H), str=('.' + a)))
     scipy.io.savemat(pathr + 'TS.acthardtanh' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
 
+def tsnoact():  # TS activation function
+    H = [512, 64, 8, 1]
+    tsv = ['NoAct']#['Tanh', 'LogSigmoid', 'Softsign', 'ELU']
+    # tsv = np.logspace(-4,-2,11)
+    tsy = []
+
+    for a in tsv:
+        class WAVE(torch.nn.Module):
+            def __init__(self, n):  # n = [512, 108, 23, 5, 1]
+                super(WAVE, self).__init__()
+                self.fc0 = torch.nn.Linear(n[0], n[1])
+                self.fc1 = torch.nn.Linear(n[1], n[2])
+                self.fc2 = torch.nn.Linear(n[2], n[3])
+
+            def forward(self, x):
+                return self.fc2(self.fc1(self.fc0(x)))
+
+        for i in range(10):
+            tsy.append(runexample(H, model=WAVE(H), str=('.' + a)))
+    scipy.io.savemat(pathr + 'TS.noact' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
+
 
 def tslr():  # TS learning rate
     tsv = np.logspace(-5, -2, 13)
@@ -266,4 +287,5 @@ def tsshape():  # TS network shape
 
 
 if __name__ == '__main__':
+    tsnoact()
     tsact()

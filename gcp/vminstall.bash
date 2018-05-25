@@ -1,6 +1,7 @@
 #!/bin/bash
-# Run this script on a brand new GCP VM. Recommend Ubuntu 17.10, 20 GB Persistent disk, P100 GPU, Skylake CPU.
+# Run this script on a brand new GCP VM. Recommend Ubuntu 18.04 LTS, 15 GB Persistent SSD, P100 GPU, Skylake CPU.
 sudo apt update -y
+sudo apt autoremove -y
 
 # Install Drive FUSE wrapper. https://github.com/astrada/google-drive-ocamlfuse
 sudo apt install -y software-properties-common
@@ -19,30 +20,28 @@ sudo apt install -y git
 sudo apt install -y python3-pip
 
 # Install Python Packages
-pip3 install http://download.pytorch.org/whl/cu90/torch-0.4.0-cp36-cp36m-linux_x86_64.whl  # PYTORCH FOR CUDA 9 is it necessary?
-pip3 install -U numpy scipy tensorflow plotly  # wave
-pip3 install -U torchvision opencv-python exifread bokeh  # velocity
-# pip3 install virtualenv
+# pip3 install http://download.pytorch.org/whl/cu90/torch-0.4.0-cp36-cp36m-linux_x86_64.whl  # PYTORCH FOR CUDA 9 is it necessary?
+pip3 install http://download.pytorch.org/whl/cu91/torch-0.4.0-cp36-cp36m-linux_x86_64.whl
+pip3 install torchvision
+
+pip3 install -U numpy scipy tensorflow # plotly  # wave
+pip3 install -U opencv-python exifread # bokeh  # velocity
 
 
-# GPU DRIVER INSTALL https://cloud.google.com/compute/docs/gpus/add-gpus#install-driver-script
-echo "Checking for CUDA and installing."
-# Check for CUDA and try to install.
-if ! dpkg-query -W cuda-9-0; then
-# The 17.04 installer works with 17.10.
-curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1704/x86_64/cuda-repo-ubuntu1704_9.0.176-1_amd64.deb
-sudo dpkg -i ./cuda-repo-ubuntu1704_9.0.176-1_amd64.deb
-sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1704/x86_64/7fa2af80.pub
-sudo apt-get update
-sudo apt-get install cuda-9-0 -y
-fi
-sudo nvidia-smi -pm 1  # Enable persistence mode
-nvidia-smi  # print GPU info to screen
+# GPU driver install P100 and K80
+sudo apt install ubuntu-drivers-common -y
+sudo ubuntu-drivers autoinstall
 
+# GPU driver install V100
+#https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=1710&target_type=debnetwork
+#sudo dpkg -i cuda-repo-ubuntu1710_9.2.88-1_amd64.deb
+#sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1710/x86_64/7fa2af80.pub
+#sudo apt-get update -y
+#sudo apt-get install -y cuda
 
 # Shutdown
 rm -rf vminstall.bash
-sudo shutdown
+sudo shutdown now
 
 
 # Extras

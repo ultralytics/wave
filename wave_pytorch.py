@@ -13,14 +13,57 @@ np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format}) 
 
 pathd = 'data/'
 pathr = 'results/'
+labels = ['train', 'validate', 'test']
 torch.manual_seed(1)
 
 
-def runexample(H, model, str, lr=0.001, amsgrad=False):
-    epochs = 200000
-    validations = 5000
-    printInterval = 1000
-    # batch_size = 10000
+class patienceTerminator(object):
+    def __init__(self, mode='min', factor=0.1, patience=10,
+                 verbose=False, threshold=1e-4, threshold_mode='rel',
+                 cooldown=0, min_lr=0, eps=1e-8):
+        #super(patienceTerminator, self).__init__()
+        self.patience = patience
+        self.verbose = verbose
+        self.mode = mode
+        self.threshold = threshold
+        self.threshold_mode = threshold_mode
+        self.best = float('inf')
+        self.num_bad_epochs = None
+        self.is_better = None
+        self.eps = eps
+        self.last_epoch = -1
+        # self._init_is_better(mode=mode, threshold=threshold,
+        #                     threshold_mode=threshold_mode)
+        self._reset()
+
+    def _reset(self):
+        """Resets num_bad_epochs counter and cooldown counter."""
+        self.best = float('inf')
+        self.num_bad_epochs = 0
+
+    def step(self, metrics, epoch=None):
+        current = metrics.item()
+        if epoch is None:
+            epoch = self.last_epoch = self.last_epoch + 1
+        self.last_epoch = epoch
+
+        if current < self.best:
+            self.best = current
+            self.num_bad_epochs = 0
+        else:
+            self.num_bad_epochs += 1
+
+        if self.num_bad_epochs > self.patience:
+            print('\n%g patience exceeded at epoch %g.' % (self.patience, epoch))
+            return True
+        else:
+            return False
+
+
+def runexample(H, model, str, lr=0.005, amsgrad=False):
+    epochs = 20
+    validations = 2000
+    printInterval = 1
     data = 'wavedata25ns.mat'
 
     cuda = torch.cuda.is_available()
@@ -44,7 +87,6 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     y, ymu, ys = normalize(y, 0)  # normalize each output column
     x, y = torch.Tensor(x), torch.Tensor(y)
     x, y, xv, yv, xt, yt = splitdata(x, y, train=0.70, validate=0.15, test=0.15, shuffle=False)
-    labels = ['train', 'validate', 'test']
 
     # train_dataset = torch.utils.data.TensorDataset(x, y)
     # test_dataset = torch.utils.data.TensorDataset(xt, yt)
@@ -60,63 +102,88 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     # criteria and optimizer
     criteria = torch.nn.MSELoss(size_average=True)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=amsgrad)
+    # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
+    stopper = patienceTerminator(patience=1000)
 
     model.train()
+    modelb = copy.deepcopy(model)
+    modeltwice = copy.deepcopy(model)
+    modelhalf = copy.deepcopy(model)
+
     ticb = time.time()
     L = np.full((epochs, 3), np.nan)
-    best = (0, 1E6, model.state_dict())  # best (epoch, validation loss, model)
+    best = (0, 1E16)  # best (epoch, validation loss)
     for i in range(epochs):
         # for j, (xj, yj) in enumerate(train_loader):
         #    print(xj.shape,time.time() - tic)
+
+        if i > 0:
+            pb = []
+            for param in model.parameters():
+                pb.append(copy.deepcopy(param.data))
+
+            with torch.no_grad():
+                for j, param in enumerate(modeltwice.parameters()):
+                    param.data = pa[j] + (pb[j] - pa[j]) * 1.5
+                for j, param in enumerate(modelhalf.parameters()):
+                    param.data = pa[j] + (pb[j] - pa[j]) / 1.5
+
+        loss = criteria(model(x), y).item()
+        losstwice = criteria(modeltwice(x), y).item()
+        losshalf = criteria(modelhalf(x), y).item()
+        # print(loss, losstwice, losshalf)
+
+        if (losstwice < loss) & (losstwice < losshalf):
+            model.load_state_dict(modeltwice.state_dict())
+        elif losshalf < loss:
+            model.load_state_dict(modelhalf.state_dict())
 
         y_pred = model(x)
         y_predv = model(xv)
 
         # loss
-        loss = criteria(y_pred, y)  # / y.numel()
-        L[i, 0] = loss.item()  # / y.numel()  # train
-        L[i, 1] = criteria(y_predv, yv).item()  # / yv.numel()  # validate
-        # L[i, 2] = criteria(model(xt), yt).item() / yv.numel()  # test
+        loss = criteria(y_pred, y)
+        lossv = criteria(y_predv, yv)
+        L[i, 0] = loss.item()  # train
+        L[i, 1] = lossv.item()  # validate
+        # scheduler.step(lossv)
+        stopper.step(lossv)
 
         if i > validations:  # validation checks
             if L[i, 1] < best[1]:
-                best = (i, L[i, 1], copy.deepcopy(model.state_dict()))
+                modelb.load_state_dict(model.state_dict())
+                best = (i, L[i, 1])
             if (i - best[0]) > validations:
                 print('\n%g validation checks exceeded at epoch %g.' % (validations, i))
                 break
 
         if i % printInterval == 0:
-            # scipy.io.savemat(pathr + name + '.mat', dict(bestepoch=best[0], loss=L[best[0]], L=L, name=name))
-            _, std = stdpt(y_predv - yv, ys)
-            print('%.3fs' % (time.time() - ticb), i, L[i], std)
+            std = (y_predv - yv).std(0).detach().item() * ys
+            print('%.3fs' % (time.time() - ticb), i, L[i, 0:2], std)
             ticb = time.time()
 
         # Zero gradients, perform a backward pass, update parameters
+        pa = []
+        for param in model.parameters():
+            pa.append(copy.deepcopy(param.data))
+
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
     else:
         print('WARNING: Validation loss still decreasing after %g epochs (train longer).' % (i + 1))
     # torch.save(best[2], pathr + 'models/' + name + '.pt')
-    model.load_state_dict(best[2])
     dt = time.time() - tica
+    epochs = i
 
-    model.eval()
+    modelb.eval()
     print('\nFinished %g epochs in %.3fs (%.3f epochs/s)\nBest results from epoch %g:' % (i + 1, dt, i / dt, best[0]))
     loss, std = np.zeros(3), np.zeros((3, ny))
     for i, (xi, yi) in enumerate(((x, y), (xv, yv), (xt, yt))):
-        loss[i], std[i] = stdpt(model(xi) - yi, ys)
+        loss[i], std[i] = stdpt(modelb(xi) - yi, ys)
         print('%.5f %s %s' % (loss[i], std[i, :], labels[i]))
     scipy.io.savemat(pathr + name + '.mat', dict(bestepoch=best[0], loss=loss, std=std, L=L, name=name))
     # files.download(pathr + name + '.mat')
-
-    # data = []
-    # for i, s in enumerate(labels):
-    #   data.append(go.Scatter(x=np.arange(epochs), y=L[:, i], mode='markers+lines', name=s))
-    # layout = go.Layout(xaxis=dict(type='linear', autorange=True),
-    #                  yaxis=dict(type='log', autorange=True))
-    # configure_plotly_browser_state()
-    # iplot(go.Figure(data=data, layout=layout))
 
     return np.concatenate(([best[0]], np.array(loss), np.array(std.ravel())))
 

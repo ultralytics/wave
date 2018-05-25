@@ -45,11 +45,6 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     x, y, xv, yv, xt, yt = splitdata(x, y, train=0.70, validate=0.15, test=0.15, shuffle=True)
     labels = ['train', 'validate', 'test']
 
-    # train_dataset = data_utils.TensorDataset(x, y)
-    # test_dataset = data_utils.TensorDataset(xt, yt)
-    # train_loader = data_utils.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
-    # test_loader = data_utils.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
-
     print(model)
     if cuda:
         x, xv, xt = x.cuda(), xv.cuda(), xt.cuda()
@@ -64,10 +59,6 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     L = np.full((epochs, 3), np.nan)
     best = (0, 1E6, model.state_dict())  # best (epoch, validation loss, model)
     for i in range(epochs):
-        # for j, (xj, yj) in enumerate(train_loader):
-        #    print(xj.shape,time.time() - tic)
-
-        # Forward pass: Compute predicted y by passing x to the model
         y_pred = model(x)
         y_predv = model(xv)
 
@@ -142,7 +133,7 @@ class WAVE(torch.nn.Module):
 
 def tsact():  # TS activation function
     H = [512, 64, 8, 1]
-    tsv = ['Tanh', 'LogSigmoid', 'Softsign', 'ELU']
+    tsv = ['Hardtanh']#['Tanh', 'LogSigmoid', 'Softsign', 'ELU']
     # tsv = np.logspace(-4,-2,11)
     tsy = []
 
@@ -168,7 +159,7 @@ def tsact():  # TS activation function
 
         for i in range(10):
             tsy.append(runexample(H, model=WAVE(H), str=('.' + a)))
-    scipy.io.savemat(pathr + 'TS.act2layer' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
+    scipy.io.savemat(pathr + 'TS.acthardtanh' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
 
 
 def tslr():  # TS learning rate
@@ -275,4 +266,4 @@ def tsshape():  # TS network shape
 
 
 if __name__ == '__main__':
-    tsams()
+    tsact()

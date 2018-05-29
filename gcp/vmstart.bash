@@ -29,7 +29,7 @@ python3 -c 'import sys;
 sys.path.append("/home/glenn_jocher1/wave");
 sys.path.append("/home/glenn_jocher1/wave/gcp");
 import wave_pytorch_gcp as a; a.tsnoact()'
-cp -r results/. drive/data  #copy results to fused Google Drive
+cp -r results/. drive/results  #copy results to fused Google Drive
 
 # 4b. OR cd drive and then run python:
 # cd drive

@@ -14,7 +14,7 @@ np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format}) 
 
 
 class patienceStopper(object):
-    def __init__(self, patience=10, verbose=True, epochs=1000, printerval=10):
+    def __init__(self, patience=10, verbose=True, epochs=1000, printerval=10, spa_start=10):
         self.patience = patience
         self.verbose = verbose
         self.bestepoch = 0
@@ -25,6 +25,8 @@ class patienceStopper(object):
         self.t0 = time.time()
         self.t = self.t0
         self.printerval = printerval
+        self.spa_start_epoch = spa_start
+        self.spamodel = None
 
     def reset(self):
         self.bestloss = float('inf')
@@ -48,6 +50,18 @@ class patienceStopper(object):
                     self.bestmodel.load_state_dict(model.state_dict())  # faster than deepcopy
                 else:
                     self.bestmodel = copy.deepcopy(model)
+
+        wa = self.epoch - self.spa_start_epoch + 1  # weight a
+        if wa > 0:
+            if self.spamodel:
+                a = self.spamodel.state_dict()
+                b = model.state_dict()
+                wb = 1
+                for key in a:
+                    a[key] = (a[key] * wa + b[key] * wb) / (wa + wb)
+                self.spamodel.load_state_dict(a)
+            else:
+                self.spamodel = copy.deepcopy(model)
 
         if self.num_bad_epochs > self.patience:
             self.final('%g Patience exceeded at epoch %g.' % (self.patience, self.epoch))
@@ -90,7 +104,8 @@ torch.manual_seed(1)
 def runexample(H, model, str, lr=0.001, amsgrad=False):
     epochs = 50000
     patience = 3000
-    printerval = 1000
+    spa_start = 20
+    printerval = 1
     data = 'wavedata25ns.mat'
 
     cuda = torch.cuda.is_available()
@@ -115,32 +130,36 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     x, y, xv, yv, xt, yt = splitdata(x, y, train=0.70, validate=0.15, test=0.15, shuffle=False)
 
     if cuda:
-        x, xv, xt = x.cuda(), xv.cuda(), xt.cuda()
-        y, yv, yt = y.cuda(), yv.cuda(), yt.cuda()
+        x, xv, xt = x.to(device), xv.to(device), xt.to(device)
+        y, yv, yt = y.to(device), yv.to(device), yt.to(device)
         if torch.cuda.device_count() > 1:
             model = torch.nn.DataParallel(model)
-        model = model.cuda()
+        model = model.to(device)
 
     # criteria and optimizer
     criteria = torch.nn.MSELoss(size_average=True)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=amsgrad)
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
-    stopper = patienceStopper(epochs=epochs, patience=patience, printerval=printerval)
+    stopper = patienceStopper(epochs=epochs, patience=patience, printerval=printerval, spa_start=spa_start)
 
     model.train()
     L = np.full((epochs, 3), np.nan)
     for i in range(epochs):
-        y_pred = model(x)
-        y_predv = model(xv)
+        yv_ = model(xv)
 
-        loss = criteria(y_pred, y)
-        lossv = criteria(y_predv, yv)
+        loss = criteria(model(x), y)
+        lossv = criteria(yv_, yv)
         L[i, 0] = loss.item()  # train
         L[i, 1] = lossv.item()  # validate
         # scheduler.step(lossv)
 
         if i % printerval == 0:
-            std = (y_predv - yv).std(0).detach().cpu().numpy() * ys
+            std = (yv_ - yv).std(0).detach().cpu().numpy() * ys
+            if i > spa_start:
+                yv_spa = stopper.spamodel(xv)
+                lossv_spa = criteria(yv_spa, yv).item()
+                std_spa = (yv_spa - yv).std(0).detach().cpu().numpy() * ys
+                std = np.concatenate((std, [lossv_spa], std_spa))
 
         if stopper.step(lossv, model=model, metrics=std):
             break
@@ -156,10 +175,10 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     for i, (xi, yi) in enumerate(((x, y), (xv, yv), (xt, yt))):
         loss[i], std[i] = stdpt(stopper.bestmodel(xi) - yi, ys)
         print('%.5f %s %s' % (loss[i], std[i, :], labels[i]))
-    scipy.io.savemat(pathr + name + '.mat', dict(bestepoch=stopper.best, loss=loss, std=std, L=L, name=name))
+    scipy.io.savemat(pathr + name + '.mat', dict(bestepoch=stopper.bestloss, loss=loss, std=std, L=L, name=name))
     # files.download(pathr + name + '.mat')
 
-    return np.concatenate(([stopper.best], np.array(loss), np.array(std.ravel())))
+    return np.concatenate(([stopper.bestloss], np.array(loss), np.array(std.ravel())))
 
 
 H = [512, 64, 8, 1]

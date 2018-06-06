@@ -29,17 +29,17 @@ pip3 install -U opencv-python exifread # bokeh  # velocity
 
 
 # GPU driver install P100 and K80
-#sudo apt install ubuntu-drivers-common -y
-#sudo ubuntu-drivers autoinstall
+sudo apt install ubuntu-drivers-common -y
+sudo ubuntu-drivers autoinstall
 
-# GPU driver install V100
-#https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=1710&target_type=debnetwork
-curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1710/x86_64/cuda-repo-ubuntu1710_9.2.88-1_amd64.deb
-sudo dpkg -i cuda-repo-ubuntu1710_9.2.88-1_amd64.deb
-sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1710/x86_64/7fa2af80.pub
-sudo apt-get update -y
-sudo apt-get install -y cuda
-sudo nvidia-smi -pm 1
+## GPU driver install V100
+##https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=1710&target_type=debnetwork
+#curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1710/x86_64/cuda-repo-ubuntu1710_9.2.88-1_amd64.deb
+#sudo dpkg -i cuda-repo-ubuntu1710_9.2.88-1_amd64.deb
+#sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1710/x86_64/7fa2af80.pub
+#sudo apt-get update -y
+#sudo apt-get install -y cuda
+#sudo nvidia-smi -pm 1
 
 # Shutdown
 sudo apt autoremove -y

@@ -4,6 +4,7 @@ import time
 
 import scipy.io
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 
 from functions import *
@@ -74,9 +75,26 @@ class patienceStopper(object):
 
     def first(self, model):
         if model:
+            shapes = [list(x.shape) for x in model.parameters()]
+            counts = [x.numel() for x in model.parameters()]
+            grad = [x.requires_grad for x in model.parameters()]
+            ng = len(shapes)  # groups
+            nmodules = len(list(model.modules())) - 1
             nparams = sum(x.numel() for x in model.parameters())
             ngradients = sum(x.numel() for x in model.parameters() if x.requires_grad)
-            print(model, '\nModel has %g parameters, %g gradients' % (nparams, ngradients))
+            print(model, '\n%g modules, %g parameters in %g groups, %g gradients' % (nmodules, nparams, ng, ngradients))
+            print('%6s%10s%12s  %.20s' % ('group', 'gradient', 'parameters', 'shape'))
+            for i in range(len(counts)):
+                print('%6g%10s%12g  %.20s' % (i, grad[i], counts[i], list(reversed(shapes[i]))))
+
+            from torchsummary import summary
+            summary(model, (1,512))
+
+            for i in model.modules():
+                print(i)
+                for j in i.parameters():
+                    print(j.shape, j.requires_grad)
+
         s = ('epoch', 'time', 'loss', 'metric(s)')
         print('%12s' * len(s) % s)
 
@@ -132,12 +150,12 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     if cuda:
         x, xv, xt = x.to(device), xv.to(device), xt.to(device)
         y, yv, yt = y.to(device), yv.to(device), yt.to(device)
-        if torch.cuda.device_count() > 1:
-            model = torch.nn.DataParallel(model)
+        # if torch.cuda.device_count() > 1:
+        # model = nn.DataParallel(model)
         model = model.to(device)
 
     # criteria and optimizer
-    criteria = torch.nn.MSELoss(size_average=True)
+    criteria = nn.MSELoss(size_average=True)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=amsgrad)
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
     stopper = patienceStopper(epochs=epochs, patience=patience, printerval=printerval, spa_start=spa_start)
@@ -187,9 +205,9 @@ H = [512, 64, 8, 1]
 class WAVE(torch.nn.Module):
     def __init__(self, n):
         super(WAVE, self).__init__()
-        self.fc0 = torch.nn.Linear(n[0], n[1])
-        self.fc1 = torch.nn.Linear(n[1], n[2])
-        self.fc2 = torch.nn.Linear(n[2], n[3])
+        self.fc0 = nn.Linear(n[0], n[1])
+        self.fc1 = nn.Linear(n[1], n[2])
+        self.fc2 = nn.Linear(n[2], n[3])
 
     def forward(self, x):
         x = F.tanh(self.fc0(x))

@@ -13,10 +13,9 @@ The https://github.com/ultralytics/wave repo contains **WA**veform **V**ector **
 
 Python 3.6 or later with the following `pip3 install -U -r requirements.txt` packages:
 
-
 - `numpy`
 - `scipy`
-- `pytorch` >= 0.4.0
+- `torch` >= 0.4.0
 - `tensorflow` >= 1.8.0
 - `plotly` (optional)
 

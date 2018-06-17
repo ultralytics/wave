@@ -11,11 +11,12 @@ sudo apt install -y google-drive-ocamlfuse
 
 # Generate creds for the Drive FUSE library.
 google-drive-ocamlfuse -headless -id 280545512213-gaaccol136ti4bt46g1imip3is7h10ph.apps.googleusercontent.com -secret l1aNm3ecGgKOit3vQ_TwBhNM
-# Create a directory and mount Google Drive using that directory.
-# mkdir drive
-# google-drive-ocamlfuse drive
-# fusermount -u drive  # unmount
+#Create a directory and mount Google Drive using that directory.
+mkdir drive
+google-drive-ocamlfuse drive
+#fusermount -u drive  # unmount
 
+sudo apt install -y unzip
 sudo apt install -y git
 sudo apt install -y python3-pip
 
@@ -25,7 +26,7 @@ pip3 install http://download.pytorch.org/whl/cu91/torch-0.4.0-cp36-cp36m-linux_x
 pip3 install torchvision
 
 pip3 install -U numpy scipy tensorflow # plotly  # wave
-pip3 install -U opencv-python exifread # bokeh  # velocity
+pip3 install -U opencv-python exifread tqdm # bokeh  # velocity
 
 
 # GPU driver install P100 and K80

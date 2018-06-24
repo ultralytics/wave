@@ -39,3 +39,14 @@ def stdtf(r, ys):  # MSE loss + standard deviation (tf eager)
     loss = (r ** 2).mean()
     std = r.std(0) * ys
     return loss, std
+
+
+def modelinfo(model):
+    nparams = sum(x.numel() for x in model.parameters())
+    ngradients = sum(x.numel() for x in model.parameters() if x.requires_grad)
+    print('\n%4s %70s %9s %12s %20s %12s %12s' % ('', 'name', 'gradient', 'parameters', 'shape', 'mu', 'sigma'))
+    for i, (name, p) in enumerate(model.named_parameters()):
+        name = name.replace('module_list.', '')
+        print('%4g %70s %9s %12g %20s %12g %12g' % (
+            i, name, p.requires_grad, p.numel(), list(p.shape), p.mean(), p.std()))
+    print('\n%g layers, %g parameters, %g gradients' % (i + 1, nparams, ngradients))

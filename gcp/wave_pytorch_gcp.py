@@ -5,7 +5,7 @@ import time
 import scipy.io
 import torch
 
-from functions import *
+from utils import *
 
 # set printoptions
 torch.set_printoptions(linewidth=320, precision=8)
@@ -133,7 +133,7 @@ class WAVE(torch.nn.Module):
 
 def tsact():  # TS activation function
     H = [512, 64, 8, 1]
-    tsv = ['Hardtanh']#['Tanh', 'LogSigmoid', 'Softsign', 'ELU']
+    tsv = ['Sigmoid']#['Tanh', 'LogSigmoid', 'Softsign', 'ELU']
     # tsv = np.logspace(-4,-2,11)
     tsy = []
 
@@ -159,7 +159,7 @@ def tsact():  # TS activation function
 
         for i in range(10):
             tsy.append(runexample(H, model=WAVE(H), str=('.' + a)))
-    scipy.io.savemat(pathr + 'TS.acthardtanh' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
+    scipy.io.savemat(pathr + 'TS.sigmoid' + '.mat', dict(tsv=tsv, tsy=np.array(tsy)))
 
 def tsnoact():  # TS activation function
     H = [512, 64, 8, 1]
@@ -287,5 +287,5 @@ def tsshape():  # TS network shape
 
 
 if __name__ == '__main__':
-    tsnoact()
+    #tsnoact()
     tsact()

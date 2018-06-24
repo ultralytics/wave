@@ -6,7 +6,7 @@ import torch
 from plotly.offline import plot
 import plotly.graph_objs as go
 
-from functions import *
+from utils import *
 
 # set printoptions
 torch.set_printoptions(linewidth=320, precision=8)

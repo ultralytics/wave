@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from functions import *
+from utils import *
 
 # set printoptions
 torch.set_printoptions(linewidth=320, precision=8)
@@ -75,26 +75,7 @@ class patienceStopper(object):
 
     def first(self, model):
         if model:
-            shapes = [list(x.shape) for x in model.parameters()]
-            counts = [x.numel() for x in model.parameters()]
-            grad = [x.requires_grad for x in model.parameters()]
-            ng = len(shapes)  # groups
-            nmodules = len(list(model.modules())) - 1
-            nparams = sum(x.numel() for x in model.parameters())
-            ngradients = sum(x.numel() for x in model.parameters() if x.requires_grad)
-            print(model, '\n%g modules, %g parameters in %g groups, %g gradients' % (nmodules, nparams, ng, ngradients))
-            print('%6s%10s%12s  %.20s' % ('group', 'gradient', 'parameters', 'shape'))
-            for i in range(len(counts)):
-                print('%6g%10s%12g  %.20s' % (i, grad[i], counts[i], list(reversed(shapes[i]))))
-
-            from torchsummary import summary
-            summary(model, (1,512))
-
-            for i in model.modules():
-                print(i)
-                for j in i.parameters():
-                    print(j.shape, j.requires_grad)
-
+            modelinfo(model)
         s = ('epoch', 'time', 'loss', 'metric(s)')
         print('%12s' * len(s) % s)
 
@@ -210,8 +191,8 @@ class WAVE(torch.nn.Module):
         self.fc2 = nn.Linear(n[2], n[3])
 
     def forward(self, x):
-        x = F.tanh(self.fc0(x))
-        x = F.tanh(self.fc1(x))
+        x = F.sigmoid(self.fc0(x))
+        x = F.sigmoid(self.fc1(x))
         return self.fc2(x)
 
 

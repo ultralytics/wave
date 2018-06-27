@@ -1,4 +1,4 @@
-#!/bin/bash
+##!/bin/bash
 # Run this script on a brand new GCP VM. Recommend Ubuntu 18.04 LTS, 15 GB Persistent SSD, P100 GPU, Skylake CPU.
 sudo apt update -y
 sudo apt autoremove -y
@@ -21,7 +21,6 @@ sudo apt install -y git
 sudo apt install -y python3-pip
 
 # Install Python Packages
-# pip3 install http://download.pytorch.org/whl/cu90/torch-0.4.0-cp36-cp36m-linux_x86_64.whl  # PYTORCH FOR CUDA 9 is it necessary?
 pip3 install http://download.pytorch.org/whl/cu91/torch-0.4.0-cp36-cp36m-linux_x86_64.whl
 pip3 install torchvision
 

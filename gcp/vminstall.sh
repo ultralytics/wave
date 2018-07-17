@@ -17,7 +17,7 @@ google-drive-ocamlfuse drive
 #fusermount -u drive  # unmount
 
 # Install Linux Programs
-sudo apt install -y git unzip python3-pip screen
+sudo apt install -y git unzip python3-pip screen vim
 
 # Install Python Packages
 pip3 install http://download.pytorch.org/whl/cu91/torch-0.4.0-cp36-cp36m-linux_x86_64.whl
@@ -26,23 +26,27 @@ pip3 install -U numpy scipy #tensorflow # plotly  # wave
 pip3 install -U opencv-python exifread tqdm # bokeh  # velocity
 
 # GPU driver install P100 and K80
-sudo apt install ubuntu-drivers-common -y
-sudo ubuntu-drivers autoinstall
+#sudo apt install ubuntu-drivers-common -y
+# sudo ubuntu-drivers autoinstall
 
-## GPU driver install V100
-##https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=1710&target_type=debnetwork
-#curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1710/x86_64/cuda-repo-ubuntu1710_9.2.88-1_amd64.deb
-#sudo dpkg -i cuda-repo-ubuntu1710_9.2.88-1_amd64.deb
-#sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1710/x86_64/7fa2af80.pub
-#sudo apt-get update -y
-#sudo apt-get install -y cuda
-#sudo nvidia-smi -pm 1
+# GPU driver install on *Ubuntu 16.04 LTS* from https://cloud.google.com/compute/docs/gpus/add-gpus#install-driver-script
+echo "Checking for CUDA and installing."
+# Check for CUDA and try to install.
+if ! dpkg-query -W cuda-9-0; then
+# The 16.04 installer works with 16.10.
+curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_9.0.176-1_amd64.deb
+dpkg -i ./cuda-repo-ubuntu1604_9.0.176-1_amd64.deb
+apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
+apt-get update
+apt-get install cuda-9-0 -y
+fi
+# Enable persistence mode
+nvidia-smi -pm 1
 
 # Shutdown
 sudo apt autoremove -y
 rm -rf vminstall.bash
 sudo shutdown now
-
 
 # Extras
 # find MATLAB/ -size +100M -ls

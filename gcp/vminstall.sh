@@ -27,7 +27,7 @@ pip3 install http://download.pytorch.org/whl/cu91/torch-0.4.0-cp36-cp36m-linux_x
 pip3 install torchvision
 
 # GPU driver install P100 and K80
-sudo apt install python3-opencv
+sudo apt install python3-opencv -y
 sudo apt install ubuntu-drivers-common -y
 sudo ubuntu-drivers autoinstall
 
@@ -45,18 +45,16 @@ sudo ubuntu-drivers autoinstall
 
 
 # get xview training data
-wget -O train_images.tgz 'https://d307kc0mrhucc3.cloudfront.net/train_images.tgz?Expires=1531850600&Signature=FvYp1qDdadcfOAF2ELmHSJXaRYkq~R2KrRi0Fk3akL1~UZWiCm26QjLh52e11Ga-99GNAkLylXauCgt0k17hmw2aMrMDW-z9Qo9hGQV-BkYEimhd~dyybOqqGJ3ZWG3CmeesHHJ7ScdDpv9aIxZTNo-QUSABA8g5X2oMs96RWOy-GnAw09W8liBIoLAfeoGcqOubvY7vOMtFeFgFatzmMSoLPQ-Y8Zv2bGpQyih-pd7A2S0VAE3ccDwvjKgdOgYeuZLXBNaF5Wy~-JNX2RdaqaXmLO42P3soxT5FnCnGbLYoVAI7K6-mtlttcw0VOTMXqWvoN8QOsdZenREhKfJ0iw__&Key-Pair-Id=APKAIKGDJB5C3XUL2DXQ'
+wget -O train_images.tgz 'https://d307kc0mrhucc3.cloudfront.net/train_images.tgz?Expires=1532237309&Signature=IY54jreVP-HiVMCBidfkIw-WRNaNkvvw0UqosbAxZ7prULRGYEnNpVsgXlOEW0kDj~w8zSKRTwQ3gc3~Hd~bykBvvylz66ORTK2EO3bgiARIHu4khg~~DCIgkjlUqxjxF9LDWd6cXX9M9n~xegbAoKtn3Hsc89VM-UUOLdtDu-DZhjQWakA7zwruIhGQJvDeDBpwA5uspG6S0TzKgLvPmhpB4rnoFGf9z~41XdhcNcMGfAq46~-KsR7fMOU6Cjp7hvtMGJWofVELvysyJBBf9gOtjxgKrWU3JUnolwNCWPgCOrm4q0IPTDIBURt9w2wrkE8R~3RFnQejtNy9UDmMhQ__&Key-Pair-Id=APKAIKGDJB5C3XUL2DXQ'
 tar -xvzf train_images.tgz
-sudo rm -rf train_images/._*
+sudo rm -rf train_images/._* train_images/659.tif train_images/769.tif
 
 # convert all .tif to .bmp
-sudo rm -rf train_images/659.tif train_images/769.tif
-sudo rm -rf yolo
-git clone https://github.com/ultralytics/yolo
+sudo rm -rf yolo && git clone https://github.com/ultralytics/yolo
 cd yolo
 python3
 from utils import datasets
-datasets.convert_tif2bmp('../train_images')
+datasets.convert_tif2bmp_clahe('../train_images')
 exit()
 
 # Shutdown

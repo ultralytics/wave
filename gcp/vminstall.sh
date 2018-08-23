@@ -4,10 +4,11 @@ sudo apt update -y
 sudo apt autoremove -y
 
 # Install Drive FUSE wrapper. https://github.com/astrada/google-drive-ocamlfuse
+sudo apt-get install dirmngr
 sudo apt install -y software-properties-common
 sudo add-apt-repository -y ppa:alessandro-strada/ppa
-sudo apt update -y
-sudo apt install -y google-drive-ocamlfuse
+sudo apt-get update -y
+sudo apt-get install -y google-drive-ocamlfuse
 
 # Generate creds for the Drive FUSE library.
 google-drive-ocamlfuse -headless -id 280545512213-gaaccol136ti4bt46g1imip3is7h10ph.apps.googleusercontent.com -secret l1aNm3ecGgKOit3vQ_TwBhNM
@@ -28,6 +29,7 @@ pip3 install torchvision
 
 # GPU driver install P100 and K80
 sudo apt install python3-opencv -y
+# sudo apt-get install python-opencv -y --allow-unauthenticated
 sudo apt install ubuntu-drivers-common -y
 sudo ubuntu-drivers autoinstall
 

@@ -75,7 +75,7 @@ class patienceStopper(object):
 
     def first(self, model):
         if model:
-            modelinfo(model)
+            model_info(model)
         s = ('epoch', 'time', 'loss', 'metric(s)')
         print('%12s' * len(s) % s)
 
@@ -103,7 +103,7 @@ torch.manual_seed(1)
 def runexample(H, model, str, lr=0.001, amsgrad=False):
     epochs = 50000
     patience = 3000
-    spa_start = 20
+    spa_start = 200000
     printerval = 1
     data = 'wavedata25ns.mat'
 
@@ -136,7 +136,7 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
         model = model.to(device)
 
     # criteria and optimizer
-    criteria = nn.MSELoss(size_average=True)
+    criteria = nn.MSELoss(reduction='elementwise_mean')
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=amsgrad)
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
     stopper = patienceStopper(epochs=epochs, patience=patience, printerval=printerval, spa_start=spa_start)
@@ -191,8 +191,8 @@ class WAVE(torch.nn.Module):
         self.fc2 = nn.Linear(n[2], n[3])
 
     def forward(self, x):
-        x = F.sigmoid(self.fc0(x))
-        x = F.sigmoid(self.fc1(x))
+        x = torch.tanh(self.fc0(x))
+        x = torch.tanh(self.fc1(x))
         return self.fc2(x)
 
 

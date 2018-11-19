@@ -5,7 +5,6 @@ import time
 import scipy.io
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 from utils import *
 
@@ -15,7 +14,7 @@ np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format}) 
 
 
 class patienceStopper(object):
-    def __init__(self, patience=10, verbose=True, epochs=1000, printerval=10, spa_start=10):
+    def __init__(self, patience=10, verbose=True, epochs=1000, printerval=10):
         self.patience = patience
         self.verbose = verbose
         self.bestepoch = 0
@@ -26,8 +25,6 @@ class patienceStopper(object):
         self.t0 = time.time()
         self.t = self.t0
         self.printerval = printerval
-        self.spa_start_epoch = spa_start
-        self.spamodel = None
 
     def reset(self):
         self.bestloss = float('inf')
@@ -51,18 +48,6 @@ class patienceStopper(object):
                     self.bestmodel.load_state_dict(model.state_dict())  # faster than deepcopy
                 else:
                     self.bestmodel = copy.deepcopy(model)
-
-        wa = self.epoch - self.spa_start_epoch + 1  # weight a
-        if wa > 0:
-            if self.spamodel:
-                a = self.spamodel.state_dict()
-                b = model.state_dict()
-                wb = 1
-                for key in a:
-                    a[key] = (a[key] * wa + b[key] * wb) / (wa + wb)
-                self.spamodel.load_state_dict(a)
-            else:
-                self.spamodel = copy.deepcopy(model)
 
         if self.num_bad_epochs > self.patience:
             self.final('%g Patience exceeded at epoch %g.' % (self.patience, self.epoch))
@@ -103,7 +88,6 @@ torch.manual_seed(1)
 def runexample(H, model, str, lr=0.001, amsgrad=False):
     epochs = 50000
     patience = 3000
-    spa_start = 200000
     printerval = 1
     data = 'wavedata25ns.mat'
 
@@ -124,22 +108,28 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     ny = y.shape[1]
 
     x, _, _ = normalize(x, 1)  # normalize each input row
-    y, ymu, ys = normalize(y, 0)  # normalize each output column
+    _, ymu, ys = normalize(y, 0)  # normalize each output column
     x, y = torch.Tensor(x), torch.Tensor(y)
     x, y, xv, yv, xt, yt = splitdata(x, y, train=0.70, validate=0.15, test=0.15, shuffle=False)
+
+    torch.nn.init.constant_(model.out.weight.data, ys.item(0))
+    torch.nn.init.constant_(model.out.bias.data, ymu.item(0))
+
+    ys = 1
 
     if cuda:
         x, xv, xt = x.to(device), xv.to(device), xt.to(device)
         y, yv, yt = y.to(device), yv.to(device), yt.to(device)
+
         # if torch.cuda.device_count() > 1:
         # model = nn.DataParallel(model)
         model = model.to(device)
 
     # criteria and optimizer
-    criteria = nn.MSELoss(reduction='elementwise_mean')
+    criteria = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=amsgrad)
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
-    stopper = patienceStopper(epochs=epochs, patience=patience, printerval=printerval, spa_start=spa_start)
+    stopper = patienceStopper(epochs=epochs, patience=patience, printerval=printerval)
 
     model.train()
     L = np.full((epochs, 3), np.nan)
@@ -154,11 +144,6 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
 
         if i % printerval == 0:
             std = (yv_ - yv).std(0).detach().cpu().numpy() * ys
-            if i > spa_start:
-                yv_spa = stopper.spamodel(xv)
-                lossv_spa = criteria(yv_spa, yv).item()
-                std_spa = (yv_spa - yv).std(0).detach().cpu().numpy() * ys
-                std = np.concatenate((std, [lossv_spa], std_spa))
 
         if stopper.step(lossv, model=model, metrics=std):
             break
@@ -189,11 +174,15 @@ class WAVE(torch.nn.Module):
         self.fc0 = nn.Linear(n[0], n[1])
         self.fc1 = nn.Linear(n[1], n[2])
         self.fc2 = nn.Linear(n[2], n[3])
+        self.out = nn.Linear(n[3], n[3])
+        for param in self.out.parameters():
+            param.requires_grad = False
 
     def forward(self, x):
         x = torch.tanh(self.fc0(x))
         x = torch.tanh(self.fc1(x))
-        return self.fc2(x)
+        x = self.fc2(x)
+        return self.out(x)
 
 
 if __name__ == '__main__':

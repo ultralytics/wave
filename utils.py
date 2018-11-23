@@ -42,11 +42,11 @@ def stdtf(r, ys):  # MSE loss + standard deviation (tf eager)
 
 
 def model_info(model):  # Plots a line-by-line description of a PyTorch model
-    nP = sum(x.numel() for x in model.parameters())  # number parameters
-    nG = sum(x.numel() for x in model.parameters() if x.requires_grad)  # number gradients
-    print('\n%4s %70s %9s %12s %20s %12s %12s' % ('', 'name', 'gradient', 'parameters', 'shape', 'mu', 'sigma'))
+    n_p = sum(x.numel() for x in model.parameters())  # number parameters
+    n_g = sum(x.numel() for x in model.parameters() if x.requires_grad)  # number gradients
+    print('\n%5s %30s %9s %12s %20s %12s %12s' % ('layer', 'name', 'gradient', 'parameters', 'shape', 'mu', 'sigma'))
     for i, (name, p) in enumerate(model.named_parameters()):
         name = name.replace('module_list.', '')
-        print('%4g %70s %9s %12g %20s %12g %12g' % (
+        print('%5g %30s %9s %12g %20s %12g %12g' % (
             i, name, p.requires_grad, p.numel(), list(p.shape), p.mean(), p.std()))
-    print('\n%g layers, %g parameters, %g gradients' % (i + 1, nP, nG))
+    print('Model Summary: %g layers, %g parameters, %g gradients\n' % (i + 1, n_p, n_g))

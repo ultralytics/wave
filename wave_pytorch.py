@@ -85,7 +85,7 @@ labels = ['train', 'validate', 'test']
 torch.manual_seed(1)
 
 
-def runexample(H, model, str, lr=0.001, amsgrad=False):
+def runexample(H, model, str, lr=0.001):
     epochs = 50000
     patience = 3000
     printerval = 1
@@ -96,26 +96,24 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     name = (data[:-4] + '%s%glr%s' % (H[:], lr, str)).replace(', ', '.').replace('[', '_').replace(']', '_')
 
     device = torch.device('cuda:0' if cuda else 'cpu')
-    print('Running %s on %s\n%s' %
-          (name, device.type, torch.cuda.get_device_properties(0) if cuda else ''))
+    print('Running %s on %s%s' % (name, device.type, '\n' + torch.cuda.get_device_properties(0) if cuda else ''))
 
     if not os.path.isfile(pathd + data):
         os.system('wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
     mat = scipy.io.loadmat(pathd + data)
     x = mat['inputs']  # inputs (nx512) [waveform1 waveform2]
-    y = mat['outputs'][:, 1:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
+    y = mat['outputs'][:, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
     nz, nx = x.shape
     ny = y.shape[1]
 
     x, _, _ = normalize(x, 1)  # normalize each input row
-    _, ymu, ys = normalize(y, 0)  # normalize each output column
+    y, ymu, ys = normalize(y, 0)  # normalize each output column
     x, y = torch.Tensor(x), torch.Tensor(y)
     x, y, xv, yv, xt, yt = splitdata(x, y, train=0.70, validate=0.15, test=0.15, shuffle=False)
 
-    torch.nn.init.constant_(model.out.weight.data, ys.item(0))
-    torch.nn.init.constant_(model.out.bias.data, ymu.item(0))
-
-    ys = 1
+    # torch.nn.init.constant_(model.out.weight.data, ys.item(0))
+    # torch.nn.init.constant_(model.out.bias.data, ymu.item(0))
+    # ys = 1
 
     if cuda:
         x, xv, xt = x.to(device), xv.to(device), xt.to(device)
@@ -127,7 +125,10 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
 
     # criteria and optimizer
     criteria = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=amsgrad)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=True)
+    optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=lr, momentum=.9,
+                                weight_decay=5e-4)
+
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
     stopper = patienceStopper(epochs=epochs, patience=patience, printerval=printerval)
 
@@ -135,15 +136,17 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     L = np.full((epochs, 3), np.nan)
     for i in range(epochs):
         yv_ = model(xv)
+        y_ = model(x)
 
-        loss = criteria(model(x), y)
+        loss = criteria(y_[:, 0], y[:, 0]) * 1 + criteria(y_[:, 1], y[:, 1]) * 1
+        # loss = criteria(y_, y)
         lossv = criteria(yv_, yv)
         L[i, 0] = loss.item()  # train
         L[i, 1] = lossv.item()  # validate
         # scheduler.step(lossv)
 
         if i % printerval == 0:
-            std = (yv_ - yv).std(0).detach().cpu().numpy() * ys
+            std = (yv_ - yv).std(0).detach().cpu().numpy()  # * ys
 
         if stopper.step(lossv, model=model, metrics=std):
             break
@@ -165,7 +168,7 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     return np.concatenate(([stopper.bestloss], np.array(loss), np.array(std.ravel())))
 
 
-H = [512, 64, 8, 1]
+H = [512, 64, 8, 2]
 
 
 class WAVE(torch.nn.Module):
@@ -182,8 +185,27 @@ class WAVE(torch.nn.Module):
         x = torch.tanh(self.fc0(x))
         x = torch.tanh(self.fc1(x))
         x = self.fc2(x)
-        return self.out(x)
+        return x  # self.out(x)
 
 
 if __name__ == '__main__':
     _ = runexample(H, model=WAVE(H), str='.Tanh')
+
+# 8 layers, 33376 parameters, 33370 gradients
+#        epoch        time        loss   metric(s)
+#            0    0.071015     0.96796      57.704      6.7323
+#            1     0.14455     0.72525      57.944      4.6891
+#            2     0.16589     0.60906      57.893      3.2648
+#            3     0.14249     0.55574      57.307      2.5013
+#            4     0.14867     0.52581       56.42      2.1762
+#            5     0.14721     0.50423       55.48      2.0354
+#            6     0.15886     0.48679      54.633      1.9413
+#            7      0.1579     0.47237      53.931      1.8527
+#            8      0.1649     0.46044      53.353      1.7714
+#            9     0.13345     0.45037      52.845      1.7092
+# WARNING: 3000 Patience not exceeded by epoch 9 (train longer).
+# Finished 10 epochs in 1.435s (6.967 epochs/s). Best results:
+#            9   0.0001719     0.45037      52.845      1.7092
+# 0.45271 [     52.953      1.7229] train
+# 0.45037 [     52.845      1.7092] validate
+# 0.45150 [     52.891      1.7008] test

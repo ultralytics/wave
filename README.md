@@ -28,6 +28,8 @@ Python 3.6 or later with the following `pip3 install -U -r requirements.txt` pac
 ![Alt](https://github.com/ultralytics/wave/blob/master/data/waveforms.png "waveforms")
 ![Alt](https://github.com/ultralytics/wave/blob/master/data/wave.png "training")
 
+# Citation
+Jocher, G., Nishimura, K., Koblanski, J. and Li, V. (2018). WAVE: Machine Learning for Full-Waveform Time-Of-Flight Detectors. [online] Arxiv.org. Available at: https://arxiv.org/abs/1811.05875 [Accessed 23 Nov. 2018].
 
 # Contact
 

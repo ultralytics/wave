@@ -1,9 +1,9 @@
-<img src="https://storage.googleapis.com/ultralytics/logo.png" width="200">  
+<img src="https://storage.googleapis.com/ultralytics/logo/logoname1000.png" width="200">
 
 # Introduction
 
 This directory contains software developed by Ultralytics LLC, and **is freely available for redistribution under the GPL-3.0 license**. For more information on Ultralytics projects please visit:
-http://www.ultralytics.com.
+https://www.ultralytics.com.
 
 
 # Description
@@ -33,4 +33,4 @@ Jocher, G., Nishimura, K., Koblanski, J. and Li, V. (2018). WAVE: Machine Learni
 
 # Contact
 
-For questions or comments please contact Glenn Jocher at glenn.jocher@ultralytics.com or visit us at http://www.ultralytics.com/contact
+For questions or comments please contact Glenn Jocher at glenn.jocher@ultralytics.com or visit us at http://contact.ultralytics.com

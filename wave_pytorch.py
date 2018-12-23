@@ -137,6 +137,7 @@ def runexample(H, model, str, lr=0.001):
     for i in range(epochs):
         yv_ = model(xv)
         y_ = model(x)
+        # y_ = torch.onnx._export(model,x,'model.onnx',verbose=True); return  # ONNX export
 
         loss = criteria(y_[:, 0], y[:, 0]) * 1 + criteria(y_[:, 1], y[:, 1]) * 1
         # loss = criteria(y_, y)

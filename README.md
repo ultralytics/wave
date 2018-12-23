@@ -1,4 +1,4 @@
-<img src="https://storage.googleapis.com/ultralytics/UltralyticsLogoName1000×676.png" width="200">  
+<img src="https://storage.googleapis.com/ultralytics/logo.png" width="200">  
 
 # Introduction
 
@@ -12,7 +12,7 @@ The https://github.com/ultralytics/wave repo contains **WA**veform **V**ector **
 
 # Requirements
 
-Python 3.6 or later with the following `pip3 install -U -r requirements.txt` packages:
+Python 3.7 or later with the following `pip3 install -U -r requirements.txt` packages:
 
 - `numpy`
 - `scipy`

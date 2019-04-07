@@ -7,7 +7,8 @@ def normalize(x, axis=None):  # normalize x mean and std by axis
     elif axis == 0:
         mu, sigma = x.mean(0), x.std(0)
     elif axis == 1:
-        mu, sigma = x.mean(1).reshape(x.shape[0], 1), x.std(1).reshape(x.shape[0], 1)
+        s = (x.shape[0], 1)
+        mu, sigma = x.mean(1).reshape(s), x.std(1).reshape(s)
     return (x - mu) / sigma, mu, sigma
 
 
@@ -41,12 +42,13 @@ def stdtf(r, ys):  # MSE loss + standard deviation (tf eager)
     return loss, std
 
 
-def model_info(model):  # Plots a line-by-line description of a PyTorch model
+def model_info(model):
+    # Plots a line-by-line description of a PyTorch model
     n_p = sum(x.numel() for x in model.parameters())  # number parameters
     n_g = sum(x.numel() for x in model.parameters() if x.requires_grad)  # number gradients
-    print('\n%5s %30s %9s %12s %20s %12s %12s' % ('layer', 'name', 'gradient', 'parameters', 'shape', 'mu', 'sigma'))
+    print('\n%5s %40s %9s %12s %20s %10s %10s' % ('layer', 'name', 'gradient', 'parameters', 'shape', 'mu', 'sigma'))
     for i, (name, p) in enumerate(model.named_parameters()):
         name = name.replace('module_list.', '')
-        print('%5g %30s %9s %12g %20s %12g %12g' % (
+        print('%5g %40s %9s %12g %20s %10.3g %10.3g' % (
             i, name, p.requires_grad, p.numel(), list(p.shape), p.mean(), p.std()))
-    print('Model Summary: %g layers, %g parameters, %g gradients\n' % (i + 1, n_p, n_g))
+    print('Model Summary: %g layers, %g parameters, %g gradients' % (i + 1, n_p, n_g))

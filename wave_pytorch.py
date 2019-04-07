@@ -126,8 +126,7 @@ def runexample(H, model, str, lr=0.001):
     # criteria and optimizer
     criteria = nn.MSELoss()
     # optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=True)
-    optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=lr, momentum=.9,
-                                weight_decay=5e-4)
+    optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9, weight_decay=5e-4)
 
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
     stopper = patienceStopper(epochs=epochs, patience=patience, printerval=printerval)
@@ -179,8 +178,8 @@ class WAVE(torch.nn.Module):
         self.fc1 = nn.Linear(n[1], n[2])
         self.fc2 = nn.Linear(n[2], n[3])
         self.out = nn.Linear(n[3], n[3])
-        for param in self.out.parameters():
-            param.requires_grad = False
+        # for param in self.out.parameters():
+        #     param.requires_grad = False
 
     def forward(self, x):
         x = torch.tanh(self.fc0(x))

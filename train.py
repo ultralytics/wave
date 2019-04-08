@@ -126,26 +126,29 @@ def train(H, model, str, lr=0.001):
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9, weight_decay=5e-4)
 
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
-    stopper = patienceStopper(epochs=opt.epochs, patience=3000, printerval=opt.printerval)
+    stopper = patienceStopper(epochs=opt.epochs, patience=100, printerval=opt.printerval)
 
     model.train()
     L = np.full((opt.epochs, 3), np.nan)
     for i in range(opt.epochs):
         # scheduler.step(lossv)
 
-        if ONNX_EXPORT:
-            y_ = torch.onnx._export(model, x, 'model.onnx', verbose=True)
-            return
+        bs = opt.batch_size
+        nb = int(np.ceil(x.shape[0] / bs))
+        for bi in range(nb):
+            j = range(bi*bs, min((bi+1) * bs, x.shape[0]))
+            if ONNX_EXPORT:
+                _ = torch.onnx._export(model, x, 'model.onnx', verbose=True)
+                return
 
-        # Train
-        y_ = model(x)
-        loss = criteria(y_, y)
-        L[i, 0] = loss.item()  # train
+            # Train
+            loss = criteria(model(x[j]), y[j])
+            L[i, 0] = loss.item()  # train
 
-        # Zero gradients, backward pass, update parameters
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+            # Zero gradients, backward pass, update parameters
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
         # Test
         yv_ = model(xv)
@@ -232,7 +235,8 @@ H = [512, 64, 8, 2]
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=50000, help='number of epochs')
-    parser.add_argument('--printerval', type=int, default=10, help='print results interval')
+    parser.add_argument('--batch-size', type=int, default=1000, help='size of each image batch')
+    parser.add_argument('--printerval', type=int, default=1, help='print results interval')
     parser.add_argument('--var', nargs='+', default=[1], help='debug list')
     opt = parser.parse_args()
     opt.var = [float(x) for x in opt.var]

@@ -200,12 +200,12 @@ class WAVE2(nn.Module):
     def __init__(self, n_out=2):
         super(WAVE2, self).__init__()
         self.layer1 = nn.Sequential(
-            nn.Conv2d(1, 16, kernel_size=(2, 10), stride=1, padding=(0, 5)),
+            nn.Conv2d(1, 16, kernel_size=(2, 10), stride=1, padding=(0, 5), bias=False),
             nn.BatchNorm2d(16),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)))
         self.layer2 = nn.Sequential(
-            nn.Conv2d(16, 32, kernel_size=(1, 10), stride=1, padding=(0, 5)),
+            nn.Conv2d(16, 32, kernel_size=(1, 10), stride=1, padding=(0, 5), bias=False),
             nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)))

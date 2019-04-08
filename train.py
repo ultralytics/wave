@@ -138,7 +138,7 @@ def train(H, model, str, lr=0.001):
             y_ = torch.onnx._export(model, x, 'model.onnx', verbose=True)
             return
 
-        # train
+        # Train
         y_ = model(x)
         loss = criteria(y_, y)
         L[i, 0] = loss.item()  # train
@@ -148,7 +148,7 @@ def train(H, model, str, lr=0.001):
         loss.backward()
         optimizer.step()
 
-        # test
+        # Test
         yv_ = model(xv)
         lossv = criteria(yv_, yv)
         L[i, 1] = lossv.item()  # validate

@@ -98,8 +98,8 @@ def train(H, model, str, lr=0.001):
     if not os.path.isfile(pathd + data):
         os.system('wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
     mat = scipy.io.loadmat(pathd + data)
-    x = mat['inputs']  # inputs (nx512) [waveform1 waveform2]
-    y = mat['outputs'][:, :2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
+    x = mat['inputs'][:10000]  # inputs (nx512) [waveform1 waveform2]
+    y = mat['outputs'][:10000, :2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
     nz, nx = x.shape
     ny = y.shape[1]
 
@@ -238,8 +238,8 @@ H = [512, 64, 8, 2]
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--epochs', type=int, default=50000, help='number of epochs')
-    parser.add_argument('--batch-size', type=int, default=10000, help='size of each image batch')
+    parser.add_argument('--epochs', type=int, default=1000, help='number of epochs')
+    parser.add_argument('--batch-size', type=int, default=2000, help='size of each image batch')
     parser.add_argument('--printerval', type=int, default=1, help='print results interval')
     parser.add_argument('--var', nargs='+', default=[1], help='debug list')
     opt = parser.parse_args()

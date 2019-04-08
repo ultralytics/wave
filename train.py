@@ -200,15 +200,15 @@ class WAVE2(nn.Module):
     def __init__(self, n_out=2):
         super(WAVE2, self).__init__()
         self.layer1 = nn.Sequential(
-            nn.Conv2d(1, 32, kernel_size=(2, 5), stride=1, padding=(0, 2), bias=False),
+            nn.Conv2d(1, 32, kernel_size=(2, 10), stride=(1, 2), padding=(0, 5), bias=False),
             nn.BatchNorm2d(32),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)))
+            nn.MaxPool2d(kernel_size=(1, 2), stride=1))
         self.layer2 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=(1, 5), stride=1, padding=(0, 2), bias=False),
+            nn.Conv2d(32, 64, kernel_size=(1, 10), stride=(1, 2), padding=(0, 5), bias=False),
             nn.BatchNorm2d(64),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)))
+            nn.MaxPool2d(kernel_size=(1, 2), stride=1))
         self.fc = nn.Linear(4096, n_out)
 
     def forward(self, x):  # x.shape = [bs, 512]
@@ -220,9 +220,9 @@ class WAVE2(nn.Module):
             plt.plot(x[0, 1].numpy())
 
         x = x.unsqueeze(1)  # [bs, 1, 2, 256]
-        x = self.layer1(x)  # [bs, 16, 1, 128]
-        x = self.layer2(x)  # [bs, 32, 1, 64]
-        x = x.reshape(x.size(0), -1)  # [bs, 32*64]
+        x = self.layer1(x)  # [bs, 32, 1, 128]
+        x = self.layer2(x)  # [bs, 64, 1, 64]
+        x = x.reshape(x.size(0), -1)  # [bs, 64*64]
         x = self.fc(x)  # [bs, 2]
         return x
 

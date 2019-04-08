@@ -99,7 +99,7 @@ def train(H, model, str, lr=0.001):
         os.system('wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
     mat = scipy.io.loadmat(pathd + data)
     x = mat['inputs']  # inputs (nx512) [waveform1 waveform2]
-    y = mat['outputs'][:, :1]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
+    y = mat['outputs'][:, 1:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
     nz, nx = x.shape
     ny = y.shape[1]
 
@@ -180,7 +180,7 @@ def train(H, model, str, lr=0.001):
 
 
 class WAVE(torch.nn.Module):
-    def __init__(self, n=(512, 64, 8, 2)):
+    def __init__(self, n=(512, 64, 8, 1)):
         super(WAVE, self).__init__()
         self.fc0 = nn.Linear(n[0], n[1])
         self.fc1 = nn.Linear(n[1], n[2])
@@ -238,7 +238,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=50000, help='number of epochs')
     parser.add_argument('--batch-size', type=int, default=2000, help='size of each image batch')
     parser.add_argument('--printerval', type=int, default=1, help='print results interval')
-    parser.add_argument('--var', nargs='+', default=[1], help='debug list')
+    parser.add_argument('--var', nargs='+', default=[0], help='debug list')
     opt = parser.parse_args()
     opt.var = [float(x) for x in opt.var]
     print(opt, end='\n\n')

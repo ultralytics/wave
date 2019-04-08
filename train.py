@@ -213,12 +213,12 @@ class WAVE2(nn.Module):
             nn.BatchNorm2d(64),
             nn.LeakyReLU(0.1),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1))
-        # self.layer3 = nn.Sequential(
-        #    nn.Conv2d(64, 2, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)))
-        self.fc0 = nn.Linear(4096 * 2, 1024)
-        self.fc1 = nn.Linear(1024, 128)
-        self.fc2 = nn.Linear(128, 16)
-        self.fc3 = nn.Linear(16, 2)
+        self.layer3 = nn.Sequential(
+            nn.Conv2d(64, 2, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)))
+        # self.fc0 = nn.Linear(4096 * 2, 1024)
+        # self.fc1 = nn.Linear(1024, 128)
+        # self.fc2 = nn.Linear(128, 16)
+        # self.fc3 = nn.Linear(16, 2)
 
     def forward(self, x):  # x.shape = [bs, 512]
         x = x.view((-1, 2, 256))  # [bs, 2, 256]
@@ -231,9 +231,9 @@ class WAVE2(nn.Module):
         x = x.unsqueeze(1)  # [bs, 1, 2, 256]
         x = self.layer1(x)  # [bs, 32, 1, 128]
         x = self.layer2(x)  # [bs, 64, 1, 64]
-        #x = self.layer3(x)
+        x = self.layer3(x)
         x = x.reshape(x.size(0), -1)  # [bs, 64*64]
-        x = self.fc3(self.fc2(self.fc1(self.fc0(x))))  # [bs, 2]
+        # x = self.fc3(self.fc2(self.fc1(self.fc0(x))))  # [bs, 2]
         return x
 
 
@@ -303,3 +303,10 @@ if __name__ == '__main__':
 #           80      3.8311    0.033249      14.673     0.28914
 #           90      3.8463    0.032257       14.46     0.28022
 #          100      3.8334    0.031657      14.229     0.27221
+
+# 100 Patience exceeded at epoch 264.
+# Finished 1000 epochs in 239.715s (4.172 epochs/s). Best results:
+#          163  7.4863e-05    0.027929      13.527     0.19442
+# 0.02528 [     12.823     0.18704] train
+# 0.02852 [     13.568     0.19513] validate
+# 0.03440 [     14.991     0.19509] test

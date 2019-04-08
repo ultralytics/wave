@@ -122,8 +122,8 @@ def train(H, model, str, lr=0.01):
 
     # Loss criteria and optimizer
     MSE = nn.MSELoss()
-    # optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9)
 
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
     stopper = patienceStopper(epochs=opt.epochs, patience=100, printerval=opt.printerval)
@@ -213,9 +213,11 @@ class WAVE2(nn.Module):
             nn.BatchNorm2d(64),
             nn.LeakyReLU(0.1),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1))
-        self.layer3 = nn.Sequential(
-            nn.Conv2d(64, 2, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)))
-        # self.fc = nn.Linear(4096 * 2, n_out)
+        # self.layer3 = nn.Sequential(
+        #    nn.Conv2d(64, 2, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)))
+        self.fc0 = nn.Linear(4096 * 2, 1024)
+        self.fc1 = nn.Linear(1024, 128)
+        self.fc2 = nn.Linear(16, 2)
 
     def forward(self, x):  # x.shape = [bs, 512]
         x = x.view((-1, 2, 256))  # [bs, 2, 256]
@@ -230,7 +232,7 @@ class WAVE2(nn.Module):
         x = self.layer2(x)  # [bs, 64, 1, 64]
         x = self.layer3(x)
         x = x.reshape(x.size(0), -1)  # [bs, 64*64]
-        # x = self.fc(x)  # [bs, 2]
+        x = self.fc2(self.fc1(self.fc0(x)))  # [bs, 2]
         return x
 
 

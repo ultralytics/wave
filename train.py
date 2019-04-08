@@ -154,7 +154,7 @@ def runexample(H, model, str, lr=0.001):
         L[i, 1] = lossv.item()  # validate
 
         if i % printerval == 0:
-            std = (yv_ - yv).std(0).detach().cpu().numpy()  # * ys
+            std = (yv_ - yv).std(0).detach().cpu().numpy() * ys
 
         if stopper.step(lossv, model=model, metrics=std):
             break

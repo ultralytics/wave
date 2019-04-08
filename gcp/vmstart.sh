@@ -32,15 +32,4 @@ python3 wave/wave_pytorch.py
 #import wave_pytorch_gcp as a; a.tsnoact()'
 cp -r results/. drive/results  #copy results to fused Google Drive
 
-# 4b. OR cd drive and then run python:
-# cd drive
-# python3 ../wave/wave_pytorch_gcp.py
-
-# 5. Shut off instance
-sleep 10s  # to allow Google Drive to sync
-rm -rf vmstart.bash
-sudo shutdown
-
-# Done
-
 

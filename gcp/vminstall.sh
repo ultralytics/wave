@@ -45,23 +45,3 @@ sudo ubuntu-drivers autoinstall
 # # Enable persistence mode
 # sudo nvidia-smi -pm 1
 
-
-# get xview training data
-wget -O train_images.tgz 'https://d307kc0mrhucc3.cloudfront.net/train_images.tgz?Expires=1532237309&Signature=IY54jreVP-HiVMCBidfkIw-WRNaNkvvw0UqosbAxZ7prULRGYEnNpVsgXlOEW0kDj~w8zSKRTwQ3gc3~Hd~bykBvvylz66ORTK2EO3bgiARIHu4khg~~DCIgkjlUqxjxF9LDWd6cXX9M9n~xegbAoKtn3Hsc89VM-UUOLdtDu-DZhjQWakA7zwruIhGQJvDeDBpwA5uspG6S0TzKgLvPmhpB4rnoFGf9z~41XdhcNcMGfAq46~-KsR7fMOU6Cjp7hvtMGJWofVELvysyJBBf9gOtjxgKrWU3JUnolwNCWPgCOrm4q0IPTDIBURt9w2wrkE8R~3RFnQejtNy9UDmMhQ__&Key-Pair-Id=APKAIKGDJB5C3XUL2DXQ'
-tar -xvzf train_images.tgz
-sudo rm -rf train_images/._* train_images/659.tif train_images/769.tif
-
-# convert all .tif to .bmp
-sudo rm -rf yolo && git clone https://github.com/ultralytics/yolo && cd yolo
-
-python3
-from utils import datasets
-datasets.convert_tif2bmp_clahe('../train_images')
-exit()
-
-# Shutdown
-sudo apt autoremove -y
-rm -rf vminstall.bash
-sudo shutdown now
-
-

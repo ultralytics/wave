@@ -16,6 +16,7 @@ google-drive-ocamlfuse drive
 
 # 2. fresh clone repo
 git clone https://github.com/ultralytics/wave
+cp -r data/* wave/data
 
 # 3. download training data
 mkdir data

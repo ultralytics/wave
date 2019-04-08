@@ -120,8 +120,8 @@ def train(H, model, str, lr=0.001):
             model = nn.DataParallel(model)
         model = model.to(device)
 
-    # criteria and optimizer
-    criteria = nn.MSELoss()
+    # Loss criteria and optimizer
+    MSE = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9, weight_decay=5e-4)
 
@@ -142,7 +142,7 @@ def train(H, model, str, lr=0.001):
                 return
 
             # Train
-            loss = criteria(model(x[j]), y[j])
+            loss = MSE(model(x[j]), y[j])
             L[i, 0] = loss.item()  # train
 
             # Zero gradients, backward pass, update parameters
@@ -151,9 +151,10 @@ def train(H, model, str, lr=0.001):
             optimizer.step()
 
         # Test
-        yv_ = model(xv)
-        lossv = criteria(yv_, yv)
-        L[i, 1] = lossv.item()  # validate
+        with torch.no_grad():
+            yv_ = model(xv)
+            lossv = MSE(yv_, yv)
+            L[i, 1] = lossv.item()  # validate
 
         if i % opt.printerval == 0:
             std = (yv_ - yv).std(0).detach().cpu().numpy() * ys

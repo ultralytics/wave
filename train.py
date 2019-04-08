@@ -99,7 +99,7 @@ def train(H, model, str, lr=0.001):
         os.system('wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
     mat = scipy.io.loadmat(pathd + data)
     x = mat['inputs']  # inputs (nx512) [waveform1 waveform2]
-    y = mat['outputs'][:, 1:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
+    y = mat['outputs'][:, :2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
     nz, nx = x.shape
     ny = y.shape[1]
 
@@ -201,18 +201,20 @@ class WAVE(torch.nn.Module):
 # 190  0.00059581    0.013831       99.58  default
 # 124      14.438    0.012876       99.55  LeakyReLU in place of ReLU
 class WAVE2(nn.Module):
-    def __init__(self, n_out=1):
+    def __init__(self, n_out=2):
         super(WAVE2, self).__init__()
         self.layer1 = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=(2, 3), stride=(1, 2), padding=(1, 2), bias=False),
             nn.BatchNorm2d(32),
-            nn.ReLU(),
+            nn.LeakyReLU(0.1),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1))
         self.layer2 = nn.Sequential(
             nn.Conv2d(32, 64, kernel_size=(2, 3), stride=(1, 2), padding=(0, 2), bias=False),
             nn.BatchNorm2d(64),
-            nn.ReLU(),
+            nn.LeakyReLU(0.1),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1))
+        self.layer3 = nn.Sequential(
+            nn.Conv2d(64, 2, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0), bias=True))
         self.fc = nn.Linear(4096 * 2, n_out)
 
     def forward(self, x):  # x.shape = [bs, 512]
@@ -226,8 +228,9 @@ class WAVE2(nn.Module):
         x = x.unsqueeze(1)  # [bs, 1, 2, 256]
         x = self.layer1(x)  # [bs, 32, 1, 128]
         x = self.layer2(x)  # [bs, 64, 1, 64]
-        x = x.reshape(x.size(0), -1)  # [bs, 64*64]
-        x = self.fc(x)  # [bs, 2]
+        x = self.layer3(x)
+        #x = x.reshape(x.size(0), -1)  # [bs, 64*64]
+        #x = self.fc(x)  # [bs, 2]
         return x
 
 

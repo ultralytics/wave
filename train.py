@@ -98,8 +98,8 @@ def train(H, model, str, lr=0.001):
     if not os.path.isfile(pathd + data):
         os.system('wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
     mat = scipy.io.loadmat(pathd + data)
-    x = mat['inputs'][:10000]  # inputs (nx512) [waveform1 waveform2]
-    y = mat['outputs'][:10000, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
+    x = mat['inputs']  # inputs (nx512) [waveform1 waveform2]
+    y = mat['outputs'][:, :2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
     nz, nx = x.shape
     ny = y.shape[1]
 
@@ -136,7 +136,7 @@ def train(H, model, str, lr=0.001):
         bs = opt.batch_size
         nb = int(np.ceil(x.shape[0] / bs))
         for bi in range(nb):
-            j = range(bi*bs, min((bi+1) * bs, x.shape[0]))
+            j = range(bi * bs, min((bi + 1) * bs, x.shape[0]))
             if ONNX_EXPORT:
                 _ = torch.onnx._export(model, x, 'model.onnx', verbose=True)
                 return
@@ -212,7 +212,7 @@ class WAVE2(nn.Module):
             nn.BatchNorm2d(64),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1))
-        self.fc = nn.Linear(4096*2, n_out)
+        self.fc = nn.Linear(4096 * 2, n_out)
 
     def forward(self, x):  # x.shape = [bs, 512]
         x = x.view((-1, 2, 256))  # [bs, 2, 256]
@@ -235,7 +235,7 @@ H = [512, 64, 8, 2]
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=50000, help='number of epochs')
-    parser.add_argument('--batch-size', type=int, default=1000, help='size of each image batch')
+    parser.add_argument('--batch-size', type=int, default=2000, help='size of each image batch')
     parser.add_argument('--printerval', type=int, default=1, help='print results interval')
     parser.add_argument('--var', nargs='+', default=[1], help='debug list')
     opt = parser.parse_args()

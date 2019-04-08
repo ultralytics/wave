@@ -85,7 +85,7 @@ labels = ['train', 'validate', 'test']
 torch.manual_seed(1)
 
 
-def train(H, model, str, lr=0.0001):
+def train(H, model, str, lr=0.001):
     data = 'wavedata25ns.mat'
 
     cuda = torch.cuda.is_available()
@@ -122,8 +122,8 @@ def train(H, model, str, lr=0.0001):
 
     # Loss criteria and optimizer
     MSE = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9, weight_decay=5e-4)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9)
 
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
     stopper = patienceStopper(epochs=opt.epochs, patience=100, printerval=opt.printerval)

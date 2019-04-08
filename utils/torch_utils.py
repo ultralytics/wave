@@ -16,10 +16,10 @@ def select_device(force_cpu=False):
     if cuda:
         ng = torch.cuda.device_count()
         x = [torch.cuda.get_device_properties(i) for i in range(ng)]
-        print('Using CUDA %s' % x[0])
+        print('Using CUDA device0: %s' % x[0])
         if ng > 0:
             # torch.cuda.set_device(0)  # OPTIONAL: Set your GPU if multiple available
             for i in range(1, ng):
-                print('           %s' % x[i])
+                print('           device%g: %s' % (i, x[i]))
 
     return device

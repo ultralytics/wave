@@ -230,7 +230,7 @@ class WAVE2(nn.Module):
         x = x.unsqueeze(1)  # [bs, 1, 2, 256]
         x = self.layer1(x)  # [bs, 32, 1, 128]
         x = self.layer2(x)  # [bs, 64, 1, 64]
-        x = self.layer3(x)
+        #x = self.layer3(x)
         x = x.reshape(x.size(0), -1)  # [bs, 64*64]
         x = self.fc2(self.fc1(self.fc0(x)))  # [bs, 2]
         return x

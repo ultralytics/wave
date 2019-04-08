@@ -135,7 +135,7 @@ def runexample(H, model, str, lr=0.001):
         # scheduler.step(lossv)
 
         if ONNX_EXPORT:
-            y_ = torch.onnx._export(model, x, 'model.onnx', verbose=True);
+            y_ = torch.onnx._export(model, x, 'model.onnx', verbose=True)
             return
 
         # train

@@ -204,12 +204,12 @@ class WAVE2(nn.Module):
     def __init__(self, n_out=1):
         super(WAVE2, self).__init__()
         self.layer1 = nn.Sequential(
-            nn.Conv2d(1, 32, kernel_size=(2, 10), stride=(1, 2), padding=(1, 5), bias=False),
+            nn.Conv2d(1, 32, kernel_size=(2, 3), stride=(1, 2), padding=(1, 2), bias=False),
             nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1))
         self.layer2 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=(2, 10), stride=(1, 2), padding=(0, 5), bias=False),
+            nn.Conv2d(32, 64, kernel_size=(2, 3), stride=(1, 2), padding=(0, 2), bias=False),
             nn.BatchNorm2d(64),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1))
@@ -236,9 +236,9 @@ H = [512, 64, 8, 2]
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=50000, help='number of epochs')
-    parser.add_argument('--batch-size', type=int, default=20000, help='size of each image batch')
+    parser.add_argument('--batch-size', type=int, default=10000, help='size of each image batch')
     parser.add_argument('--printerval', type=int, default=1, help='print results interval')
-    parser.add_argument('--var', nargs='+', default=[0], help='debug list')
+    parser.add_argument('--var', nargs='+', default=[1], help='debug list')
     opt = parser.parse_args()
     opt.var = [float(x) for x in opt.var]
     print(opt, end='\n\n')

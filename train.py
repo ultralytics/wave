@@ -122,8 +122,8 @@ def train(H, model, str, lr=0.001):
 
     # criteria and optimizer
     criteria = nn.MSELoss()
-    #optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=True)
-    optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9, weight_decay=5e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9, weight_decay=5e-4)
 
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
     stopper = patienceStopper(epochs=opt.epochs, patience=3000, printerval=opt.printerval)
@@ -279,3 +279,16 @@ if __name__ == '__main__':
 # 0.01647 [     10.276      0.2399] train
 # 0.03501 [     15.104     0.25241] validate
 # 0.04057 [     16.274     0.26408] test
+
+
+#            0     0.65193     0.53722      50.246      3.6345
+#           10      3.8394    0.071336      20.327     0.85992
+#           20        3.83    0.057666      18.956     0.55196
+#           30      3.8275    0.046855      17.102     0.46873
+#           40      3.8302    0.041027      16.198     0.36977
+#           50      3.8416    0.037985      15.633     0.33154
+#           60      3.8344    0.036114      15.252     0.31177
+#           70      3.8428    0.034575      14.949     0.30234
+#           80      3.8311    0.033249      14.673     0.28914
+#           90      3.8463    0.032257       14.46     0.28022
+#          100      3.8334    0.031657      14.229     0.27221

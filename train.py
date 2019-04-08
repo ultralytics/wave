@@ -3,10 +3,10 @@ import os
 import time
 
 import scipy.io
-import torch
 import torch.nn as nn
 
-from utils import *
+from utils.torch_utils import *
+from utils.utils import *
 
 # set printoptions
 torch.set_printoptions(linewidth=320, precision=8)
@@ -94,9 +94,9 @@ def runexample(H, model, str, lr=0.001):
     cuda = torch.cuda.is_available()
     os.makedirs(pathr + 'models', exist_ok=True)
     name = (data[:-4] + '%s%glr%s' % (H[:], lr, str)).replace(', ', '.').replace('[', '_').replace(']', '_')
+    print('Running ' + name)
 
-    device = torch.device('cuda:0' if cuda else 'cpu')
-    print('Running %s on %s%s' % (name, device.type, '\n' + torch.cuda.get_device_properties(0) if cuda else ''))
+    device = select_device()
 
     if not os.path.isfile(pathd + data):
         os.system('wget -P data/ https://storage.googleapis.com/ultralytics/' + data)

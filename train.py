@@ -8,6 +8,8 @@ import torch.nn as nn
 from utils.torch_utils import *
 from utils.utils import *
 
+ONNX_EXPORT = False
+
 
 class patienceStopper(object):
     def __init__(self, patience=10, verbose=True, epochs=1000, printerval=10):
@@ -84,7 +86,7 @@ torch.manual_seed(1)
 def runexample(H, model, str, lr=0.001):
     epochs = 50000
     patience = 3000
-    printerval = 100
+    printerval = 1000
     data = 'wavedata25ns.mat'
 
     cuda = torch.cuda.is_available()
@@ -115,14 +117,14 @@ def runexample(H, model, str, lr=0.001):
         x, xv, xt = x.to(device), xv.to(device), xt.to(device)
         y, yv, yt = y.to(device), yv.to(device), yt.to(device)
 
-        # if torch.cuda.device_count() > 1:
-        # model = nn.DataParallel(model)
+        if torch.cuda.device_count() > 1:
+            model = nn.DataParallel(model)
         model = model.to(device)
 
     # criteria and optimizer
     criteria = nn.MSELoss()
-    # optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=True)
-    optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9, weight_decay=5e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=True)
+    # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9, weight_decay=5e-4)
 
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
     stopper = patienceStopper(epochs=epochs, patience=patience, printerval=printerval)
@@ -130,15 +132,26 @@ def runexample(H, model, str, lr=0.001):
     model.train()
     L = np.full((epochs, 3), np.nan)
     for i in range(epochs):
-        yv_ = model(xv)
-        y_ = model(x)
-        # y_ = torch.onnx._export(model,x,'model.onnx',verbose=True); return  # ONNX export
-
-        loss = criteria(y_, y)
-        lossv = criteria(yv_, yv)
-        L[i, 0] = loss.item()  # train
-        L[i, 1] = lossv.item()  # validate
         # scheduler.step(lossv)
+
+        if ONNX_EXPORT:
+            y_ = torch.onnx._export(model, x, 'model.onnx', verbose=True);
+            return
+
+        # train
+        y_ = model(x)
+        loss = criteria(y_, y)
+        L[i, 0] = loss.item()  # train
+
+        # Zero gradients, backward pass, update parameters
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        # test
+        yv_ = model(xv)
+        lossv = criteria(yv_, yv)
+        L[i, 1] = lossv.item()  # validate
 
         if i % printerval == 0:
             std = (yv_ - yv).std(0).detach().cpu().numpy()  # * ys
@@ -146,10 +159,6 @@ def runexample(H, model, str, lr=0.001):
         if stopper.step(lossv, model=model, metrics=std):
             break
 
-        # Zero gradients, backward pass, update parameters
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
     # torch.save(stopper.bestmodel.state_dict(), pathr + 'models/' + name + '.pt')
 
     stopper.bestmodel.eval()

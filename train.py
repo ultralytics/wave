@@ -232,9 +232,10 @@ H = [512, 64, 8, 2]
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=50000, help='number of epochs')
-    parser.add_argument('--printerval', type=int, default=1000, help='print results interval')
+    parser.add_argument('--printerval', type=int, default=10, help='print results interval')
     parser.add_argument('--var', nargs='+', default=[0], help='debug list')
     opt = parser.parse_args()
+    opt.var = [float(x) for x in opt.var]
     print(opt, end='\n\n')
 
     init_seeds()

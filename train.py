@@ -206,12 +206,12 @@ class WAVE2(nn.Module):
         self.layer1 = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=(2, 30), stride=(1, 2), padding=(1, 15), bias=False),
             nn.BatchNorm2d(32),
-            nn.LeakyReLU(0.1),
+            nn.ReLU(),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1))
         self.layer2 = nn.Sequential(
             nn.Conv2d(32, 64, kernel_size=(2, 30), stride=(1, 2), padding=(0, 15), bias=False),
             nn.BatchNorm2d(64),
-            nn.LeakyReLU(0.1),
+            nn.ReLU(),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1))
         self.layer3 = nn.Sequential(
             nn.Conv2d(64, 2, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)))
@@ -310,3 +310,11 @@ if __name__ == '__main__':
 # 0.02528 [     12.823     0.18704] train
 # 0.02852 [     13.568     0.19513] validate
 # 0.03440 [     14.991     0.19509] test
+
+
+# 100 Patience exceeded at epoch 301.
+# Finished 1000 epochs in 279.341s (3.580 epochs/s). Best results:
+#          200  2.5511e-05    0.027798      13.435     0.21111
+# 0.01846 [     10.901     0.17024] train
+# 0.02752 [      13.41     0.18784] validate
+# 0.03360 [     14.818     0.19295] test

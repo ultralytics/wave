@@ -217,7 +217,8 @@ class WAVE2(nn.Module):
         #    nn.Conv2d(64, 2, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)))
         self.fc0 = nn.Linear(4096 * 2, 1024)
         self.fc1 = nn.Linear(1024, 128)
-        self.fc2 = nn.Linear(16, 2)
+        self.fc2 = nn.Linear(128, 16)
+        self.fc3 = nn.Linear(16, 2)
 
     def forward(self, x):  # x.shape = [bs, 512]
         x = x.view((-1, 2, 256))  # [bs, 2, 256]
@@ -232,7 +233,7 @@ class WAVE2(nn.Module):
         x = self.layer2(x)  # [bs, 64, 1, 64]
         #x = self.layer3(x)
         x = x.reshape(x.size(0), -1)  # [bs, 64*64]
-        x = self.fc2(self.fc1(self.fc0(x)))  # [bs, 2]
+        x = self.fc3(self.fc2(self.fc1(self.fc0(x))))  # [bs, 2]
         return x
 
 

@@ -86,8 +86,6 @@ torch.manual_seed(1)
 
 
 def train(H, model, str, lr=0.001):
-    patience = 3000
-    printerval = 1
     data = 'wavedata25ns.mat'
 
     cuda = torch.cuda.is_available()
@@ -128,7 +126,7 @@ def train(H, model, str, lr=0.001):
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9, weight_decay=5e-4)
 
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
-    stopper = patienceStopper(epochs=opt.epochs, patience=patience, printerval=printerval)
+    stopper = patienceStopper(epochs=opt.epochs, patience=3000, printerval=opt.printerval)
 
     model.train()
     L = np.full((opt.epochs, 3), np.nan)
@@ -154,7 +152,7 @@ def train(H, model, str, lr=0.001):
         lossv = criteria(yv_, yv)
         L[i, 1] = lossv.item()  # validate
 
-        if i % printerval == 0:
+        if i % opt.printerval == 0:
             std = (yv_ - yv).std(0).detach().cpu().numpy() * ys
 
         if stopper.step(lossv, model=model, metrics=std):
@@ -234,6 +232,7 @@ H = [512, 64, 8, 2]
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=50000, help='number of epochs')
+    parser.add_argument('--printerval', type=int, default=1000, help='print results interval')
     parser.add_argument('--var', nargs='+', default=[0], help='debug list')
     opt = parser.parse_args()
     print(opt, end='\n\n')

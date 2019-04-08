@@ -1,9 +1,11 @@
+import argparse
 import copy
 import os
 import time
 
 import scipy.io
 import torch.nn as nn
+from matplotlib import pyplot as plt
 
 from utils.torch_utils import *
 from utils.utils import *
@@ -84,9 +86,8 @@ torch.manual_seed(1)
 
 
 def train(H, model, str, lr=0.001):
-    epochs = 50000
     patience = 3000
-    printerval = 1000
+    printerval = 1
     data = 'wavedata25ns.mat'
 
     cuda = torch.cuda.is_available()
@@ -127,11 +128,11 @@ def train(H, model, str, lr=0.001):
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9, weight_decay=5e-4)
 
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
-    stopper = patienceStopper(epochs=epochs, patience=patience, printerval=printerval)
+    stopper = patienceStopper(epochs=opt.epochs, patience=patience, printerval=printerval)
 
     model.train()
-    L = np.full((epochs, 3), np.nan)
-    for i in range(epochs):
+    L = np.full((opt.epochs, 3), np.nan)
+    for i in range(opt.epochs):
         # scheduler.step(lossv)
 
         if ONNX_EXPORT:
@@ -177,24 +178,72 @@ def train(H, model, str, lr=0.001):
 
 
 class WAVE(torch.nn.Module):
-    def __init__(self, n):
+    def __init__(self, n=(512, 64, 8, 2)):
         super(WAVE, self).__init__()
         self.fc0 = nn.Linear(n[0], n[1])
         self.fc1 = nn.Linear(n[1], n[2])
         self.fc2 = nn.Linear(n[2], n[3])
         self.out = nn.Linear(n[3], n[3])
 
-    def forward(self, x):
-        x = torch.tanh(self.fc0(x))
-        x = torch.tanh(self.fc1(x))
-        x = self.fc2(x)
+    def forward(self, x):  # x.shape = [bs, 512]
+        x = torch.tanh(self.fc0(x))  # [bs, 64]
+        x = torch.tanh(self.fc1(x))  # [bs, 8]
+        x = self.fc2(x)  # [bs, 2]
+        return x
+
+
+# https://github.com/yunjey/pytorch-tutorial/tree/master/tutorials/02-intermediate
+# 8  0.00023365    0.025934       99.14  default no augmentation
+# 126: 99.62% test accuracy, 0.0137 test loss, normalize + 10% augment
+# 185: 99.60% test accuracy, 0.0123 test loss
+# 190  0.00059581    0.013831       99.58  default
+# 124      14.438    0.012876       99.55  LeakyReLU in place of ReLU
+class WAVE2(nn.Module):
+    def __init__(self, n_out=2):
+        super(WAVE2, self).__init__()
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(1, 16, kernel_size=(1, 5), stride=1, padding=(0, 2)),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)))
+        self.layer2 = nn.Sequential(
+            nn.Conv2d(16, 32, kernel_size=(1, 5), stride=1, padding=(0, 2)),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=(2, 2), stride=(1, 2)))
+        self.fc = nn.Linear(32 * 64, n_out)
+
+    def forward(self, x):  # x.shape = [bs, 512]
+        x = x.view((-1, 2, 256))  # [bs, 2, 256]
+
+        plot = False
+        if plot:
+            plt.plot(x[0, 0].numpy())
+            plt.plot(x[0, 1].numpy())
+
+        x = x.unsqueeze(1)  # [bs, 1, 2, 256]
+        x = self.layer1(x)  # [bs, 16, 2, 128]
+        x = self.layer2(x)  # [bs, 32, 1, 64]
+        x = x.reshape(x.size(0), -1)  # [bs, 32*64]
+        x = self.fc(x)  # [bs, 2]
         return x
 
 
 H = [512, 64, 8, 2]
 
 if __name__ == '__main__':
-    _ = train(H, model=WAVE(H), str='.Tanh')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--epochs', type=int, default=50000, help='number of epochs')
+    parser.add_argument('--var', nargs='+', default=[0], help='debug list')
+    opt = parser.parse_args()
+    print(opt, end='\n\n')
+
+    init_seeds()
+
+    if opt.var[0] == 0:
+        _ = train(H, model=WAVE(), str='.Tanh')
+    elif opt.var[0] == 1:
+        _ = train(H, model=WAVE2(), str='.Tanh')
 
 # Model Summary: 8 layers, 33376 parameters, 33376 gradients
 #        epoch        time        loss   metric(s)

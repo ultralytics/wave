@@ -83,7 +83,7 @@ labels = ['train', 'validate', 'test']
 torch.manual_seed(1)
 
 
-def runexample(H, model, str, lr=0.001):
+def train(H, model, str, lr=0.001):
     epochs = 50000
     patience = 3000
     printerval = 1000
@@ -164,15 +164,16 @@ def runexample(H, model, str, lr=0.001):
     stopper.bestmodel.eval()
     loss, std = np.zeros(3), np.zeros((3, ny))
     for i, (xi, yi) in enumerate(((x, y), (xv, yv), (xt, yt))):
-        loss[i], std[i] = stdpt(stopper.bestmodel(xi) - yi, ys)
+        with torch.no_grad():
+            r = stopper.bestmodel(xi) - yi  # residuals, ().detach?
+            loss[i] = (r ** 2).mean().cpu().item()
+            std[i] = r.std(0).cpu().numpy() * ys
         print('%.5f %s %s' % (loss[i], std[i, :], labels[i]))
+
     scipy.io.savemat(pathr + name + '.mat', dict(bestepoch=stopper.bestloss, loss=loss, std=std, L=L, name=name))
     # files.download(pathr + name + '.mat')
 
     return np.concatenate(([stopper.bestloss], np.array(loss), np.array(std.ravel())))
-
-
-H = [512, 64, 8, 2]
 
 
 class WAVE(torch.nn.Module):
@@ -182,34 +183,41 @@ class WAVE(torch.nn.Module):
         self.fc1 = nn.Linear(n[1], n[2])
         self.fc2 = nn.Linear(n[2], n[3])
         self.out = nn.Linear(n[3], n[3])
-        # for param in self.out.parameters():
-        #     param.requires_grad = False
 
     def forward(self, x):
         x = torch.tanh(self.fc0(x))
         x = torch.tanh(self.fc1(x))
         x = self.fc2(x)
-        return x  # self.out(x)
+        return x
 
+
+H = [512, 64, 8, 2]
 
 if __name__ == '__main__':
-    _ = runexample(H, model=WAVE(H), str='.Tanh')
+    _ = train(H, model=WAVE(H), str='.Tanh')
 
-# 8 layers, 33376 parameters, 33370 gradients
+# Model Summary: 8 layers, 33376 parameters, 33376 gradients
 #        epoch        time        loss   metric(s)
-#            0    0.071015     0.96796      57.704      6.7323
-#            1     0.14455     0.72525      57.944      4.6891
-#            2     0.16589     0.60906      57.893      3.2648
-#            3     0.14249     0.55574      57.307      2.5013
-#            4     0.14867     0.52581       56.42      2.1762
-#            5     0.14721     0.50423       55.48      2.0354
-#            6     0.15886     0.48679      54.633      1.9413
-#            7      0.1579     0.47237      53.931      1.8527
-#            8      0.1649     0.46044      53.353      1.7714
-#            9     0.13345     0.45037      52.845      1.7092
-# WARNING: 3000 Patience not exceeded by epoch 9 (train longer).
-# Finished 10 epochs in 1.435s (6.967 epochs/s). Best results:
-#            9   0.0001719     0.45037      52.845      1.7092
-# 0.45271 [     52.953      1.7229] train
-# 0.45037 [     52.845      1.7092] validate
-# 0.45150 [     52.891      1.7008] test
+#            0     0.23533     0.72525      57.944      4.6891
+#         1000      6.1377    0.027707      13.409     0.23723
+#         2000      6.1811    0.025165       12.82     0.19568
+#         3000      6.1135    0.024321      12.614     0.18148
+#         4000      6.1703    0.023974      12.528     0.17578
+#         5000      6.0297    0.023792       12.48     0.17282
+#         6000       6.044    0.023641      12.443     0.17017
+#         7000       6.022    0.025316       12.86     0.16977
+#         8000      6.0789    0.023559      12.424     0.16832
+#         9000      6.0554    0.023912      12.464     0.16599
+#        10000      6.0805     0.02347      12.403     0.16509
+#        11000      6.1321    0.024346      12.579     0.16366
+#        12000      6.0378    0.025261      12.618     0.16218
+#        13000       6.003    0.023413      12.391     0.16071
+#        14000      6.0259    0.023771       12.46     0.15963
+#        15000      6.0809    0.023371      12.382       0.158
+#        16000      6.0842     0.02339      12.389     0.15699
+# 3000 Patience exceeded at epoch 16857.
+# Finished 50000 epochs in 102.663s (487.032 epochs/s). Best results:
+#        13856      5.1492    0.023221      12.391     0.16071
+# 0.01641 [     10.358     0.15294] train
+# 0.02322 [      12.34     0.15902] validate
+# 0.02316 [     12.328     0.15611] test

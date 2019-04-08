@@ -2,15 +2,11 @@ import os
 import time
 
 import scipy.io
-import torch
 from plotly.offline import plot
 import plotly.graph_objs as go
 
-from utils import *
+from utils.utils import *
 
-# set printoptions
-torch.set_printoptions(linewidth=320, precision=8)
-np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format})  # format short g, %precision=5
 
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe

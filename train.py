@@ -8,10 +8,6 @@ import torch.nn as nn
 from utils.torch_utils import *
 from utils.utils import *
 
-# set printoptions
-torch.set_printoptions(linewidth=320, precision=8)
-np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format})  # format short g, %precision=5
-
 
 class patienceStopper(object):
     def __init__(self, patience=10, verbose=True, epochs=1000, printerval=10):
@@ -88,7 +84,7 @@ torch.manual_seed(1)
 def runexample(H, model, str, lr=0.001):
     epochs = 50000
     patience = 3000
-    printerval = 1
+    printerval = 100
     data = 'wavedata25ns.mat'
 
     cuda = torch.cuda.is_available()
@@ -138,8 +134,7 @@ def runexample(H, model, str, lr=0.001):
         y_ = model(x)
         # y_ = torch.onnx._export(model,x,'model.onnx',verbose=True); return  # ONNX export
 
-        loss = criteria(y_[:, 0], y[:, 0]) * 1 + criteria(y_[:, 1], y[:, 1]) * 1
-        # loss = criteria(y_, y)
+        loss = criteria(y_, y)
         lossv = criteria(yv_, yv)
         L[i, 0] = loss.item()  # train
         L[i, 1] = lossv.item()  # validate

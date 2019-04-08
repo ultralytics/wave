@@ -242,7 +242,7 @@ H = [512, 64, 8, 2]
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=1000, help='number of epochs')
-    parser.add_argument('--batch-size', type=int, default=10000, help='size of each image batch')
+    parser.add_argument('--batch-size', type=int, default=2000, help='size of each image batch')
     parser.add_argument('--printerval', type=int, default=1, help='print results interval')
     parser.add_argument('--var', nargs='+', default=[1], help='debug list')
     opt = parser.parse_args()
@@ -304,14 +304,8 @@ if __name__ == '__main__':
 #           90      3.8463    0.032257       14.46     0.28022
 #          100      3.8334    0.031657      14.229     0.27221
 
-# 100 Patience exceeded at epoch 264.
-# Finished 1000 epochs in 239.715s (4.172 epochs/s). Best results:
-#          163  7.4863e-05    0.027929      13.527     0.19442
-# 0.02528 [     12.823     0.18704] train
-# 0.02852 [     13.568     0.19513] validate
-# 0.03440 [     14.991     0.19509] test
 
-
+# BASELINE TRAIN ON FIRST 10K
 # 100 Patience exceeded at epoch 301.
 # Finished 1000 epochs in 279.341s (3.580 epochs/s). Best results:
 #          200  2.5511e-05    0.027798      13.435     0.21111

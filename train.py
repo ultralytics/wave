@@ -215,7 +215,7 @@ class WAVE2(nn.Module):
             nn.MaxPool2d(kernel_size=(1, 2), stride=1))
         self.layer3 = nn.Sequential(
             nn.Conv2d(64, 2, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0), bias=True))
-        self.fc = nn.Linear(4096 * 2, n_out)
+        # self.fc = nn.Linear(4096 * 2, n_out)
 
     def forward(self, x):  # x.shape = [bs, 512]
         x = x.view((-1, 2, 256))  # [bs, 2, 256]
@@ -229,8 +229,8 @@ class WAVE2(nn.Module):
         x = self.layer1(x)  # [bs, 32, 1, 128]
         x = self.layer2(x)  # [bs, 64, 1, 64]
         x = self.layer3(x)
-        #x = x.reshape(x.size(0), -1)  # [bs, 64*64]
-        #x = self.fc(x)  # [bs, 2]
+        x = x.reshape(x.size(0), -1)  # [bs, 64*64]
+        # x = self.fc(x)  # [bs, 2]
         return x
 
 

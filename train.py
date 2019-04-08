@@ -180,7 +180,7 @@ def train(H, model, str, lr=0.001):
 
 
 class WAVE(torch.nn.Module):
-    def __init__(self, n=(512, 64, 8, 1)):
+    def __init__(self, n=(512, 64, 8, 2)):
         super(WAVE, self).__init__()
         self.fc0 = nn.Linear(n[0], n[1])
         self.fc1 = nn.Linear(n[1], n[2])

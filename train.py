@@ -204,17 +204,17 @@ class WAVE2(nn.Module):
     def __init__(self, n_out=2):
         super(WAVE2, self).__init__()
         self.layer1 = nn.Sequential(
-            nn.Conv2d(1, 32, kernel_size=(2, 3), stride=(1, 2), padding=(1, 2), bias=False),
+            nn.Conv2d(1, 32, kernel_size=(2, 10), stride=(1, 2), padding=(1, 5), bias=False),
             nn.BatchNorm2d(32),
             nn.LeakyReLU(0.1),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1))
         self.layer2 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=(2, 3), stride=(1, 2), padding=(0, 2), bias=False),
+            nn.Conv2d(32, 64, kernel_size=(2, 10), stride=(1, 2), padding=(0, 5), bias=False),
             nn.BatchNorm2d(64),
             nn.LeakyReLU(0.1),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1))
         self.layer3 = nn.Sequential(
-            nn.Conv2d(64, 2, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0), bias=True))
+            nn.Conv2d(64, 2, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)))
         # self.fc = nn.Linear(4096 * 2, n_out)
 
     def forward(self, x):  # x.shape = [bs, 512]

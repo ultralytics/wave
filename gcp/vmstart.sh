@@ -15,8 +15,9 @@ mkdir drive
 google-drive-ocamlfuse drive
 
 # 2. fresh clone repo
-git clone https://github.com/ultralytics/wave
-cp -r data/* wave/data
+rm -rf wave && git clone https://github.com/ultralytics/wave
+cp -r data/* wave/data && cd wave
+python3 train.py
 
 # 3. download training data
 mkdir data

@@ -120,19 +120,23 @@ def train(H, model, str, lr=0.001):
             model = nn.DataParallel(model)
         model = model.to(device)
 
-    # Loss criteria and optimizer
+    # Loss criteria
     MSE = nn.MSELoss()
+
+    # Optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9)
 
-    # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
+    # Scheduler
     stopper = patienceStopper(epochs=opt.epochs, patience=100, printerval=opt.printerval)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=30, factor=0.1, min_lr=1E-5, verbose=True)
 
+    lossv = 1E6
     bs = opt.batch_size
     nb = int(np.ceil(x.shape[0] / bs))
     L = np.full((opt.epochs, 3), np.nan)
     for i in range(opt.epochs):
-        # scheduler.step(lossv)
+        scheduler.step(lossv)
 
         # Train
         model.train()

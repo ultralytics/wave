@@ -253,7 +253,7 @@ class WAVE3(nn.Module):
         x = self.layer4(x)
         return x.reshape(x.size(0), -1)  # [bs, 64*64]
 
-
+#       121  2.6941e-05    0.021642      11.923     0.14201  # var 1
 class WAVE2(nn.Module):
     def __init__(self, n_out=2):
         super(WAVE2, self).__init__()
@@ -284,7 +284,7 @@ H = [512, 64, 8, 2]
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=5000, help='number of epochs')
-    parser.add_argument('--batch-size', type=int, default=5000, help='size of each image batch')
+    parser.add_argument('--batch-size', type=int, default=2000, help='size of each image batch')
     parser.add_argument('--printerval', type=int, default=1, help='print results interval')
     parser.add_argument('--var', nargs='+', default=[0], help='debug list')
     opt = parser.parse_args()

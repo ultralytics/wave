@@ -230,7 +230,7 @@ class WAVE3(nn.Module):
     def __init__(self, n_out=2):
         super(WAVE3, self).__init__()
         self.layer1 = nn.Sequential(
-            nn.Conv2d(in_channels=2, out_channels=32, kernel_size=(1, 65), stride=(1, 2), padding=(0, 32), bias=False),
+            nn.Conv2d(in_channels=2, out_channels=32, kernel_size=(1, 33), stride=(1, 2), padding=(0, 16), bias=False),
             nn.BatchNorm2d(32),
             nn.LeakyReLU(0.1))
         self.layer2 = nn.Sequential(

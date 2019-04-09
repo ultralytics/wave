@@ -247,7 +247,7 @@ H = [512, 64, 8, 2]
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=1000, help='number of epochs')
-    parser.add_argument('--batch-size', type=int, default=2000, help='size of each image batch')
+    parser.add_argument('--batch-size', type=int, default=10000, help='size of each image batch')
     parser.add_argument('--printerval', type=int, default=1, help='print results interval')
     parser.add_argument('--var', nargs='+', default=[1], help='debug list')
     opt = parser.parse_args()
@@ -319,6 +319,6 @@ if __name__ == '__main__':
 # 0.02752 [      13.41     0.18784] validate
 # 0.03360 [     14.818     0.19295] test
 
-
+#       400  5.1498e-05    0.023752      12.484     0.15728  # var 0
 #        71  2.4557e-05    0.022613      12.169      0.1504
 #       127      1.4338    0.021565        11.9     0.14246

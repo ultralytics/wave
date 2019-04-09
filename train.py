@@ -128,20 +128,20 @@ def train(H, model, str, lr=0.001):
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1000, factor=0.66, min_lr=1E-4, verbose=True)
     stopper = patienceStopper(epochs=opt.epochs, patience=100, printerval=opt.printerval)
 
-    model.train()
+    bs = opt.batch_size
+    nb = int(np.ceil(x.shape[0] / bs))
     L = np.full((opt.epochs, 3), np.nan)
     for i in range(opt.epochs):
         # scheduler.step(lossv)
 
-        bs = opt.batch_size
-        nb = int(np.ceil(x.shape[0] / bs))
+        # Train
+        model.train()
         for bi in range(nb):
             j = range(bi * bs, min((bi + 1) * bs, x.shape[0]))
             if ONNX_EXPORT:
                 _ = torch.onnx._export(model, x, 'model.onnx', verbose=True)
                 return
 
-            # Train
             loss = MSE(model(x[j]), y[j])
             L[i, 0] = loss.item()  # train
 
@@ -152,6 +152,8 @@ def train(H, model, str, lr=0.001):
 
         # Test
         with torch.no_grad():
+            model.eval()
+
             yv_ = model(xv)
             lossv = MSE(yv_, yv)
             L[i, 1] = lossv.item()  # validate
@@ -159,7 +161,7 @@ def train(H, model, str, lr=0.001):
         if i % opt.printerval == 0:
             std = (yv_ - yv).std(0).detach().cpu().numpy() * ys
 
-        if stopper.step(lossv, model=model, metrics=std):
+        if stopper.step(lossv, model=None, metrics=std):
             break
 
     # torch.save(stopper.bestmodel.state_dict(), pathr + 'models/' + name + '.pt')
@@ -256,6 +258,8 @@ if __name__ == '__main__':
     elif opt.var[0] == 1:
         _ = train(H, model=WAVE2(), str='.Tanh')
 
+
+# 100K SET ---------------------------------------------------------------------
 # Model Summary: 8 layers, 33376 parameters, 33376 gradients
 #        epoch        time        loss   metric(s)
 #            0     0.23533     0.72525      57.944      4.6891
@@ -282,6 +286,18 @@ if __name__ == '__main__':
 # 0.02322 [      12.34     0.15902] validate
 # 0.02316 [     12.328     0.15611] test
 
+#BS 2K
+# 100 Patience exceeded at epoch 510.
+# Finished 1000 epochs in 27.223s (36.733 epochs/s). Best results:
+#          409  5.7936e-05     0.02456       12.69     0.15899
+# 0.01756 [     10.706     0.15338] train
+# 0.02456 [      12.69     0.15899] validate
+# 0.02457 [     12.687     0.15632] test
+
+
+
+
+
 
 # 10K TEST SET
 # 3000 Patience exceeded at epoch 4162.
@@ -290,19 +306,6 @@ if __name__ == '__main__':
 # 0.01647 [     10.276      0.2399] train
 # 0.03501 [     15.104     0.25241] validate
 # 0.04057 [     16.274     0.26408] test
-
-
-#            0     0.65193     0.53722      50.246      3.6345
-#           10      3.8394    0.071336      20.327     0.85992
-#           20        3.83    0.057666      18.956     0.55196
-#           30      3.8275    0.046855      17.102     0.46873
-#           40      3.8302    0.041027      16.198     0.36977
-#           50      3.8416    0.037985      15.633     0.33154
-#           60      3.8344    0.036114      15.252     0.31177
-#           70      3.8428    0.034575      14.949     0.30234
-#           80      3.8311    0.033249      14.673     0.28914
-#           90      3.8463    0.032257       14.46     0.28022
-#          100      3.8334    0.031657      14.229     0.27221
 
 
 # BASELINE TRAIN ON FIRST 10K

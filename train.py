@@ -9,6 +9,8 @@ import torch.nn as nn
 from utils.torch_utils import *
 from utils.utils import *
 
+torch.backends.cudnn.benchmark = True  # unsuitable for multiscale
+
 ONNX_EXPORT = False
 
 
@@ -252,6 +254,7 @@ class WAVE3(nn.Module):
         # print(x.shape)
         x = self.layer4(x)
         return x.reshape(x.size(0), -1)  # [bs, 64*64]
+
 
 #       121  2.6941e-05    0.021642      11.923     0.14201  # var 1
 class WAVE2(nn.Module):

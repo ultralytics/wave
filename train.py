@@ -232,11 +232,11 @@ class WAVE3(nn.Module):
             nn.BatchNorm2d(32),
             nn.LeakyReLU(0.1))
         self.layer2 = nn.Sequential(
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(2, 17), stride=(1, 2), padding=(0, 8), bias=False),
+            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(1, 17), stride=(1, 2), padding=(0, 8), bias=False),
             nn.BatchNorm2d(64),
             nn.LeakyReLU(0.1))
         self.layer3 = nn.Sequential(
-            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(2, 9), stride=(1, 2), padding=(0, 4), bias=False),
+            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
             nn.BatchNorm2d(128),
             nn.LeakyReLU(0.1))
         self.layer4 = nn.Conv2d(128, n_out, kernel_size=(1, 32), stride=1, padding=0)

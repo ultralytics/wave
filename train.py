@@ -235,31 +235,25 @@ class WAVE3(nn.Module):
             nn.BatchNorm2d(n),
             nn.LeakyReLU(0.1))
         self.layer2 = nn.Sequential(
-            nn.Conv2d(in_channels=n, out_channels=n * 2, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
-            nn.BatchNorm2d(n * 2),
+            nn.Conv2d(in_channels=n, out_channels=n*2, kernel_size=(1, 17), stride=(1, 2), padding=(0, 8), bias=False),
+            nn.BatchNorm2d(n*2),
             nn.LeakyReLU(0.1))
         self.layer3 = nn.Sequential(
-            nn.Conv2d(in_channels=n * 2, out_channels=n * 4, kernel_size=(1, 5), stride=(1, 2), padding=(0, 2), bias=False),
-            nn.BatchNorm2d(n * 4),
+            nn.Conv2d(in_channels=n*2, out_channels=n*4, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
+            nn.BatchNorm2d(n*4),
             nn.LeakyReLU(0.1))
-        # self.layer4 = nn.Sequential(
-        #     nn.Conv2d(in_channels=n * 4, out_channels=n * 8, kernel_size=(1, 5), stride=(1, 2), padding=(0, 2), bias=False),
-        #     nn.BatchNorm2d(n * 8),
-        #     nn.LeakyReLU(0.1))
-        self.out = nn.Conv2d(n * 4, n_out, kernel_size=(1, 32), stride=1, padding=0)
+        self.layer4 = nn.Conv2d(n*4, n_out, kernel_size=(1, 32), stride=1, padding=0)
 
     def forward(self, x):  # x.shape = [bs, 512]
         x = x.view((-1, 2, 256))  # [bs, 2, 256]
         x = x.unsqueeze(2)  # [bs, 2, 1, 256] = [N, C, H, W]
         x = self.layer1(x)  # [bs, 32, 1, 128]
-        #print(x.shape)
+        # print(x.shape)
         x = self.layer2(x)  # [bs, 64, 1, 64]
-        #print(x.shape)
+        # print(x.shape)
         x = self.layer3(x)  # [bs, 128, 1, 32]
-        #print(x.shape)
-        #x = self.layer4(x)
-        #print(x.shape)
-        x = self.out(x)
+        # print(x.shape)
+        x = self.layer4(x)
         return x.reshape(x.size(0), -1)  # [bs, 64*64]
 
 

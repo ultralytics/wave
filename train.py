@@ -252,13 +252,13 @@ class WAVE3(nn.Module):
         x = x.view((-1, 2, 256))  # [bs, 2, 256]
         x = x.unsqueeze(2)  # [bs, 2, 1, 256] = [N, C, H, W]
         x = self.layer1(x)  # [bs, 32, 1, 128]
-        print(x.shape)
+        #print(x.shape)
         x = self.layer2(x)  # [bs, 64, 1, 64]
-        print(x.shape)
+        #print(x.shape)
         x = self.layer3(x)  # [bs, 128, 1, 32]
-        print(x.shape)
+        #print(x.shape)
         x = self.layer4(x)
-        print(x.shape)
+        #print(x.shape)
         x = self.layer5(x)
         return x.reshape(x.size(0), -1)  # [bs, 64*64]
 

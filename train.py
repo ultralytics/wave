@@ -229,20 +229,26 @@ class WAVE4(nn.Module):
 class WAVE3(nn.Module):
     def __init__(self, n_out=2):
         super(WAVE3, self).__init__()
-        n = 64
+        n = 32
         self.layer1 = nn.Sequential(
-            nn.Conv2d(in_channels=2, out_channels=n, kernel_size=(1, 33), stride=(1, 2), padding=(0, 16), bias=False),
+            nn.Conv2d(in_channels=2, out_channels=n, kernel_size=(1, 5), stride=(1, 2), padding=(0, 2), bias=False),
             nn.BatchNorm2d(n),
             nn.LeakyReLU(0.1))
         self.layer2 = nn.Sequential(
-            nn.Conv2d(in_channels=n, out_channels=n*2, kernel_size=(1, 17), stride=(1, 2), padding=(0, 8), bias=False),
-            nn.BatchNorm2d(n*2),
+            nn.Conv2d(in_channels=n, out_channels=n * 2, kernel_size=(1, 5), stride=(1, 2), padding=(0, 2), bias=False),
+            nn.BatchNorm2d(n * 2),
             nn.LeakyReLU(0.1))
         self.layer3 = nn.Sequential(
-            nn.Conv2d(in_channels=n*2, out_channels=n*4, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
-            nn.BatchNorm2d(n*4),
+            nn.Conv2d(in_channels=n * 2, out_channels=n * 4, kernel_size=(1, 5), stride=(1, 2), padding=(0, 2),
+                      bias=False),
+            nn.BatchNorm2d(n * 4),
             nn.LeakyReLU(0.1))
-        self.layer4 = nn.Conv2d(n*4, n_out, kernel_size=(1, 32), stride=1, padding=0)
+        self.layer4 = nn.Sequential(
+            nn.Conv2d(in_channels=n * 5, out_channels=n * 4, kernel_size=(1, 5), stride=(1, 2), padding=(0, 2),
+                      bias=False),
+            nn.BatchNorm2d(n * 5),
+            nn.LeakyReLU(0.1))
+        self.layer4 = nn.Conv2d(n * 5, n_out, kernel_size=(1, 16), stride=1, padding=0)
 
     def forward(self, x):  # x.shape = [bs, 512]
         x = x.view((-1, 2, 256))  # [bs, 2, 256]

@@ -128,8 +128,8 @@ def train(H, model, str, lr=0.001):
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9)
 
     # Scheduler
-    stopper = patienceStopper(epochs=opt.epochs, patience=100, printerval=opt.printerval)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=10, factor=0.5, min_lr=1E-5, verbose=True)
+    stopper = patienceStopper(epochs=opt.epochs, patience=30, printerval=opt.printerval)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=20, factor=0.1, min_lr=1E-5, verbose=True)
 
     lossv = 1E6
     bs = opt.batch_size
@@ -321,3 +321,4 @@ if __name__ == '__main__':
 
 
 #        71  2.4557e-05    0.022613      12.169      0.1504
+#       127      1.4338    0.021565        11.9     0.14246

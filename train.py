@@ -95,8 +95,8 @@ def train(H, model, str, lr=0.001):
     if not os.path.isfile(pathd + data):
         os.system('wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
     mat = scipy.io.loadmat(pathd + data)
-    x = mat['inputs'][:10000]  # inputs (nx512) [waveform1 waveform2]
-    y = mat['outputs'][:10000, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
+    x = mat['inputs'][:]  # inputs (nx512) [waveform1 waveform2]
+    y = mat['outputs'][:, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
     nz, nx = x.shape
     ny = y.shape[1]
 
@@ -257,7 +257,7 @@ class WAVE3(nn.Module):
 
 
 class WAVE2(nn.Module):
-    def __init__(self, n_out=1):
+    def __init__(self, n_out=2):
         super(WAVE2, self).__init__()
         self.layer1 = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=(2, 30), stride=(1, 2), padding=(1, 15), bias=False),

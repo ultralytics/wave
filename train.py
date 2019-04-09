@@ -242,11 +242,11 @@ class WAVE3(nn.Module):
             nn.Conv2d(in_channels=n * 2, out_channels=n * 4, kernel_size=(1, 5), stride=(1, 2), padding=(0, 2), bias=False),
             nn.BatchNorm2d(n * 4),
             nn.LeakyReLU(0.1))
-        self.layer4 = nn.Sequential(
-            nn.Conv2d(in_channels=n * 4, out_channels=n * 8, kernel_size=(1, 5), stride=(1, 2), padding=(0, 2), bias=False),
-            nn.BatchNorm2d(n * 8),
-            nn.LeakyReLU(0.1))
-        self.layer5 = nn.Conv2d(n * 8, n_out, kernel_size=(1, 16), stride=1, padding=0)
+        # self.layer4 = nn.Sequential(
+        #     nn.Conv2d(in_channels=n * 4, out_channels=n * 8, kernel_size=(1, 5), stride=(1, 2), padding=(0, 2), bias=False),
+        #     nn.BatchNorm2d(n * 8),
+        #     nn.LeakyReLU(0.1))
+        self.out = nn.Conv2d(n * 4, n_out, kernel_size=(1, 32), stride=1, padding=0)
 
     def forward(self, x):  # x.shape = [bs, 512]
         x = x.view((-1, 2, 256))  # [bs, 2, 256]
@@ -257,9 +257,9 @@ class WAVE3(nn.Module):
         #print(x.shape)
         x = self.layer3(x)  # [bs, 128, 1, 32]
         #print(x.shape)
-        x = self.layer4(x)
+        #x = self.layer4(x)
         #print(x.shape)
-        x = self.layer5(x)
+        x = self.out(x)
         return x.reshape(x.size(0), -1)  # [bs, 64*64]
 
 

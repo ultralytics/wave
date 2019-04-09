@@ -99,7 +99,7 @@ def train(H, model, str, lr=0.001):
         os.system('wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
     mat = scipy.io.loadmat(pathd + data)
     x = mat['inputs'][:]  # inputs (nx512) [waveform1 waveform2]
-    y = mat['outputs'][:, :2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
+    y = mat['outputs'][:, :1]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
     nz, nx = x.shape
     ny = y.shape[1]
 
@@ -185,7 +185,7 @@ def train(H, model, str, lr=0.001):
 
 
 class WAVE(torch.nn.Module):
-    def __init__(self, n=(512, 64, 8, 2)):
+    def __init__(self, n=(512, 64, 8, 1)):
         super(WAVE, self).__init__()
         self.fc0 = nn.Linear(n[0], n[1])
         self.fc1 = nn.Linear(n[1], n[2])
@@ -206,7 +206,7 @@ class WAVE(torch.nn.Module):
 # 190  0.00059581    0.013831       99.58  default
 # 124      14.438    0.012876       99.55  LeakyReLU in place of ReLU
 class WAVE2(nn.Module):
-    def __init__(self, n_out=2):
+    def __init__(self, n_out=1):
         super(WAVE2, self).__init__()
         self.layer1 = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=(2, 30), stride=(1, 2), padding=(1, 15), bias=False),
@@ -219,7 +219,7 @@ class WAVE2(nn.Module):
             nn.LeakyReLU(0.1),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1))
         self.layer3 = nn.Sequential(
-            nn.Conv2d(64, 2, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)))
+            nn.Conv2d(64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)))
         # self.fc0 = nn.Linear(4096 * 2, 1024)
         # self.fc1 = nn.Linear(1024, 128)
         # self.fc2 = nn.Linear(128, 16)
@@ -297,6 +297,8 @@ if __name__ == '__main__':
 # 0.02456 [      12.69     0.15899] validate
 # 0.02457 [     12.687     0.15632] test
 
+#       400  5.1498e-05    0.023752      12.484     0.15728  # var 0
+#       121  2.6941e-05    0.021642      11.923     0.14201  # var 1
 
 
 
@@ -319,6 +321,4 @@ if __name__ == '__main__':
 # 0.02752 [      13.41     0.18784] validate
 # 0.03360 [     14.818     0.19295] test
 
-#       400  5.1498e-05    0.023752      12.484     0.15728  # var 0
-#        71  2.4557e-05    0.022613      12.169      0.1504
-#       127      1.4338    0.021565        11.9     0.14246
+

@@ -99,7 +99,7 @@ def train(H, model, str, lr=0.001):
         os.system('wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
     mat = scipy.io.loadmat(pathd + data)
     x = mat['inputs'][:]  # inputs (nx512) [waveform1 waveform2]
-    y = mat['outputs'][:, :1]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
+    y = mat['outputs'][:, 1:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
     nz, nx = x.shape
     ny = y.shape[1]
 

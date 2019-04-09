@@ -231,7 +231,7 @@ class WAVE3(nn.Module):
         super(WAVE3, self).__init__()
         n = 32
         self.layer1 = nn.Sequential(
-            nn.Conv2d(in_channels=2, out_channels=n, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
+            nn.Conv2d(in_channels=2, out_channels=n, kernel_size=(1, 17), stride=(1, 2), padding=(0, 8), bias=False),
             nn.BatchNorm2d(n),
             nn.LeakyReLU(0.1))
         self.layer2 = nn.Sequential(
@@ -294,7 +294,7 @@ H = [512, 64, 8, 2]
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=5000, help='number of epochs')
-    parser.add_argument('--batch-size', type=int, default=1000, help='size of each image batch')
+    parser.add_argument('--batch-size', type=int, default=2000, help='size of each image batch')
     parser.add_argument('--printerval', type=int, default=1, help='print results interval')
     parser.add_argument('--var', nargs='+', default=[3], help='debug list')
     opt = parser.parse_args()

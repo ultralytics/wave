@@ -228,15 +228,15 @@ class WAVE3(nn.Module):
     def __init__(self, n_out=2):
         super(WAVE3, self).__init__()
         self.layer1 = nn.Sequential(
-            nn.Conv2d(in_channels=2, out_channels=32, kernel_size=(1, 33), stride=(1, 2), padding=(0, 16), bias=False),
+            nn.Conv2d(in_channels=2, out_channels=32, kernel_size=(1, 65), stride=(1, 2), padding=(0, 32), bias=False),
             nn.BatchNorm2d(32),
             nn.LeakyReLU(0.1))
         self.layer2 = nn.Sequential(
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(1, 17), stride=(1, 2), padding=(0, 8), bias=False),
+            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(2, 17), stride=(1, 2), padding=(0, 8), bias=False),
             nn.BatchNorm2d(64),
             nn.LeakyReLU(0.1))
         self.layer3 = nn.Sequential(
-            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
+            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(2, 9), stride=(1, 2), padding=(0, 4), bias=False),
             nn.BatchNorm2d(128),
             nn.LeakyReLU(0.1))
         self.layer4 = nn.Conv2d(128, n_out, kernel_size=(1, 32), stride=1, padding=0)
@@ -245,7 +245,7 @@ class WAVE3(nn.Module):
         x = x.view((-1, 2, 256))  # [bs, 2, 256]
         x = x.unsqueeze(2)  # [bs, 2, 1, 256] = [N, C, H, W]
         x = self.layer1(x)  # [bs, 32, 1, 128]
-        # print(x.shape)
+        print(x.shape)
         x = self.layer2(x)  # [bs, 64, 1, 64]
         # print(x.shape)
         x = self.layer3(x)  # [bs, 128, 1, 32]
@@ -286,7 +286,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=5000, help='number of epochs')
     parser.add_argument('--batch-size', type=int, default=2000, help='size of each image batch')
     parser.add_argument('--printerval', type=int, default=1, help='print results interval')
-    parser.add_argument('--var', nargs='+', default=[0], help='debug list')
+    parser.add_argument('--var', nargs='+', default=[3], help='debug list')
     opt = parser.parse_args()
     opt.var = [float(x) for x in opt.var]
     print(opt, end='\n\n')

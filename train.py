@@ -84,7 +84,7 @@ labels = ['train', 'validate', 'test']
 torch.manual_seed(1)
 
 
-def train(H, model, str, lr=0.001):
+def train(H, model, str, lr=0.01):
     data = 'wavedata25ns.mat'
 
     cuda = torch.cuda.is_available()

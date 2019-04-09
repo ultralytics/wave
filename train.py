@@ -5,7 +5,6 @@ import time
 
 import scipy.io
 import torch.nn as nn
-from matplotlib import pyplot as plt
 
 from utils.torch_utils import *
 from utils.utils import *
@@ -59,8 +58,6 @@ class patienceStopper(object):
             return False
 
     def first(self, model):
-        if model:
-            model_info(model)
         s = ('epoch', 'time', 'loss', 'metric(s)')
         print('%12s' * len(s) % s)
 
@@ -98,8 +95,8 @@ def train(H, model, str, lr=0.001):
     if not os.path.isfile(pathd + data):
         os.system('wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
     mat = scipy.io.loadmat(pathd + data)
-    x = mat['inputs'][:]  # inputs (nx512) [waveform1 waveform2]
-    y = mat['outputs'][:, 1:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
+    x = mat['inputs'][:10000]  # inputs (nx512) [waveform1 waveform2]
+    y = mat['outputs'][:10000, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
     nz, nx = x.shape
     ny = y.shape[1]
 
@@ -129,12 +126,14 @@ def train(H, model, str, lr=0.001):
 
     # Scheduler
     stopper = patienceStopper(epochs=opt.epochs, patience=30, printerval=opt.printerval)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=20, factor=0.1, min_lr=1E-5, verbose=True)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=20, factor=0.1, min_lr=1E-5,
+                                                           verbose=True)
 
     lossv = 1E6
     bs = opt.batch_size
     nb = int(np.ceil(x.shape[0] / bs))
     L = np.full((opt.epochs, 3), np.nan)
+    model_info(model)
     for i in range(opt.epochs):
         scheduler.step(lossv)
 
@@ -184,27 +183,79 @@ def train(H, model, str, lr=0.001):
     return np.concatenate(([stopper.bestloss], np.array(loss), np.array(std.ravel())))
 
 
+#       400  5.1498e-05    0.023752      12.484     0.15728  # var 0
 class WAVE(torch.nn.Module):
-    def __init__(self, n=(512, 64, 8, 1)):
+    def __init__(self, n=(512, 64, 8, 2)):
         super(WAVE, self).__init__()
         self.fc0 = nn.Linear(n[0], n[1])
         self.fc1 = nn.Linear(n[1], n[2])
         self.fc2 = nn.Linear(n[2], n[3])
-        self.out = nn.Linear(n[3], n[3])
 
     def forward(self, x):  # x.shape = [bs, 512]
         x = torch.tanh(self.fc0(x))  # [bs, 64]
         x = torch.tanh(self.fc1(x))  # [bs, 8]
-        x = self.fc2(x)  # [bs, 2]
-        return x
+        return self.fc2(x)  # [bs, 2]
 
 
 # https://github.com/yunjey/pytorch-tutorial/tree/master/tutorials/02-intermediate
-# 8  0.00023365    0.025934       99.14  default no augmentation
-# 126: 99.62% test accuracy, 0.0137 test loss, normalize + 10% augment
-# 185: 99.60% test accuracy, 0.0123 test loss
-# 190  0.00059581    0.013831       99.58  default
-# 124      14.438    0.012876       99.55  LeakyReLU in place of ReLU
+#       121  2.6941e-05    0.021642      11.923     0.14201  # var 1
+class WAVE4(nn.Module):
+    def __init__(self, n_out=2):
+        super(WAVE4, self).__init__()
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(1, 32, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
+            nn.BatchNorm2d(32),
+            nn.LeakyReLU(0.1))
+        # nn.MaxPool2d(kernel_size=(1, 2), stride=1))
+        self.layer2 = nn.Sequential(
+            nn.Conv2d(32, 64, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
+            nn.BatchNorm2d(64),
+            nn.LeakyReLU(0.1))
+        # nn.MaxPool2d(kernel_size=(1, 2), stride=1))
+        self.layer3 = nn.Conv2d(64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0))
+
+    def forward(self, x):  # x.shape = [bs, 512]
+        x = x.view((-1, 2, 256))  # [bs, 2, 256]
+        x = x.unsqueeze(1)  # [bs, 1, 2, 256] =  = [N, C, H, W]
+        x = self.layer1(x)  # [bs, 32, 1, 128]
+        x = self.layer2(x)  # [bs, 64, 1, 64]
+        x = self.layer3(x)
+        return x.reshape(x.size(0), -1)  # [bs, 64*64]
+
+
+#       121  2.6941e-05    0.021642      11.923     0.14201  # var 1
+class WAVE3(nn.Module):
+    def __init__(self, n_out=2):
+        super(WAVE3, self).__init__()
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(in_channels=2, out_channels=32, kernel_size=(1, 3), stride=(1, 2), padding=(0, 1), bias=False),
+            nn.BatchNorm2d(32),
+            nn.LeakyReLU(0.1))
+        self.layer2 = nn.Sequential(
+            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(1, 3), stride=(1, 2), padding=(0, 1), bias=False),
+            nn.BatchNorm2d(64),
+            nn.LeakyReLU(0.1))
+        self.layer3 = nn.Sequential(
+            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(1, 3), stride=(1, 2), padding=(0, 1), bias=False),
+            nn.BatchNorm2d(128),
+            nn.LeakyReLU(0.1))
+        self.layer4 = nn.Conv2d(128, n_out, kernel_size=(1, 32), stride=1, padding=0)
+
+    def forward(self, x):  # x.shape = [bs, 512]
+        x = x.view((-1, 2, 256))  # [bs, 2, 256]
+        x = x.unsqueeze(2)  # [bs, 2, 1, 256] = [N, C, H, W]
+
+        x = self.layer1(x)  # [bs, 32, 1, 128]
+        # print(x.shape)
+        x = self.layer2(x)  # [bs, 64, 1, 64]
+        # print(x.shape)
+        x = self.layer3(x)  # [bs, 128, 1, 32]
+        # print(x.shape)
+
+        x = self.layer4(x)
+        return x.reshape(x.size(0), -1)  # [bs, 64*64]
+
+
 class WAVE2(nn.Module):
     def __init__(self, n_out=1):
         super(WAVE2, self).__init__()
@@ -220,26 +271,14 @@ class WAVE2(nn.Module):
             nn.MaxPool2d(kernel_size=(1, 2), stride=1))
         self.layer3 = nn.Sequential(
             nn.Conv2d(64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)))
-        # self.fc0 = nn.Linear(4096 * 2, 1024)
-        # self.fc1 = nn.Linear(1024, 128)
-        # self.fc2 = nn.Linear(128, 16)
-        # self.fc3 = nn.Linear(16, 2)
 
     def forward(self, x):  # x.shape = [bs, 512]
         x = x.view((-1, 2, 256))  # [bs, 2, 256]
-
-        plot = False
-        if plot:
-            plt.plot(x[0, 0].numpy())
-            plt.plot(x[0, 1].numpy())
-
         x = x.unsqueeze(1)  # [bs, 1, 2, 256]
         x = self.layer1(x)  # [bs, 32, 1, 128]
         x = self.layer2(x)  # [bs, 64, 1, 64]
         x = self.layer3(x)
-        x = x.reshape(x.size(0), -1)  # [bs, 64*64]
-        # x = self.fc3(self.fc2(self.fc1(self.fc0(x))))  # [bs, 2]
-        return x
+        return x.reshape(x.size(0), -1)  # [bs, 64*64]
 
 
 H = [512, 64, 8, 2]
@@ -249,7 +288,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=5000, help='number of epochs')
     parser.add_argument('--batch-size', type=int, default=2000, help='size of each image batch')
     parser.add_argument('--printerval', type=int, default=1, help='print results interval')
-    parser.add_argument('--var', nargs='+', default=[1], help='debug list')
+    parser.add_argument('--var', nargs='+', default=[0], help='debug list')
     opt = parser.parse_args()
     opt.var = [float(x) for x in opt.var]
     print(opt, end='\n\n')
@@ -258,9 +297,12 @@ if __name__ == '__main__':
 
     if opt.var[0] == 0:
         _ = train(H, model=WAVE(), str='.Tanh')
-    elif opt.var[0] == 1:
+    elif opt.var[0] == 2:
         _ = train(H, model=WAVE2(), str='.Tanh')
-
+    elif opt.var[0] == 3:
+        _ = train(H, model=WAVE3(), str='.Tanh')
+    elif opt.var[0] == 4:
+        _ = train(H, model=WAVE4(), str='.Tanh')
 
 # 100K SET ---------------------------------------------------------------------
 # Model Summary: 8 layers, 33376 parameters, 33376 gradients
@@ -289,7 +331,7 @@ if __name__ == '__main__':
 # 0.02322 [      12.34     0.15902] validate
 # 0.02316 [     12.328     0.15611] test
 
-#BS 2K
+# BS 2K
 # 100 Patience exceeded at epoch 510.
 # Finished 1000 epochs in 27.223s (36.733 epochs/s). Best results:
 #          409  5.7936e-05     0.02456       12.69     0.15899
@@ -299,9 +341,6 @@ if __name__ == '__main__':
 
 #       400  5.1498e-05    0.023752      12.484     0.15728  # var 0
 #       121  2.6941e-05    0.021642      11.923     0.14201  # var 1
-
-
-
 
 
 # 10K TEST SET
@@ -320,5 +359,3 @@ if __name__ == '__main__':
 # 0.01846 [     10.901     0.17024] train
 # 0.02752 [      13.41     0.18784] validate
 # 0.03360 [     14.818     0.19295] test
-
-

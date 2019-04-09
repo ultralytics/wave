@@ -123,13 +123,12 @@ def train(H, model, str, lr=0.001):
     MSE = nn.MSELoss()
 
     # Optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=.9)
 
     # Scheduler
-    stopper = patienceStopper(epochs=opt.epochs, patience=30, printerval=opt.printerval)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=10, factor=0.5, min_lr=1E-5,
-                                                           verbose=True)
+    stopper = patienceStopper(epochs=opt.epochs, patience=24, printerval=opt.printerval)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=20, factor=0.1, min_lr=1E-5, verbose=True)
 
     lossv = 1E6
     bs = opt.batch_size
@@ -235,14 +234,16 @@ class WAVE3(nn.Module):
             nn.BatchNorm2d(n),
             nn.LeakyReLU(0.1))
         self.layer2 = nn.Sequential(
-            nn.Conv2d(in_channels=n, out_channels=n*2, kernel_size=(1, 17), stride=(1, 2), padding=(0, 8), bias=False),
-            nn.BatchNorm2d(n*2),
+            nn.Conv2d(in_channels=n, out_channels=n * 2, kernel_size=(1, 17), stride=(1, 2), padding=(0, 8),
+                      bias=False),
+            nn.BatchNorm2d(n * 2),
             nn.LeakyReLU(0.1))
         self.layer3 = nn.Sequential(
-            nn.Conv2d(in_channels=n*2, out_channels=n*4, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
-            nn.BatchNorm2d(n*4),
+            nn.Conv2d(in_channels=n * 2, out_channels=n * 4, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4),
+                      bias=False),
+            nn.BatchNorm2d(n * 4),
             nn.LeakyReLU(0.1))
-        self.layer4 = nn.Conv2d(n*4, n_out, kernel_size=(1, 32), stride=1, padding=0)
+        self.layer4 = nn.Conv2d(n * 4, n_out, kernel_size=(1, 32), stride=1, padding=0)
 
     def forward(self, x):  # x.shape = [bs, 512]
         x = x.view((-1, 2, 256))  # [bs, 2, 256]

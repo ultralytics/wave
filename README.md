@@ -1,32 +1,43 @@
 <br>
-<img src="https://raw.githubusercontent.com/ultralytics/assets/main/logo/Ultralytics_Logotype_Original.svg" width="320">
+<img src="https://raw.githubusercontent.com/ultralytics/assets/main/logo/Ultralytics_Logotype_Original.svg" width="350">
 
-# Introduction
+# WAveform Vector Exploitation (WAVE)
 
-The https://github.com/ultralytics/wave repo contains **WA**veform **V**ector **E**xploitation code, a new method for particle physics detector readout and reconstruction based on Machine Learning and Deep Neural Networks.
+The [WAVE](https://github.com/ultralytics/wave) repository is home to the WAVE project, which explores the use of Machine Learning and Deep Neural Networks in particle physics detector readout and reconstruction.
 
-# Requirements
+## Requirements
 
-Python 3.7 or later with the following `pip3 install -U -r requirements.txt` packages:
+To run the WAVE code, make sure you have the following dependencies installed:
 
-- `numpy`
-- `scipy`
-- `torch` >= 0.4.0
-- `tensorflow` >= 1.8.0
-- `plotly` (optional)
+- Python 3.7 or later
+- Packages: `numpy`, `scipy`, `torch` (version 0.4.0 or higher), `tensorflow` (version 1.8.0 or higher), `plotly` (optional)
 
-# Run
+You can install the required packages by running the following command:
 
-- WAVE in pytorch: `wave_pytorch.py` 
-- WAVE in tensorflow: `wave_tf.py`
-- WAVE in pytorch on Google Cloud Platform: `gcp/wave_pytorch_gcp.py`
+```bash
+pip3 install -U -r requirements.txt
+```
 
-![Alt](https://github.com/ultralytics/wave/blob/master/data/waveforms.png "waveforms")
-![Alt](https://github.com/ultralytics/wave/blob/master/data/wave.png "training")
+## Usage
 
-# Citation
+The WAVE project provides different implementations in both PyTorch and Tensorflow, as well as a version for deployment on Google Cloud Platform (GCP). To run WAVE, use the following scripts:
 
-Jocher, G., Nishimura, K., Koblanski, J. and Li, V. (2018). WAVE: Machine Learning for Full-Waveform Time-Of-Flight Detectors. [online] Arxiv.org. Available at: https://arxiv.org/abs/1811.05875.
+- WAVE in PyTorch: `wave_pytorch.py`
+- WAVE in Tensorflow: `wave_tf.py`
+- WAVE in PyTorch on GCP: `gcp/wave_pytorch_gcp.py`
+
+## Results
+
+Here are some visualization of the WAVE project:
+
+![waveforms](https://github.com/ultralytics/wave/blob/master/data/waveforms.png)
+![training](https://github.com/ultralytics/wave/blob/master/data/wave.png)
+
+## Citation
+
+If you use the WAVE project, please cite the following paper:
+
+Jocher, G., Nishimura, K., Koblanski, J. and Li, V. (2018). WAVE: Machine Learning for Full-Waveform Time-Of-Flight Detectors. [Read the paper](https://arxiv.org/abs/1811.05875).
 
 # Contribute
 

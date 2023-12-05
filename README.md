@@ -1,3 +1,6 @@
+<br>
+<img src="https://raw.githubusercontent.com/ultralytics/assets/main/logo/Ultralytics_Logotype_Original.svg" width="320">
+
 # 🌊 Introduction
 
 Welcome to the [Ultralytics WAVE repository](https://github.com/ultralytics/wave) – the cutting-edge solution for the machine learning driven analysis and interpretation of waveform data in particle physics! 🎉
@@ -60,20 +63,21 @@ Ultralytics is pleased to offer dual licensing options to accommodate a wide ran
 
 # 📬 Contact Us
 
-Have a glitch to report or a feature to request? Post it on [GitHub Issues](https://github.com/ultralytics/wave/issues) for support. For questions and real-time discussions, become a part of our vibrant [Discord](https://ultralytics.com/discord) community. Let's talk waves! 💡
+For bug reports, feature requests, and contributions, head to [GitHub Issues](https://github.com/ultralytics/velocity/issues). For questions and discussions about this project and other Ultralytics endeavors, join us on [Discord](https://ultralytics.com/discord)!
 
-## 📢 Stay Connected
-
-Join us across our socials to stay updated on the latest from Ultralytics! Explore, follow, and connect with us:
-
+<br>
 <div align="center">
   <a href="https://github.com/ultralytics"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-github.png" width="3%" alt="Ultralytics GitHub"></a>
+  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="3%" alt="space">
   <a href="https://www.linkedin.com/company/ultralytics/"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-linkedin.png" width="3%" alt="Ultralytics LinkedIn"></a>
+  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="3%" alt="space">
   <a href="https://twitter.com/ultralytics"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-twitter.png" width="3%" alt="Ultralytics Twitter"></a>
+  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="3%" alt="space">
   <a href="https://youtube.com/ultralytics"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-youtube.png" width="3%" alt="Ultralytics YouTube"></a>
+  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="3%" alt="space">
   <a href="https://www.tiktok.com/@ultralytics"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-tiktok.png" width="3%" alt="Ultralytics TikTok"></a>
+  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="3%" alt="space">
   <a href="https://www.instagram.com/ultralytics/"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-instagram.png" width="3%" alt="Ultralytics Instagram"></a>
+  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="3%" alt="space">
   <a href="https://ultralytics.com/discord"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-discord.png" width="3%" alt="Ultralytics Discord"></a>
 </div>
-```
-This enhanced README provides a comprehensive introduction to the Ultralytics WAVE repository, detailing the project's objectives, features, and how to run and contribute to it. It ensures all readers, technical or not, can grasp the purpose and usage of the repository. It reflects Ultralytics' welcoming community-driven approach and adheres to the AGPL-3.0 licensing throughout.

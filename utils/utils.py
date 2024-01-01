@@ -5,8 +5,8 @@ import numpy as np
 import torch
 
 # Set printoptions
-torch.set_printoptions(linewidth=1320, precision=5, profile='long')
-np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format})  # format short g, %precision=5
+torch.set_printoptions(linewidth=1320, precision=5, profile="long")
+np.set_printoptions(linewidth=320, formatter={"float_kind": "{:11.5g}".format})  # format short g, %precision=5
 
 
 def normalize(x, axis=None):  # normalize x mean and std by axis
@@ -38,14 +38,14 @@ def splitdata(x, y, train=0.7, validate=0.15, test=0.15, shuffle=False):  # spli
 
 def stdpt(r, ys):  # MSE loss + standard deviation (pytorch)
     r = r.detach()
-    loss = (r ** 2).mean().cpu().item()
+    loss = (r**2).mean().cpu().item()
     std = r.std(0).cpu().numpy() * ys
     return loss, std
 
 
 def stdtf(r, ys):  # MSE loss + standard deviation (tf eager)
     r = r.numpy()
-    loss = (r ** 2).mean()
+    loss = (r**2).mean()
     std = r.std(0) * ys
     return loss, std
 
@@ -54,12 +54,14 @@ def model_info(model):
     # Plots a line-by-line description of a PyTorch model
     n_p = sum(x.numel() for x in model.parameters())  # number parameters
     n_g = sum(x.numel() for x in model.parameters() if x.requires_grad)  # number gradients
-    print('\n%5s %40s %9s %12s %20s %10s %10s' % ('layer', 'name', 'gradient', 'parameters', 'shape', 'mu', 'sigma'))
+    print("\n%5s %40s %9s %12s %20s %10s %10s" % ("layer", "name", "gradient", "parameters", "shape", "mu", "sigma"))
     for i, (name, p) in enumerate(model.named_parameters()):
-        name = name.replace('module_list.', '')
-        print('%5g %40s %9s %12g %20s %10.3g %10.3g' % (
-            i, name, p.requires_grad, p.numel(), list(p.shape), p.mean(), p.std()))
-    print('Model Summary: %g layers, %g parameters, %g gradients' % (i + 1, n_p, n_g))
+        name = name.replace("module_list.", "")
+        print(
+            "%5g %40s %9s %12g %20s %10.3g %10.3g"
+            % (i, name, p.requires_grad, p.numel(), list(p.shape), p.mean(), p.std())
+        )
+    print("Model Summary: %g layers, %g parameters, %g gradients" % (i + 1, n_p, n_g))
 
 
 class patienceStopper(object):
@@ -76,7 +78,7 @@ class patienceStopper(object):
         self.printerval = printerval
 
     def reset(self):
-        self.bestloss = float('inf')
+        self.bestloss = float("inf")
         self.bestmetrics = None
         self.num_bad_epochs = 0
 
@@ -99,28 +101,30 @@ class patienceStopper(object):
                     self.bestmodel = copy.deepcopy(model)
 
         if self.num_bad_epochs > self.patience:
-            self.final('%g Patience exceeded at epoch %g.' % (self.patience, self.epoch))
+            self.final("%g Patience exceeded at epoch %g." % (self.patience, self.epoch))
             return True
         elif self.epoch >= self.epochs:
-            self.final('WARNING: %g Patience not exceeded by epoch %g (train longer).' % (self.patience, self.epoch))
+            self.final("WARNING: %g Patience not exceeded by epoch %g (train longer)." % (self.patience, self.epoch))
             return True
         else:
             return False
 
     def first(self, model):
-        s = ('epoch', 'time', 'loss', 'metric(s)')
-        print('%12s' * len(s) % s)
+        s = ("epoch", "time", "loss", "metric(s)")
+        print("%12s" * len(s) % s)
 
     def printepoch(self, epoch, loss, metrics):
         s = (epoch, time.time() - self.t, loss)
         if metrics is not None:
             for i in range(len(metrics)):
                 s += (metrics[i],)
-        print('%12.5g' * len(s) % s)
+        print("%12.5g" * len(s) % s)
         self.t = time.time()
 
     def final(self, msg):
         dt = time.time() - self.t0
-        print('%s\nFinished %g epochs in %.3fs (%.3f epochs/s). Best results:' % (
-            msg, self.epochs + 1, dt, (self.epochs + 1) / dt))
+        print(
+            "%s\nFinished %g epochs in %.3fs (%.3f epochs/s). Best results:"
+            % (msg, self.epochs + 1, dt, (self.epochs + 1) / dt)
+        )
         self.printepoch(self.bestepoch, self.bestloss, self.bestmetrics)

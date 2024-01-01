@@ -11,27 +11,27 @@ torch.backends.cudnn.benchmark = True  # unsuitable for multiscale
 
 ONNX_EXPORT = False
 
-pathd = 'data/'
-pathr = 'results/'
-labels = ['train', 'validate', 'test']
+pathd = "data/"
+pathr = "results/"
+labels = ["train", "validate", "test"]
 torch.manual_seed(1)
 
 
 def train(H, model, str, lr=0.001):
-    data = 'wavedata25ns.mat'
+    data = "wavedata25ns.mat"
 
     cuda = torch.cuda.is_available()
-    os.makedirs(pathr + 'models', exist_ok=True)
-    name = (data[:-4] + '%s%glr%s' % (H[:], lr, str)).replace(', ', '.').replace('[', '_').replace(']', '_')
-    print('Running ' + name)
+    os.makedirs(pathr + "models", exist_ok=True)
+    name = (data[:-4] + "%s%glr%s" % (H[:], lr, str)).replace(", ", ".").replace("[", "_").replace("]", "_")
+    print("Running " + name)
 
     device = select_device()
 
     if not os.path.isfile(pathd + data):
-        os.system('wget -P data/ https://storage.googleapis.com/ultralytics/' + data)
+        os.system("wget -P data/ https://storage.googleapis.com/ultralytics/" + data)
     mat = scipy.io.loadmat(pathd + data)
-    x = mat['inputs'][:]  # inputs (nx512) [waveform1 waveform2]
-    y = mat['outputs'][:, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
+    x = mat["inputs"][:]  # inputs (nx512) [waveform1 waveform2]
+    y = mat["outputs"][:, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
     nz, nx = x.shape
     ny = y.shape[1]
 
@@ -61,10 +61,11 @@ def train(H, model, str, lr=0.001):
 
     # Scheduler
     stopper = patienceStopper(epochs=opt.epochs, patience=24, printerval=opt.printerval)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=20, factor=0.1, min_lr=1E-5,
-                                                           verbose=True)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, patience=20, factor=0.1, min_lr=1e-5, verbose=True
+    )
 
-    lossv = 1E6
+    lossv = 1e6
     bs = opt.batch_size
     nb = int(np.ceil(x.shape[0] / bs))
     L = np.full((opt.epochs, 3), np.nan)
@@ -77,7 +78,7 @@ def train(H, model, str, lr=0.001):
         for bi in range(nb):
             j = range(bi * bs, min((bi + 1) * bs, x.shape[0]))
             if ONNX_EXPORT:
-                _ = torch.onnx._export(model, x, 'model.onnx', verbose=True)
+                _ = torch.onnx._export(model, x, "model.onnx", verbose=True)
                 return
 
             loss = MSE(model(x[j]), y[j])
@@ -108,11 +109,11 @@ def train(H, model, str, lr=0.001):
     for i, (xi, yi) in enumerate(((x, y), (xv, yv), (xt, yt))):
         with torch.no_grad():
             r = stopper.bestmodel(xi) - yi  # residuals, ().detach?
-            loss[i] = (r ** 2).mean().cpu().item()
+            loss[i] = (r**2).mean().cpu().item()
             std[i] = r.std(0).cpu().numpy() * ys
-        print('%.5f %s %s' % (loss[i], std[i, :], labels[i]))
+        print("%.5f %s %s" % (loss[i], std[i, :], labels[i]))
 
-    scipy.io.savemat(pathr + name + '.mat', dict(bestepoch=stopper.bestloss, loss=loss, std=std, L=L, name=name))
+    scipy.io.savemat(pathr + name + ".mat", dict(bestepoch=stopper.bestloss, loss=loss, std=std, L=L, name=name))
     # files.download(pathr + name + '.mat')
 
     return np.concatenate(([stopper.bestloss], np.array(loss), np.array(std.ravel())))
@@ -140,12 +141,14 @@ class WAVE4(nn.Module):
         self.layer1 = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
             nn.BatchNorm2d(32),
-            nn.LeakyReLU(0.1))
+            nn.LeakyReLU(0.1),
+        )
         # nn.MaxPool2d(kernel_size=(1, 2), stride=1))
         self.layer2 = nn.Sequential(
             nn.Conv2d(32, 64, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
             nn.BatchNorm2d(64),
-            nn.LeakyReLU(0.1))
+            nn.LeakyReLU(0.1),
+        )
         # nn.MaxPool2d(kernel_size=(1, 2), stride=1))
         self.layer3 = nn.Conv2d(64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0))
 
@@ -166,17 +169,22 @@ class WAVE3(nn.Module):
         self.layer1 = nn.Sequential(
             nn.Conv2d(in_channels=2, out_channels=n, kernel_size=(1, 33), stride=(1, 2), padding=(0, 16), bias=False),
             nn.BatchNorm2d(n),
-            nn.LeakyReLU(0.1))
+            nn.LeakyReLU(0.1),
+        )
         self.layer2 = nn.Sequential(
-            nn.Conv2d(in_channels=n, out_channels=n * 2, kernel_size=(1, 17), stride=(1, 2), padding=(0, 8),
-                      bias=False),
+            nn.Conv2d(
+                in_channels=n, out_channels=n * 2, kernel_size=(1, 17), stride=(1, 2), padding=(0, 8), bias=False
+            ),
             nn.BatchNorm2d(n * 2),
-            nn.LeakyReLU(0.1))
+            nn.LeakyReLU(0.1),
+        )
         self.layer3 = nn.Sequential(
-            nn.Conv2d(in_channels=n * 2, out_channels=n * 4, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4),
-                      bias=False),
+            nn.Conv2d(
+                in_channels=n * 2, out_channels=n * 4, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False
+            ),
             nn.BatchNorm2d(n * 4),
-            nn.LeakyReLU(0.1))
+            nn.LeakyReLU(0.1),
+        )
         self.layer4 = nn.Conv2d(n * 4, n_out, kernel_size=(1, 32), stride=1, padding=0)
 
     def forward(self, x):  # x.shape = [bs, 512]
@@ -200,14 +208,15 @@ class WAVE2(nn.Module):
             nn.Conv2d(1, 32, kernel_size=(2, 30), stride=(1, 2), padding=(1, 15), bias=False),
             nn.BatchNorm2d(32),
             nn.LeakyReLU(0.1),
-            nn.MaxPool2d(kernel_size=(1, 2), stride=1))
+            nn.MaxPool2d(kernel_size=(1, 2), stride=1),
+        )
         self.layer2 = nn.Sequential(
             nn.Conv2d(32, 64, kernel_size=(2, 30), stride=(1, 2), padding=(0, 15), bias=False),
             nn.BatchNorm2d(64),
             nn.LeakyReLU(0.1),
-            nn.MaxPool2d(kernel_size=(1, 2), stride=1))
-        self.layer3 = nn.Sequential(
-            nn.Conv2d(64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)))
+            nn.MaxPool2d(kernel_size=(1, 2), stride=1),
+        )
+        self.layer3 = nn.Sequential(nn.Conv2d(64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)))
 
     def forward(self, x):  # x.shape = [bs, 512]
         x = x.view((-1, 2, 256))  # [bs, 2, 256]
@@ -220,26 +229,26 @@ class WAVE2(nn.Module):
 
 H = [512, 64, 8, 2]
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--epochs', type=int, default=5000, help='number of epochs')
-    parser.add_argument('--batch-size', type=int, default=2000, help='size of each image batch')
-    parser.add_argument('--printerval', type=int, default=1, help='print results interval')
-    parser.add_argument('--var', nargs='+', default=[3], help='debug list')
+    parser.add_argument("--epochs", type=int, default=5000, help="number of epochs")
+    parser.add_argument("--batch-size", type=int, default=2000, help="size of each image batch")
+    parser.add_argument("--printerval", type=int, default=1, help="print results interval")
+    parser.add_argument("--var", nargs="+", default=[3], help="debug list")
     opt = parser.parse_args()
     opt.var = [float(x) for x in opt.var]
-    print(opt, end='\n\n')
+    print(opt, end="\n\n")
 
     init_seeds()
 
     if opt.var[0] == 0:
-        _ = train(H, model=WAVE(), str='.Tanh')
+        _ = train(H, model=WAVE(), str=".Tanh")
     elif opt.var[0] == 2:
-        _ = train(H, model=WAVE2(), str='.Tanh')
+        _ = train(H, model=WAVE2(), str=".Tanh")
     elif opt.var[0] == 3:
-        _ = train(H, model=WAVE3(), str='.Tanh')
+        _ = train(H, model=WAVE3(), str=".Tanh")
     elif opt.var[0] == 4:
-        _ = train(H, model=WAVE4(), str='.Tanh')
+        _ = train(H, model=WAVE4(), str=".Tanh")
 
 # 100K SET ---------------------------------------------------------------------
 # Model Summary: 8 layers, 33376 parameters, 33376 gradients

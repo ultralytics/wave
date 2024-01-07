@@ -23,11 +23,11 @@ The primary goal of this project is to develop and share Machine Learning techni
 Before you dive into waveform vector exploitation with our WAVE code, make sure your machine is set up with the following:
 
 - Python 3.7 or later, plus these packages installed with `pip3 install -U -r requirements.txt`:
-  - `numpy`
-  - `scipy`
-  - `torch` (version 0.4.0 or later)
-  - `tensorflow` (version 1.8.0 or later)
-  - `plotly` (optional, for visualization)
+    - `numpy`
+    - `scipy`
+    - `torch` (version 0.4.0 or later)
+    - `tensorflow` (version 1.8.0 or later)
+    - `plotly` (optional, for visualization)
 
 # 🏃 Run Instructions
 

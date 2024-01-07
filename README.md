@@ -7,6 +7,8 @@ Welcome to the [Ultralytics WAVE repository](https://github.com/ultralytics/wave
 
 Here, we introduce **WA**veform **V**ector **E**xploitation (WAVE), a novel approach that uses Deep Learning to readout and reconstruct signals from particle physics detectors. This repository contains our open-source codebase and aims to foster collaboration and innovation in this exciting intersection of ML and physics.
 
+[![Ultralytics Actions](https://github.com/ultralytics/wave/actions/workflows/format.yml/badge.svg)](https://github.com/ultralytics/wave/actions/workflows/format.yml)
+
 ## 🚀 Project Objectives
 
 The primary goal of this project is to develop and share Machine Learning techniques that can be applied to full-waveform time-of-flight detectors. These advanced methods are designed to enhance signal processing and interpretation, thereby pushing the boundaries of what's possible in particle physics research.
@@ -23,11 +25,11 @@ The primary goal of this project is to develop and share Machine Learning techni
 Before you dive into waveform vector exploitation with our WAVE code, make sure your machine is set up with the following:
 
 - Python 3.7 or later, plus these packages installed with `pip3 install -U -r requirements.txt`:
-  - `numpy`
-  - `scipy`
-  - `torch` (version 0.4.0 or later)
-  - `tensorflow` (version 1.8.0 or later)
-  - `plotly` (optional, for visualization)
+    - `numpy`
+    - `scipy`
+    - `torch` (version 0.4.0 or later)
+    - `tensorflow` (version 1.8.0 or later)
+    - `plotly` (optional, for visualization)
 
 # 🏃 Run Instructions
 

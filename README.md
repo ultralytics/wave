@@ -7,7 +7,7 @@ Welcome to the [Ultralytics WAVE repository](https://github.com/ultralytics/wave
 
 Here, we introduce **WA**veform **V**ector **E**xploitation (WAVE), a novel approach that uses Deep Learning to readout and reconstruct signals from particle physics detectors. This repository contains our open-source codebase and aims to foster collaboration and innovation in this exciting intersection of ML and physics.
 
-[![Ultralytics Actions](https://github.com/ultralytics/wave/actions/workflows/format.yml/badge.svg)](https://github.com/ultralytics/wave/actions/workflows/format.yml)
+[![Ultralytics Actions](https://github.com/ultralytics/wave/actions/workflows/format.yml/badge.svg)](https://github.com/ultralytics/wave/actions/workflows/format.yml) <a href="https://ultralytics.com/discord"><img alt="Discord" src="https://img.shields.io/discord/1089800235347353640?logo=discord&logoColor=white&label=Discord&color=blue"></a>
 
 ## 🚀 Project Objectives
 

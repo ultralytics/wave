@@ -41,7 +41,7 @@ You can run the WAVE models using the following scripts:
 
 Explore the beauty of waveform signals and training process visualization with the images below:
 
-![Waveform Signals](https://github.com/ultralytics/wave/blob/master/data/waveforms.png "Waveform signals captured by the detector.") ![Training Visualization](https://github.com/ultralytics/wave/blob/master/data/wave.png "Visualization of the training process.")
+![Waveform Signals](https://github.com/ultralytics/wave/blob/main/data/waveforms.png "Waveform signals captured by the detector.") ![Training Visualization](https://github.com/ultralytics/wave/blob/main/data/wave.png "Visualization of the training process.")
 
 # 📜 Citation
 

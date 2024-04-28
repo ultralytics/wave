@@ -1,15 +1,13 @@
 import os
 import time
 
-import scipy.io
-from plotly.offline import plot
 import plotly.graph_objs as go
-
-from utils.utils import *
-
-
+import scipy.io
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
+from plotly.offline import plot
+
+from utils.utils import *
 
 tf.enable_eager_execution()
 

@@ -21,14 +21,14 @@ def train(H, model, str, lr=0.001):
     data = "wavedata25ns.mat"
 
     cuda = torch.cuda.is_available()
-    os.makedirs(pathr + "models", exist_ok=True)
+    os.makedirs(f"{pathr}models", exist_ok=True)
     name = (data[:-4] + "%s%glr%s" % (H[:], lr, str)).replace(", ", ".").replace("[", "_").replace("]", "_")
-    print("Running " + name)
+    print(f"Running {name}")
 
     device = select_device()
 
     if not os.path.isfile(pathd + data):
-        os.system("wget -P data/ https://storage.googleapis.com/ultralytics/" + data)
+        os.system(f"wget -P data/ https://storage.googleapis.com/ultralytics/{data}")
     mat = scipy.io.loadmat(pathd + data)
     x = mat["inputs"][:]  # inputs (nx512) [waveform1 waveform2]
     y = mat["outputs"][:, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]

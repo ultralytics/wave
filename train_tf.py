@@ -6,7 +6,6 @@ import scipy.io
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
 from plotly.offline import plot
-
 from utils.utils import *
 
 tf.enable_eager_execution()
@@ -24,15 +23,15 @@ def runexample(H, model, str):
     cuda = tf.test.is_gpu_available()
     tf.set_random_seed(1)
     path = "data/"
-    os.makedirs(path + "models", exist_ok=True)
+    os.makedirs(f"{path}models", exist_ok=True)
     name = (data[:-4] + "%s%glr%geps%s" % (H[:], lr, eps, str)).replace(", ", "_").replace("[", "_").replace("]", "_")
 
     tica = time.time()
     device = "/gpu:0" if cuda else "/cpu:0"
-    print("Running %s on %s" % (name, device))
+    print(f"Running {name} on {device}")
 
     if not os.path.isfile(path + data):
-        os.system("wget -P data/ https://storage.googleapis.com/ultralytics/" + data)
+        os.system(f"wget -P data/ https://storage.googleapis.com/ultralytics/{data}")
     mat = scipy.io.loadmat(path + data)
     x = mat["inputs"]  # inputs (nx512) [waveform1 waveform2]
     y = mat["outputs"][:, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
@@ -128,4 +127,4 @@ def runexample(H, model, str):
 if __name__ == "__main__":
     H = [128, 32, 8]
     for i in range(1):
-        runexample(H, None, "." + str(i))
+        runexample(H, None, f".{str(i)}")

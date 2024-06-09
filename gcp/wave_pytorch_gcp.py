@@ -4,7 +4,6 @@ import time
 
 import scipy.io
 import torch
-
 from utils import *
 
 # set printoptions
@@ -24,7 +23,7 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     data = "wavedata25ns.mat"
 
     cuda = torch.cuda.is_available()
-    os.makedirs(pathr + "models", exist_ok=True)
+    os.makedirs(f"{pathr}models", exist_ok=True)
     name = (data[:-4] + "%s%glr%s" % (H[:], lr, str)).replace(", ", ".").replace("[", "_").replace("]", "_")
 
     tica = time.time()
@@ -32,7 +31,7 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     print("Running %s on %s\n%s" % (name, device.type, torch.cuda.get_device_properties(0) if cuda else ""))
 
     if not os.path.isfile(pathd + data):
-        os.system("wget -P data/ https://storage.googleapis.com/ultralytics/" + data)
+        os.system(f"wget -P data/ https://storage.googleapis.com/ultralytics/{data}")
     mat = scipy.io.loadmat(pathd + data)
     x = mat["inputs"]  # inputs (nx512) [waveform1 waveform2]
     y = mat["outputs"][:, 1:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
@@ -146,7 +145,7 @@ def tsact():  # TS activation function
             def __init__(self, nx, ny):
                 super(LinearAct, self).__init__()
                 self.Linear1 = torch.nn.Linear(nx, ny)
-                self.act = eval("torch.nn." + a + "()")
+                self.act = eval(f"torch.nn.{a}()")
 
             def forward(self, x):
                 return self.act(self.Linear1(x))
@@ -161,9 +160,9 @@ def tsact():  # TS activation function
             def forward(self, x):
                 return self.fc2(self.fc1(self.fc0(x)))
 
-        for i in range(10):
-            tsy.append(runexample(H, model=WAVE(H), str=("." + a)))
-    scipy.io.savemat(pathr + "TS.sigmoid" + ".mat", dict(tsv=tsv, tsy=np.array(tsy)))
+        for _ in range(10):
+            tsy.append(runexample(H, model=WAVE(H), str=f".{a}"))
+    scipy.io.savemat(f"{pathr}TS.sigmoid.mat", dict(tsv=tsv, tsy=np.array(tsy)))
 
 
 def tsnoact():  # TS activation function
@@ -184,27 +183,25 @@ def tsnoact():  # TS activation function
             def forward(self, x):
                 return self.fc2(self.fc1(self.fc0(x)))
 
-        for i in range(10):
-            tsy.append(runexample(H, model=WAVE(H), str=("." + a)))
-    scipy.io.savemat(pathr + "TS.noact" + ".mat", dict(tsv=tsv, tsy=np.array(tsy)))
+        for _ in range(10):
+            tsy.append(runexample(H, model=WAVE(H), str=f".{a}"))
+    scipy.io.savemat(f"{pathr}TS.noact.mat", dict(tsv=tsv, tsy=np.array(tsy)))
 
 
 def tslr():  # TS learning rate
     tsv = np.logspace(-5, -2, 13)
     tsy = []
     for a in tsv:
-        for i in range(10):
-            tsy.append(runexample(H, model=WAVE(H), str=("." + "Tanh"), lr=a))
-    scipy.io.savemat(pathr + "TS.lr" + ".mat", dict(tsv=tsv, tsy=np.array(tsy)))
+        tsy.extend(runexample(H, model=WAVE(H), str=("." + "Tanh"), lr=a) for _ in range(10))
+    scipy.io.savemat(f"{pathr}TS.lr.mat", dict(tsv=tsv, tsy=np.array(tsy)))
 
 
 def tsams():  # TS AMSgrad
     tsv = [False, True]
     tsy = []
     for a in tsv:
-        for i in range(3):
-            tsy.append(runexample(H, model=WAVE(H), str=(".TanhAMS" + str(a)), amsgrad=a))
-    scipy.io.savemat(pathr + "TS.AMSgrad" + ".mat", dict(tsv=tsv, tsy=np.array(tsy)))
+        tsy.extend(runexample(H, model=WAVE(H), str=f".TanhAMS{str(a)}", amsgrad=a) for _ in range(3))
+    scipy.io.savemat(f"{pathr}TS.AMSgrad.mat", dict(tsv=tsv, tsy=np.array(tsy)))
 
 
 def tsshape():  # TS network shape
@@ -223,8 +220,6 @@ def tsshape():  # TS network shape
     # tsv = ['Tanh', 'LogSigmoid', 'Softsign', 'ELU']
     # tsv = np.logspace(-4, -2, 11)
     tsv = [[512, 23, 1], [512, 64, 8, 1], [512, 108, 23, 5, 1], [512, 147, 42, 12, 3, 1], [512, 181, 64, 23, 8, 3, 1]]
-    tsy = []
-
     H = tsv[0]
 
     class WAVE(torch.nn.Module):
@@ -236,9 +231,7 @@ def tsshape():  # TS network shape
         def forward(self, x):
             return self.fc1(self.fc0(x))
 
-    for i in range(10):
-        tsy.append(runexample(H, model=WAVE(H), str=("." + "Tanh")))
-
+    tsy = [runexample(H, model=WAVE(H), str=("." + "Tanh")) for _ in range(10)]
     H = tsv[1]
 
     class WAVE(torch.nn.Module):
@@ -251,7 +244,7 @@ def tsshape():  # TS network shape
         def forward(self, x):
             return self.fc2(self.fc1(self.fc0(x)))
 
-    for i in range(10):
+    for _ in range(10):
         tsy.append(runexample(H, model=WAVE(H), str=("." + "Tanh")))
 
     H = tsv[2]
@@ -267,7 +260,7 @@ def tsshape():  # TS network shape
         def forward(self, x):
             return self.fc3(self.fc2(self.fc1(self.fc0(x))))
 
-    for i in range(10):
+    for _ in range(10):
         tsy.append(runexample(H, model=WAVE(H), str=("." + "Tanh")))
 
     H = tsv[3]
@@ -284,7 +277,7 @@ def tsshape():  # TS network shape
         def forward(self, x):
             return self.fc4(self.fc3(self.fc2(self.fc1(self.fc0(x)))))
 
-    for i in range(10):
+    for _ in range(10):
         tsy.append(runexample(H, model=WAVE(H), str=("." + "Tanh")))
 
     H = tsv[4]
@@ -302,9 +295,9 @@ def tsshape():  # TS network shape
         def forward(self, x):
             return self.fc5(self.fc4(self.fc3(self.fc2(self.fc1(self.fc0(x))))))
 
-    for i in range(10):
+    for _ in range(10):
         tsy.append(runexample(H, model=WAVE(H), str=("." + "Tanh")))
-    scipy.io.savemat(pathr + "TS.shape" + ".mat", dict(tsv=tsv, tsy=np.array(tsy)))
+    scipy.io.savemat(f"{pathr}TS.shape.mat", dict(tsv=tsv, tsy=np.array(tsy)))
 
 
 if __name__ == "__main__":

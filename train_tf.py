@@ -6,6 +6,7 @@ import scipy.io
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
 from plotly.offline import plot
+
 from utils.utils import *
 
 tf.enable_eager_execution()

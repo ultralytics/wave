@@ -4,7 +4,6 @@ import time
 import plotly.graph_objs as go
 import scipy.io
 import tensorflow as tf
-import tensorflow.contrib.eager as tfe
 from plotly.offline import plot
 
 from utils.utils import *

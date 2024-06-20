@@ -10,6 +10,7 @@ np.set_printoptions(linewidth=320, formatter={"float_kind": "{:11.5g}".format}) 
 
 
 def normalize(x, axis=None):  # normalize x mean and std by axis
+    """Normalize an array 'x' by its mean and standard deviation along the specified axis."""
     if axis is None:
         mu, sigma = x.mean(), x.std()
     elif axis == 0:
@@ -21,12 +22,14 @@ def normalize(x, axis=None):  # normalize x mean and std by axis
 
 
 def shuffledata(x, y):  # randomly shuffle x and y by same axis=0 indices
+    """Randomly shuffles arrays x and y along the same axis=0 indices."""
     i = np.arange(x.shape[0])
     np.random.shuffle(i)
     return x[i], y[i]
 
 
 def splitdata(x, y, train=0.7, validate=0.15, test=0.15, shuffle=False):  # split training data
+    """Splits data arrays x and y into training, validation, and test sets with optional shuffling."""
     n = x.shape[0]
     if shuffle:
         x, y = shuffledata(x, y)
@@ -37,6 +40,7 @@ def splitdata(x, y, train=0.7, validate=0.15, test=0.15, shuffle=False):  # spli
 
 
 def stdpt(r, ys):  # MSE loss + standard deviation (pytorch)
+    """Calculate Mean Squared Error loss and standard deviation of tensor r, scaled by ys."""
     r = r.detach()
     loss = (r**2).mean().cpu().item()
     std = r.std(0).cpu().numpy() * ys
@@ -44,6 +48,7 @@ def stdpt(r, ys):  # MSE loss + standard deviation (pytorch)
 
 
 def stdtf(r, ys):  # MSE loss + standard deviation (tf eager)
+    """Calculate Mean Squared Error loss and standard deviation of tensor r using TensorFlow, scaled by ys."""
     r = r.numpy()
     loss = (r**2).mean()
     std = r.std(0) * ys
@@ -51,7 +56,9 @@ def stdtf(r, ys):  # MSE loss + standard deviation (tf eager)
 
 
 def model_info(model):
-    # Plots a line-by-line description of a PyTorch model
+    """Print a detailed line-by-line summary of a PyTorch model including layer name, gradient status, parameters,
+    shape, mean, and std.
+    """
     n_p = sum(x.numel() for x in model.parameters())  # number parameters
     n_g = sum(x.numel() for x in model.parameters() if x.requires_grad)  # number gradients
     print("\n%5s %40s %9s %12s %20s %10s %10s" % ("layer", "name", "gradient", "parameters", "shape", "mu", "sigma"))
@@ -66,6 +73,7 @@ def model_info(model):
 
 class patienceStopper(object):
     def __init__(self, patience=10, verbose=True, epochs=1000, printerval=10):
+        """Initialize a patience stopper with given parameters for early stopping in training."""
         self.patience = patience
         self.verbose = verbose
         self.bestepoch = 0
@@ -78,11 +86,15 @@ class patienceStopper(object):
         self.printerval = printerval
 
     def reset(self):
+        """Resets tracking metrics to initial states for the training process."""
         self.bestloss = float("inf")
         self.bestmetrics = None
         self.num_bad_epochs = 0
 
     def step(self, loss, metrics=None, model=None):
+        """Updates internal state for each training epoch, tracking loss and metrics, and printing progress
+        periodically.
+        """
         loss = loss.item()
         self.num_bad_epochs += 1
         self.epoch += 1
@@ -110,10 +122,12 @@ class patienceStopper(object):
             return False
 
     def first(self, model):
+        """Prints a formatted header for model training details including epoch, time, loss, and metrics."""
         s = ("epoch", "time", "loss", "metric(s)")
         print("%12s" * len(s) % s)
 
     def printepoch(self, epoch, loss, metrics):
+        """Prints the epoch number, elapsed time, loss, and optional metrics for model training."""
         s = (epoch, time.time() - self.t, loss)
         if metrics is not None:
             for i in range(len(metrics)):
@@ -122,6 +136,7 @@ class patienceStopper(object):
         self.t = time.time()
 
     def final(self, msg):
+        """Print final results and completion message with total elapsed time and best training epoch details."""
         dt = time.time() - self.t0
         print(
             "%s\nFinished %g epochs in %.3fs (%.3f epochs/s). Best results:"

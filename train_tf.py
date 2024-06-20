@@ -12,6 +12,7 @@ tf.enable_eager_execution()
 
 
 def runexample(H, model, str):
+    """Trains a TensorFlow model using provided hyperparameters and data, then evaluates and saves the results."""
     lr = 0.002
     eps = 0.001
     epochs = 50000

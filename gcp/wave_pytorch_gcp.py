@@ -17,6 +17,9 @@ torch.manual_seed(1)
 
 
 def runexample(H, model, str, lr=0.001, amsgrad=False):
+    """Train a model on waveform data with specified hyperparameters, validate performance, and return best epoch
+    results.
+    """
     epochs = 100000
     validations = 5000
     printInterval = 1000
@@ -115,26 +118,35 @@ H = [512, 64, 8, 1]
 
 class LinearAct(torch.nn.Module):
     def __init__(self, nx, ny):
+        """Initializes the LinearAct module with input and output dimensions and defines a linear transformation
+        followed by a Tanh activation.
+        """
         super(LinearAct, self).__init__()
         self.Linear1 = torch.nn.Linear(nx, ny)
         self.act = torch.nn.Tanh()
 
     def forward(self, x):
+        """Applies a linear transformation followed by Tanh activation to the input tensor."""
         return self.act(self.Linear1(x))
 
 
 class WAVE(torch.nn.Module):
     def __init__(self, n):  # n = [512, 108, 23, 5, 1]
+        """Initializes the WAVE model with specified linear layers and activation functions."""
         super(WAVE, self).__init__()
         self.fc0 = LinearAct(n[0], n[1])
         self.fc1 = LinearAct(n[1], n[2])
         self.fc2 = torch.nn.Linear(n[2], n[3])
 
     def forward(self, x):
+        """Computes the forward pass of the WAVE model through its linear and activation layers."""
         return self.fc2(self.fc1(self.fc0(x)))
 
 
 def tsact():  # TS activation function
+    """Implements a TS activation function using WAVE model with Sigmoid activation and saves the result in
+    'TS.sigmoid.mat'.
+    """
     H = [512, 64, 8, 1]
     tsv = ["Sigmoid"]  # ['Tanh', 'LogSigmoid', 'Softsign', 'ELU']
     # tsv = np.logspace(-4,-2,11)
@@ -167,6 +179,7 @@ def tsact():  # TS activation function
 
 
 def tsnoact():  # TS activation function
+    """Generates and saves a TS dataset using a neural network model without any activation functions."""
     H = [512, 64, 8, 1]
     tsv = ["NoAct"]  # ['Tanh', 'LogSigmoid', 'Softsign', 'ELU']
     # tsv = np.logspace(-4,-2,11)
@@ -190,6 +203,9 @@ def tsnoact():  # TS activation function
 
 
 def tslr():  # TS learning rate
+    """Generate and save learning rate (LR) logs for time-series models with varying LRs using WAVE and TanH
+    activation.
+    """
     tsv = np.logspace(-5, -2, 13)
     tsy = []
     for a in tsv:
@@ -198,6 +214,7 @@ def tslr():  # TS learning rate
 
 
 def tsams():  # TS AMSgrad
+    """Trains models using AMSgrad with Tanh activation and saves the results to a .mat file."""
     tsv = [False, True]
     tsy = []
     for a in tsv:
@@ -206,7 +223,7 @@ def tsams():  # TS AMSgrad
 
 
 def tsshape():  # TS network shape
-    # H = [32] # 512 inputs, 2 outputs structures:
+    """Determines the shape of the TS network and saves the results to a .mat file."""
     # H = [81, 13]
     # H = [128, 32, 8]
     # H = [169, 56, 18, 6]

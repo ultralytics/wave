@@ -5,13 +5,13 @@ import plotly.graph_objs as go
 import scipy.io
 import tensorflow as tf
 from plotly.offline import plot
-
 from utils.utils import *
 
 tf.enable_eager_execution()
 
 
 def runexample(H, model, str):
+    """Trains a TensorFlow model using provided hyperparameters and data, then evaluates and saves the results."""
     lr = 0.002
     eps = 0.001
     epochs = 50000

@@ -3,7 +3,6 @@ import os
 
 import scipy.io
 import torch.nn as nn
-
 from utils.torch_utils import *
 from utils.utils import *
 
@@ -18,6 +17,7 @@ torch.manual_seed(1)
 
 
 def train(H, model, str, lr=0.001):
+    """Trains a given model on provided data with specified hyperparameters and saves training results."""
     data = "wavedata25ns.mat"
 
     cuda = torch.cuda.is_available()
@@ -122,12 +122,14 @@ def train(H, model, str, lr=0.001):
 #       400  5.1498e-05    0.023752      12.484     0.15728  # var 0
 class WAVE(torch.nn.Module):
     def __init__(self, n=(512, 64, 8, 2)):
+        """Initializes the WAVE model architecture with specified layer sizes."""
         super(WAVE, self).__init__()
         self.fc0 = nn.Linear(n[0], n[1])
         self.fc1 = nn.Linear(n[1], n[2])
         self.fc2 = nn.Linear(n[2], n[3])
 
     def forward(self, x):  # x.shape = [bs, 512]
+        """Performs a forward pass through the WAVE model transforming input x from shape [bs, 512] to [bs, 2]."""
         x = torch.tanh(self.fc0(x))  # [bs, 64]
         x = torch.tanh(self.fc1(x))  # [bs, 8]
         return self.fc2(x)  # [bs, 2]
@@ -137,6 +139,7 @@ class WAVE(torch.nn.Module):
 #         121     0.47059      0.0306      14.184      0.1608
 class WAVE4(nn.Module):
     def __init__(self, n_out=2):
+        """Initializes the WAVE4 model with specified output layers and configurations for convolutional layers."""
         super(WAVE4, self).__init__()
         self.layer1 = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
@@ -153,6 +156,9 @@ class WAVE4(nn.Module):
         self.layer3 = nn.Conv2d(64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0))
 
     def forward(self, x):  # x.shape = [bs, 512]
+        """Forward pass for processing input tensor through convolutional layers and reshaping output for
+        classification.
+        """
         x = x.view((-1, 2, 256))  # [bs, 2, 256]
         x = x.unsqueeze(1)  # [bs, 1, 2, 256] =  = [N, C, H, W]
         x = self.layer1(x)  # [bs, 32, 1, 128]
@@ -164,6 +170,9 @@ class WAVE4(nn.Module):
 #          65    4.22e-05    0.021527      11.883     0.14406
 class WAVE3(nn.Module):
     def __init__(self, n_out=2):
+        """Initializes the WAVE3 class with neural network layers for feature extraction and classification in a
+        sequential manner.
+        """
         super(WAVE3, self).__init__()
         n = 32
         self.layer1 = nn.Sequential(
@@ -188,6 +197,9 @@ class WAVE3(nn.Module):
         self.layer4 = nn.Conv2d(n * 4, n_out, kernel_size=(1, 32), stride=1, padding=0)
 
     def forward(self, x):  # x.shape = [bs, 512]
+        """Performs the forward pass for input tensor `x` through the defined neural network layers, reshaping as
+        necessary.
+        """
         x = x.view((-1, 2, 256))  # [bs, 2, 256]
         x = x.unsqueeze(2)  # [bs, 2, 1, 256] = [N, C, H, W]
         x = self.layer1(x)  # [bs, 32, 1, 128]
@@ -203,6 +215,7 @@ class WAVE3(nn.Module):
 #       121  2.6941e-05    0.021642      11.923     0.14201  # var 1
 class WAVE2(nn.Module):
     def __init__(self, n_out=2):
+        """Initializes the WAVE2 model architecture components."""
         super(WAVE2, self).__init__()
         self.layer1 = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=(2, 30), stride=(1, 2), padding=(1, 15), bias=False),
@@ -219,6 +232,7 @@ class WAVE2(nn.Module):
         self.layer3 = nn.Sequential(nn.Conv2d(64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)))
 
     def forward(self, x):  # x.shape = [bs, 512]
+        """Forward pass for processing input tensor x through sequential layers, reshaping as needed for the model."""
         x = x.view((-1, 2, 256))  # [bs, 2, 256]
         x = x.unsqueeze(1)  # [bs, 1, 2, 256]
         x = self.layer1(x)  # [bs, 32, 1, 128]

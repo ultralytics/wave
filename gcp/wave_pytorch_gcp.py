@@ -4,7 +4,6 @@ import time
 
 import scipy.io
 import torch
-
 from utils import *
 
 # set printoptions
@@ -117,6 +116,8 @@ H = [512, 64, 8, 1]
 
 
 class LinearAct(torch.nn.Module):
+    """Applies a linear transformation followed by Tanh activation to the input tensor."""
+
     def __init__(self, nx, ny):
         """Initializes the LinearAct module with input and output dimensions and defines a linear transformation
         followed by a Tanh activation.
@@ -131,6 +132,8 @@ class LinearAct(torch.nn.Module):
 
 
 class WAVE(torch.nn.Module):
+    """A neural network model for waveform data processing with multiple linear and activation layers."""
+
     def __init__(self, n):  # n = [512, 108, 23, 5, 1]
         """Initializes the WAVE model with specified linear layers and activation functions."""
         super(WAVE, self).__init__()

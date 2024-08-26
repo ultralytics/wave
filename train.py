@@ -3,7 +3,6 @@ import os
 
 import scipy.io
 import torch.nn as nn
-
 from utils.torch_utils import *
 from utils.utils import *
 
@@ -122,6 +121,8 @@ def train(H, model, str, lr=0.001):
 
 #       400  5.1498e-05    0.023752      12.484     0.15728  # var 0
 class WAVE(torch.nn.Module):
+    """A neural network model for waveform data regression with three fully connected layers."""
+
     def __init__(self, n=(512, 64, 8, 2)):
         """Initializes the WAVE model architecture with specified layer sizes."""
         super(WAVE, self).__init__()
@@ -139,6 +140,8 @@ class WAVE(torch.nn.Module):
 # https://github.com/yunjey/pytorch-tutorial/tree/master/tutorials/02-intermediate
 #         121     0.47059      0.0306      14.184      0.1608
 class WAVE4(nn.Module):
+    """Implements a convolutional neural network for waveform data processing with configurable output layers."""
+
     def __init__(self, n_out=2):
         """Initializes the WAVE4 model with specified output layers and configurations for convolutional layers."""
         super(WAVE4, self).__init__()
@@ -170,6 +173,8 @@ class WAVE4(nn.Module):
 
 #          65    4.22e-05    0.021527      11.883     0.14406
 class WAVE3(nn.Module):
+    """Implements a convolutional neural network for feature extraction and classification from waveform data."""
+
     def __init__(self, n_out=2):
         """Initializes the WAVE3 class with neural network layers for feature extraction and classification in a
         sequential manner.
@@ -215,6 +220,8 @@ class WAVE3(nn.Module):
 
 #       121  2.6941e-05    0.021642      11.923     0.14201  # var 1
 class WAVE2(nn.Module):
+    """Implements the WAVE2 model for processing input tensors through convolutional layers for feature extraction."""
+
     def __init__(self, n_out=2):
         """Initializes the WAVE2 model architecture components."""
         super(WAVE2, self).__init__()

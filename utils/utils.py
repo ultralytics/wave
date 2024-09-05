@@ -72,6 +72,7 @@ def model_info(model):
 
 
 class patienceStopper(object):
+    """Monitors training loss and metrics to halt early when no improvement is seen for a specified patience period."""
     def __init__(self, patience=10, verbose=True, epochs=1000, printerval=10):
         """Initialize a patience stopper with given parameters for early stopping in training."""
         self.patience = patience

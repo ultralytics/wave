@@ -41,7 +41,7 @@ You can run the WAVE models using the following scripts:
 
 Explore the beauty of waveform signals and training process visualization with the images below:
 
-![Waveform Signals](https://github.com/ultralytics/wave/blob/main/data/waveforms.png%20%22Waveform%20signals%20captured%20by%20the%20detector.%22) ![Training Visualization](https://github.com/ultralytics/wave/blob/main/data/wave.png%20%22Visualization%20of%20the%20training%20process.%22)
+![Waveform Signals](https://github.com/ultralytics/wave/blob/main/data/waveforms.png) ![Training Visualization](https://github.com/ultralytics/wave/blob/main/data/wave.png)
 
 # 📜 Citation
 
@@ -53,7 +53,7 @@ If you use this code in your research or wish to refer to the WAVE methodology, 
 
 We value each contribution and invite you to participate in developing this pioneering ML approach for physics! Whether you're sharpening bugs, proposing new features, or enriching our documentation, find out how to contribute through our [Contributing Guide](https://docs.ultralytics.com/help/contributing). Also, let us know your thoughts by completing our [Survey](https://www.ultralytics.com/survey?utm_source=github&utm_medium=social&utm_campaign=Survey). A massive thank you 🙏 to everyone involved!
 
-![Ultralytics Open-Source Contributors](https://github.com/ultralytics/assets/raw/main/im/image-contributors.png%20%22Thanks%20to%20our%20community%20of%20contributors!%22)
+![Ultralytics Open-Source Contributors](https://github.com/ultralytics/assets/raw/main/im/image-contributors.png)
 
 # 📄 License
 

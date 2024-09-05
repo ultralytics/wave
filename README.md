@@ -41,7 +41,7 @@ You can run the WAVE models using the following scripts:
 
 Explore the beauty of waveform signals and training process visualization with the images below:
 
-![Waveform Signals](https://github.com/ultralytics/wave/blob/main/data/waveforms.png "Waveform signals captured by the detector.") ![Training Visualization](https://github.com/ultralytics/wave/blob/main/data/wave.png "Visualization of the training process.")
+![Waveform Signals](https://github.com/ultralytics/wave/blob/main/data/waveforms.png%20%22Waveform%20signals%20captured%20by%20the%20detector.%22) ![Training Visualization](https://github.com/ultralytics/wave/blob/main/data/wave.png%20%22Visualization%20of%20the%20training%20process.%22)
 
 # 📜 Citation
 
@@ -51,20 +51,20 @@ If you use this code in your research or wish to refer to the WAVE methodology, 
 
 # 🤝 Contribute
 
-We value each contribution and invite you to participate in developing this pioneering ML approach for physics! Whether you're sharpening bugs, proposing new features, or enriching our documentation, find out how to contribute through our [Contributing Guide](https://docs.ultralytics.com/help/contributing). Also, let us know your thoughts by completing our [Survey](https://ultralytics.com/survey?utm_source=github&utm_medium=social&utm_campaign=Survey). A massive thank you 🙏 to everyone involved!
+We value each contribution and invite you to participate in developing this pioneering ML approach for physics! Whether you're sharpening bugs, proposing new features, or enriching our documentation, find out how to contribute through our [Contributing Guide](https://docs.ultralytics.com/help/contributing). Also, let us know your thoughts by completing our [Survey](https://www.ultralytics.com/survey?utm_source=github&utm_medium=social&utm_campaign=Survey). A massive thank you 🙏 to everyone involved!
 
-![Ultralytics Open-Source Contributors](https://github.com/ultralytics/assets/raw/main/im/image-contributors.png "Thanks to our community of contributors!")
+![Ultralytics Open-Source Contributors](https://github.com/ultralytics/assets/raw/main/im/image-contributors.png%20%22Thanks%20to%20our%20community%20of%20contributors!%22)
 
 # 📄 License
 
 Ultralytics is pleased to offer dual licensing options to accommodate a wide range of uses:
 
 - **AGPL-3.0 License**: Our default [open-source license](https://github.com/ultralytics/ultralytics/blob/main/LICENSE), which is OSI-approved and encourages open collaboration and knowledge sharing, is perfect for students, educators, and enthusiasts.
-- **Enterprise License**: For commercial applications that require a more flexible licensing arrangement, our enterprise license allows integration of Ultralytics software into proprietary products and services. Reach out through [Ultralytics Licensing](https://ultralytics.com/license) for more details.
+- **Enterprise License**: For commercial applications that require a more flexible licensing arrangement, our enterprise license allows integration of Ultralytics software into proprietary products and services. Reach out through [Ultralytics Licensing](https://www.ultralytics.com/license) for more details.
 
 # 📬 Contact Us
 
-For bug reports, feature requests, and contributions, head to [GitHub Issues](https://github.com/ultralytics/velocity/issues). For questions and discussions about this project and other Ultralytics endeavors, join us on [Discord](https://ultralytics.com/discord)!
+For bug reports, feature requests, and contributions, head to [GitHub Issues](https://github.com/ultralytics/velocity/issues). For questions and discussions about this project and other Ultralytics endeavors, join us on [Discord](https://discord.com/invite/ultralytics)!
 
 <br>
 <div align="center">

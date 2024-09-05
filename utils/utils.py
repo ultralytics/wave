@@ -68,10 +68,12 @@ def model_info(model):
             "%5g %40s %9s %12g %20s %10.3g %10.3g"
             % (i, name, p.requires_grad, p.numel(), list(p.shape), p.mean(), p.std())
         )
-    print("Model Summary: %g layers, %g parameters, %g gradients" % (i + 1, n_p, n_g))
+    print(f"Model Summary: {i + 1:g} layers, {n_p:g} parameters, {n_g:g} gradients")
 
 
-class patienceStopper(object):
+class patienceStopper:
+    """Monitors training loss and metrics to halt early when no improvement is seen for a specified patience period."""
+
     def __init__(self, patience=10, verbose=True, epochs=1000, printerval=10):
         """Initialize a patience stopper with given parameters for early stopping in training."""
         self.patience = patience
@@ -113,10 +115,10 @@ class patienceStopper(object):
                     self.bestmodel = copy.deepcopy(model)
 
         if self.num_bad_epochs > self.patience:
-            self.final("%g Patience exceeded at epoch %g." % (self.patience, self.epoch))
+            self.final(f"{self.patience:g} Patience exceeded at epoch {self.epoch:g}.")
             return True
         elif self.epoch >= self.epochs:
-            self.final("WARNING: %g Patience not exceeded by epoch %g (train longer)." % (self.patience, self.epoch))
+            self.final(f"WARNING: {self.patience:g} Patience not exceeded by epoch {self.epoch:g} (train longer).")
             return True
         else:
             return False
@@ -139,7 +141,6 @@ class patienceStopper(object):
         """Print final results and completion message with total elapsed time and best training epoch details."""
         dt = time.time() - self.t0
         print(
-            "%s\nFinished %g epochs in %.3fs (%.3f epochs/s). Best results:"
-            % (msg, self.epochs + 1, dt, (self.epochs + 1) / dt)
+            f"{msg}\nFinished {self.epochs + 1:g} epochs in {dt:.3f}s ({(self.epochs + 1) / dt:.3f} epochs/s). Best results:"
         )
         self.printepoch(self.bestepoch, self.bestloss, self.bestmetrics)

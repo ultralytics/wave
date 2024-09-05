@@ -25,7 +25,7 @@ def runexample(H, model, str):
     tf.set_random_seed(1)
     path = "data/"
     os.makedirs(f"{path}models", exist_ok=True)
-    name = (data[:-4] + "%s%glr%geps%s" % (H[:], lr, eps, str)).replace(", ", "_").replace("[", "_").replace("]", "_")
+    name = (data[:-4] + f"{H[:]}{lr:g}lr{eps:g}eps{str}").replace(", ", "_").replace("[", "_").replace("]", "_")
 
     tica = time.time()
     device = "/gpu:0" if cuda else "/cpu:0"
@@ -92,7 +92,7 @@ def runexample(H, model, str):
                 if L[i, 1] < best[1]:
                     best = (i, L[i, 1], None)
                 if (i - best[0]) > validations:
-                    print("\n%g validation checks exceeded at epoch %g." % (validations, i))
+                    print(f"\n{validations:g} validation checks exceeded at epoch {i:g}.")
                     break
 
             if i % printInterval == 0:  # print and save progress
@@ -109,11 +109,11 @@ def runexample(H, model, str):
         # model.load_state_dict(best[2])
         dt = time.time() - tica
 
-    print("\nFinished %g epochs in %.3fs (%.3f epochs/s)\nBest results from epoch %g:" % (i + 1, dt, i / dt, best[0]))
+    print(f"\nFinished {i + 1:g} epochs in {dt:.3f}s ({i / dt:.3f} epochs/s)\nBest results from epoch {best[0]:g}:")
     loss, std = np.zeros(3), np.zeros((3, ny))
     for i, (xi, yi) in enumerate(((x, y), (xv, yv), (xt, yt))):
         loss[i], std[i] = stdtf(model(xi) - yi, ys)
-        print("%.5f %s %s" % (loss[i], std[i, :], labels[i]))
+        print(f"{loss[i]:.5f} {std[i, :]} {labels[i]}")
     # scipy.io.savemat(path + name + '.mat', dict(bestepoch=best[0], loss=loss, std=std, L=L, name=name))
     # files.download(path + name + '.mat')
 

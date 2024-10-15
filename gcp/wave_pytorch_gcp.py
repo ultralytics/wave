@@ -28,11 +28,17 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
 
     cuda = torch.cuda.is_available()
     os.makedirs(f"{pathr}models", exist_ok=True)
-    name = (data[:-4] + f"{H[:]}{lr:g}lr{str}").replace(", ", ".").replace("[", "_").replace("]", "_")
+    name = (
+        f"{data[:-4]}{H[:]}{lr:g}lr{str}".replace(", ", ".")
+        .replace("[", "_")
+        .replace("]", "_")
+    )
 
     tica = time.time()
     device = torch.device("cuda:0" if cuda else "cpu")
-    print("Running {} on {}\n{}".format(name, device.type, torch.cuda.get_device_properties(0) if cuda else ""))
+    print(
+        f'Running {name} on {device.type}\n{torch.cuda.get_device_properties(0) if cuda else ""}'
+    )
 
     if not os.path.isfile(pathd + data):
         os.system(f"wget -P data/ https://storage.googleapis.com/ultralytics/{data}")

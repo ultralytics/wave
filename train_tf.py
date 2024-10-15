@@ -25,11 +25,7 @@ def runexample(H, model, str):
     tf.set_random_seed(1)
     path = "data/"
     os.makedirs(f"{path}models", exist_ok=True)
-    name = (
-        f"{data[:-4]}{H[:]}{lr:g}lr{eps:g}eps{str}".replace(", ", "_")
-        .replace("[", "_")
-        .replace("]", "_")
-    )
+    name = f"{data[:-4]}{H[:]}{lr:g}lr{eps:g}eps{str}".replace(", ", "_").replace("[", "_").replace("]", "_")
 
     tica = time.time()
     device = "/gpu:0" if cuda else "/cpu:0"

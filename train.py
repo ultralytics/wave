@@ -23,11 +23,7 @@ def train(H, model, str, lr=0.001):
 
     cuda = torch.cuda.is_available()
     os.makedirs(f"{pathr}models", exist_ok=True)
-    name = (
-        f"{data[:-4]}{H[:]}{lr:g}lr{str}".replace(", ", ".")
-        .replace("[", "_")
-        .replace("]", "_")
-    )
+    name = f"{data[:-4]}{H[:]}{lr:g}lr{str}".replace(", ", ".").replace("[", "_").replace("]", "_")
     print(f"Running {name}")
 
     device = select_device()

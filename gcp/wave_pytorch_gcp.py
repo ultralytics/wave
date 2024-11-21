@@ -28,11 +28,11 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
 
     cuda = torch.cuda.is_available()
     os.makedirs(f"{pathr}models", exist_ok=True)
-    name = (data[:-4] + "%s%glr%s" % (H[:], lr, str)).replace(", ", ".").replace("[", "_").replace("]", "_")
+    name = f"{data[:-4]}{H[:]}{lr:g}lr{str}".replace(", ", ".").replace("[", "_").replace("]", "_")
 
     tica = time.time()
     device = torch.device("cuda:0" if cuda else "cpu")
-    print("Running %s on %s\n%s" % (name, device.type, torch.cuda.get_device_properties(0) if cuda else ""))
+    print(f'Running {name} on {device.type}\n{torch.cuda.get_device_properties(0) if cuda else ""}')
 
     if not os.path.isfile(pathd + data):
         os.system(f"wget -P data/ https://storage.googleapis.com/ultralytics/{data}")
@@ -75,7 +75,7 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
             if L[i, 1] < best[1]:
                 best = (i, L[i, 1], copy.deepcopy(model.state_dict()))
             if (i - best[0]) > validations:
-                print("\n%g validation checks exceeded at epoch %g." % (validations, i))
+                print(f"\n{validations:g} validation checks exceeded at epoch {i:g}.")
                 break
 
         if i % printInterval == 0:  # print and save progress
@@ -94,11 +94,11 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     model.load_state_dict(best[2])
     dt = time.time() - tica
 
-    print("\nFinished %g epochs in %.3fs (%.3f epochs/s)\nBest results from epoch %g:" % (i + 1, dt, i / dt, best[0]))
+    print(f"\nFinished {i + 1:g} epochs in {dt:.3f}s ({i / dt:.3f} epochs/s)\nBest results from epoch {best[0]:g}:")
     loss, std = np.zeros(3), np.zeros((3, ny))
     for i, (xi, yi) in enumerate(((x, y), (xv, yv), (xt, yt))):
         loss[i], std[i] = stdpt(model(xi) - yi, ys)
-        print("%.5f %s %s" % (loss[i], std[i, :], labels[i]))
+        print(f"{loss[i]:.5f} {std[i, :]} {labels[i]}")
     # scipy.io.savemat(pathr + name + '.mat', dict(bestepoch=best[0], loss=loss, std=std, L=L, name=name))
     # files.download(pathr + name + '.mat')
 
@@ -123,7 +123,7 @@ class LinearAct(torch.nn.Module):
         """Initializes the LinearAct module with input and output dimensions and defines a linear transformation
         followed by a Tanh activation.
         """
-        super(LinearAct, self).__init__()
+        super().__init__()
         self.Linear1 = torch.nn.Linear(nx, ny)
         self.act = torch.nn.Tanh()
 
@@ -137,7 +137,7 @@ class WAVE(torch.nn.Module):
 
     def __init__(self, n):  # n = [512, 108, 23, 5, 1]
         """Initializes the WAVE model with specified linear layers and activation functions."""
-        super(WAVE, self).__init__()
+        super().__init__()
         self.fc0 = LinearAct(n[0], n[1])
         self.fc1 = LinearAct(n[1], n[2])
         self.fc2 = torch.nn.Linear(n[2], n[3])
@@ -160,7 +160,7 @@ def tsact():  # TS activation function
 
         class LinearAct(torch.nn.Module):
             def __init__(self, nx, ny):
-                super(LinearAct, self).__init__()
+                super().__init__()
                 self.Linear1 = torch.nn.Linear(nx, ny)
                 self.act = eval(f"torch.nn.{a}()")
 
@@ -169,7 +169,7 @@ def tsact():  # TS activation function
 
         class WAVE(torch.nn.Module):
             def __init__(self, n):  # n = [512, 108, 23, 5, 1]
-                super(WAVE, self).__init__()
+                super().__init__()
                 self.fc0 = LinearAct(n[0], n[1])
                 self.fc1 = LinearAct(n[1], n[2])
                 self.fc2 = torch.nn.Linear(n[2], n[3])
@@ -193,7 +193,7 @@ def tsnoact():  # TS activation function
 
         class WAVE(torch.nn.Module):
             def __init__(self, n):  # n = [512, 108, 23, 5, 1]
-                super(WAVE, self).__init__()
+                super().__init__()
                 self.fc0 = torch.nn.Linear(n[0], n[1])
                 self.fc1 = torch.nn.Linear(n[1], n[2])
                 self.fc2 = torch.nn.Linear(n[2], n[3])
@@ -246,7 +246,7 @@ def tsshape():  # TS network shape
 
     class WAVE(torch.nn.Module):
         def __init__(self, n):  # n = [512, 108, 23, 5, 1]
-            super(WAVE, self).__init__()
+            super().__init__()
             self.fc0 = LinearAct(n[0], n[1])
             self.fc1 = torch.nn.Linear(n[1], n[2])
 
@@ -258,7 +258,7 @@ def tsshape():  # TS network shape
 
     class WAVE(torch.nn.Module):
         def __init__(self, n):  # n = [512, 108, 23, 5, 1]
-            super(WAVE, self).__init__()
+            super().__init__()
             self.fc0 = LinearAct(n[0], n[1])
             self.fc1 = LinearAct(n[1], n[2])
             self.fc2 = torch.nn.Linear(n[2], n[3])
@@ -273,7 +273,7 @@ def tsshape():  # TS network shape
 
     class WAVE(torch.nn.Module):
         def __init__(self, n):  # n = [512, 108, 23, 5, 1]
-            super(WAVE, self).__init__()
+            super().__init__()
             self.fc0 = LinearAct(n[0], n[1])
             self.fc1 = LinearAct(n[1], n[2])
             self.fc2 = LinearAct(n[2], n[3])
@@ -289,7 +289,7 @@ def tsshape():  # TS network shape
 
     class WAVE(torch.nn.Module):
         def __init__(self, n):  # n = [512, 108, 23, 5, 1]
-            super(WAVE, self).__init__()
+            super().__init__()
             self.fc0 = LinearAct(n[0], n[1])
             self.fc1 = LinearAct(n[1], n[2])
             self.fc2 = LinearAct(n[2], n[3])
@@ -306,7 +306,7 @@ def tsshape():  # TS network shape
 
     class WAVE(torch.nn.Module):
         def __init__(self, n):  # n = [512, 108, 23, 5, 1]
-            super(WAVE, self).__init__()
+            super().__init__()
             self.fc0 = LinearAct(n[0], n[1])
             self.fc1 = LinearAct(n[1], n[2])
             self.fc2 = LinearAct(n[2], n[3])

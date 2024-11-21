@@ -23,7 +23,7 @@ def train(H, model, str, lr=0.001):
 
     cuda = torch.cuda.is_available()
     os.makedirs(f"{pathr}models", exist_ok=True)
-    name = (data[:-4] + "%s%glr%s" % (H[:], lr, str)).replace(", ", ".").replace("[", "_").replace("]", "_")
+    name = f"{data[:-4]}{H[:]}{lr:g}lr{str}".replace(", ", ".").replace("[", "_").replace("]", "_")
     print(f"Running {name}")
 
     device = select_device()
@@ -112,7 +112,7 @@ def train(H, model, str, lr=0.001):
             r = stopper.bestmodel(xi) - yi  # residuals, ().detach?
             loss[i] = (r**2).mean().cpu().item()
             std[i] = r.std(0).cpu().numpy() * ys
-        print("%.5f %s %s" % (loss[i], std[i, :], labels[i]))
+        print(f"{loss[i]:.5f} {std[i, :]} {labels[i]}")
 
     scipy.io.savemat(pathr + name + ".mat", dict(bestepoch=stopper.bestloss, loss=loss, std=std, L=L, name=name))
     # files.download(pathr + name + '.mat')
@@ -126,7 +126,7 @@ class WAVE(torch.nn.Module):
 
     def __init__(self, n=(512, 64, 8, 2)):
         """Initializes the WAVE model architecture with specified layer sizes."""
-        super(WAVE, self).__init__()
+        super().__init__()
         self.fc0 = nn.Linear(n[0], n[1])
         self.fc1 = nn.Linear(n[1], n[2])
         self.fc2 = nn.Linear(n[2], n[3])
@@ -145,7 +145,7 @@ class WAVE4(nn.Module):
 
     def __init__(self, n_out=2):
         """Initializes the WAVE4 model with specified output layers and configurations for convolutional layers."""
-        super(WAVE4, self).__init__()
+        super().__init__()
         self.layer1 = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
             nn.BatchNorm2d(32),
@@ -180,7 +180,7 @@ class WAVE3(nn.Module):
         """Initializes the WAVE3 class with neural network layers for feature extraction and classification in a
         sequential manner.
         """
-        super(WAVE3, self).__init__()
+        super().__init__()
         n = 32
         self.layer1 = nn.Sequential(
             nn.Conv2d(in_channels=2, out_channels=n, kernel_size=(1, 33), stride=(1, 2), padding=(0, 16), bias=False),
@@ -225,7 +225,7 @@ class WAVE2(nn.Module):
 
     def __init__(self, n_out=2):
         """Initializes the WAVE2 model architecture components."""
-        super(WAVE2, self).__init__()
+        super().__init__()
         self.layer1 = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=(2, 30), stride=(1, 2), padding=(1, 15), bias=False),
             nn.BatchNorm2d(32),

@@ -9,7 +9,6 @@ Here, we introduce **WA**veform **V**ector **E**xploitation (WAVE), a novel appr
 
 [![Ultralytics Actions](https://github.com/ultralytics/wave/actions/workflows/format.yml/badge.svg)](https://github.com/ultralytics/wave/actions/workflows/format.yml) <a href="https://ultralytics.com/discord"><img alt="Discord" src="https://img.shields.io/discord/1089800235347353640?logo=discord&logoColor=white&label=Discord&color=blue"></a> <a href="https://community.ultralytics.com"><img alt="Ultralytics Forums" src="https://img.shields.io/discourse/users?server=https%3A%2F%2Fcommunity.ultralytics.com&logo=discourse&label=Forums&color=blue"></a> <a href="https://reddit.com/r/ultralytics"><img alt="Ultralytics Reddit" src="https://img.shields.io/reddit/subreddit-subscribers/ultralytics?style=flat&logo=reddit&logoColor=white&label=Reddit&color=blue"></a>
 
-
 ## 🚀 Project Objectives
 
 The primary goal of this project is to develop and share Machine Learning techniques that can be applied to full-waveform time-of-flight detectors. These advanced methods are designed to enhance signal processing and interpretation, thereby pushing the boundaries of what's possible in particle physics research.

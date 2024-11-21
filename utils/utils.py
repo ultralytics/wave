@@ -71,7 +71,7 @@ def model_info(model):
     print(f"Model Summary: {i + 1:g} layers, {n_p:g} parameters, {n_g:g} gradients")
 
 
-class patienceStopper(object):
+class patienceStopper:
     """Implements early stopping mechanism for training models based on validation loss and patience criteria."""
 
     def __init__(self, patience=10, verbose=True, epochs=1000, printerval=10):

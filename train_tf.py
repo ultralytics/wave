@@ -1,3 +1,5 @@
+# Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
+
 import os
 import time
 
@@ -5,7 +7,6 @@ import plotly.graph_objs as go
 import scipy.io
 import tensorflow as tf
 from plotly.offline import plot
-
 from utils.utils import *
 
 tf.enable_eager_execution()

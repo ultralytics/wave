@@ -1,10 +1,11 @@
+# Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
+
 import copy
 import os
 import time
 
 import scipy.io
 import torch
-
 from utils import *
 
 # set printoptions
@@ -32,7 +33,7 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
 
     tica = time.time()
     device = torch.device("cuda:0" if cuda else "cpu")
-    print(f'Running {name} on {device.type}\n{torch.cuda.get_device_properties(0) if cuda else ""}')
+    print(f"Running {name} on {device.type}\n{torch.cuda.get_device_properties(0) if cuda else ''}")
 
     if not os.path.isfile(pathd + data):
         os.system(f"wget -P data/ https://storage.googleapis.com/ultralytics/{data}")

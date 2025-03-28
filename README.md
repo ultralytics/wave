@@ -1,7 +1,5 @@
 <a href="https://www.ultralytics.com/"><img src="https://raw.githubusercontent.com/ultralytics/assets/main/logo/Ultralytics_Logotype_Original.svg" width="320" alt="Ultralytics logo"></a>
 
-<br>
-
 # 🌊 Introduction
 
 Welcome to the [Ultralytics WAVE repository](https://github.com/ultralytics/wave) – the cutting-edge solution for the [machine learning](https://www.ultralytics.com/glossary/machine-learning-ml) driven analysis and interpretation of waveform data in [particle physics](https://en.wikipedia.org/wiki/Particle_physics)! 🎉

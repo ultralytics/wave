@@ -23,9 +23,9 @@ google-drive-ocamlfuse drive
 sudo apt install -y git unzip python3-pip screen vim
 
 # Install Python Packages
-pip3 install -U numpy scipy #tensorflow # plotly  # wave
-pip3 install -U opencv-python exifread tqdm # bokeh  # velocity
-pip3 install http://download.pytorch.org/whl/cu91/torch-0.4.0-cp36-cp36m-linux_x86_64.whl  # CUDA 9.1
+pip3 install -U numpy scipy                                                               #tensorflow # plotly  # wave
+pip3 install -U opencv-python exifread tqdm                                               # bokeh  # velocity
+pip3 install http://download.pytorch.org/whl/cu91/torch-0.4.0-cp36-cp36m-linux_x86_64.whl # CUDA 9.1
 # pip3 install http://download.pytorch.org/whl/cu90/torch-0.4.0-cp36-cp36m-linux_x86_64.whl  # CUDA 9.0
 pip3 install torchvision
 
@@ -46,4 +46,3 @@ sudo ubuntu-drivers autoinstall
 # fi
 # # Enable persistence mode
 # sudo nvidia-smi -pm 1
-

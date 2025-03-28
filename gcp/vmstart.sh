@@ -1,4 +1,6 @@
 #!/bin/bash
+# Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
+
 # Run this script on every GCP VM startup.
 # If this is a new VM, run vminstall.bash first.
 # Recommend running this script in a 'screen' (if connection drops run 'screen -r' to reattach)
@@ -17,7 +19,7 @@ google-drive-ocamlfuse drive
 # 2. fresh clone repo
 rm -rf wave && git clone https://github.com/ultralytics/wave
 cp -r data/* wave/data && cd wave
-python3 train.py  --var 2
+python3 train.py --var 2
 
 # 3. download training data
 mkdir data
@@ -32,6 +34,4 @@ python3 wave/wave_pytorch.py
 #sys.path.append("/home/glenn_jocher1/wave");
 #sys.path.append("/home/glenn_jocher1/wave/gcp");
 #import wave_pytorch_gcp as a; a.tsnoact()'
-cp -r results/. drive/results  #copy results to fused Google Drive
-
-
+cp -r results/. drive/results #copy results to fused Google Drive

@@ -1,4 +1,6 @@
 #!/bin/bash
+# Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
+
 # Run this script on a brand new GCP VM. Recommend Ubuntu 18.04 LTS, 15 GB Persistent SSD, P100 GPU, Skylake CPU.
 sudo apt update -y
 sudo apt autoremove -y
@@ -21,9 +23,9 @@ google-drive-ocamlfuse drive
 sudo apt install -y git unzip python3-pip screen vim
 
 # Install Python Packages
-pip3 install -U numpy scipy #tensorflow # plotly  # wave
-pip3 install -U opencv-python exifread tqdm # bokeh  # velocity
-pip3 install http://download.pytorch.org/whl/cu91/torch-0.4.0-cp36-cp36m-linux_x86_64.whl  # CUDA 9.1
+pip3 install -U numpy scipy                                                               #tensorflow # plotly  # wave
+pip3 install -U opencv-python exifread tqdm                                               # bokeh  # velocity
+pip3 install http://download.pytorch.org/whl/cu91/torch-0.4.0-cp36-cp36m-linux_x86_64.whl # CUDA 9.1
 # pip3 install http://download.pytorch.org/whl/cu90/torch-0.4.0-cp36-cp36m-linux_x86_64.whl  # CUDA 9.0
 pip3 install torchvision
 
@@ -44,4 +46,3 @@ sudo ubuntu-drivers autoinstall
 # fi
 # # Enable persistence mode
 # sudo nvidia-smi -pm 1
-

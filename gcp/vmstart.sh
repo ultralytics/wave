@@ -1,4 +1,6 @@
 #!/bin/bash
+# Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
+
 # Run this script on every GCP VM startup.
 # If this is a new VM, run vminstall.bash first.
 # Recommend running this script in a 'screen' (if connection drops run 'screen -r' to reattach)

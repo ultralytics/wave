@@ -1,4 +1,6 @@
 #!/bin/bash
+# Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
+
 # Run this script on a brand new GCP VM. Recommend Ubuntu 18.04 LTS, 15 GB Persistent SSD, P100 GPU, Skylake CPU.
 sudo apt update -y
 sudo apt autoremove -y

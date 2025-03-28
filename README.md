@@ -1,70 +1,73 @@
+<a href="https://www.ultralytics.com/"><img src="https://raw.githubusercontent.com/ultralytics/assets/main/logo/Ultralytics_Logotype_Original.svg" width="320" alt="Ultralytics logo"></a>
+
 <br>
-<a href="https://www.ultralytics.com/" target="_blank"><img src="https://raw.githubusercontent.com/ultralytics/assets/main/logo/Ultralytics_Logotype_Original.svg" width="320" alt="Ultralytics logo"></a>
 
 # 🌊 Introduction
 
-Welcome to the [Ultralytics WAVE repository](https://github.com/ultralytics/wave) – the cutting-edge solution for the machine learning driven analysis and interpretation of waveform data in particle physics! 🎉
+Welcome to the [Ultralytics WAVE repository](https://github.com/ultralytics/wave) – the cutting-edge solution for the [machine learning](https://www.ultralytics.com/glossary/machine-learning-ml) driven analysis and interpretation of waveform data in [particle physics](https://en.wikipedia.org/wiki/Particle_physics)! 🎉
 
-Here, we introduce **WA**veform **V**ector **E**xploitation (WAVE), a novel approach that uses Deep Learning to readout and reconstruct signals from particle physics detectors. This repository contains our open-source codebase and aims to foster collaboration and innovation in this exciting intersection of ML and physics.
+Here, we introduce **WA**veform **V**ector **E**xploitation (WAVE), a novel approach that uses [Deep Learning](https://www.ultralytics.com/glossary/deep-learning-dl) to readout and reconstruct signals from particle physics detectors. This repository contains our open-source codebase and aims to foster collaboration and innovation in this exciting intersection of ML and physics.
 
 [![Ultralytics Actions](https://github.com/ultralytics/wave/actions/workflows/format.yml/badge.svg)](https://github.com/ultralytics/wave/actions/workflows/format.yml) <a href="https://discord.com/invite/ultralytics"><img alt="Discord" src="https://img.shields.io/discord/1089800235347353640?logo=discord&logoColor=white&label=Discord&color=blue"></a> <a href="https://community.ultralytics.com/"><img alt="Ultralytics Forums" src="https://img.shields.io/discourse/users?server=https%3A%2F%2Fcommunity.ultralytics.com&logo=discourse&label=Forums&color=blue"></a> <a href="https://reddit.com/r/ultralytics"><img alt="Ultralytics Reddit" src="https://img.shields.io/reddit/subreddit-subscribers/ultralytics?style=flat&logo=reddit&logoColor=white&label=Reddit&color=blue"></a>
 
 ## 🚀 Project Objectives
 
-The primary goal of this project is to develop and share Machine Learning techniques that can be applied to full-waveform time-of-flight detectors. These advanced methods are designed to enhance signal processing and interpretation, thereby pushing the boundaries of what's possible in particle physics research.
+The primary goal of this project is to develop and share [Machine Learning](https://www.ultralytics.com/glossary/machine-learning-ml) techniques that can be applied to full-waveform time-of-flight detectors. These advanced methods are designed to enhance signal processing and interpretation, thereby pushing the boundaries of what's possible in particle physics research.
 
 ## 🌟 Key Features
 
-- Implementation of WAVE using PyTorch and TensorFlow.
+- Implementation of WAVE using [PyTorch](https://pytorch.org/) and [TensorFlow](https://www.tensorflow.org/).
 - Codebase designed for ease of use and adaptability.
-- Support for running WAVE on Google Cloud Platform (GCP).
+- Support for running WAVE on [Google Cloud Platform (GCP)](https://cloud.google.com/).
 - Sample images illustrating waveform analysis.
 
-# 🔧 Requirements
+## 🔧 Requirements
 
 Before you dive into waveform vector exploitation with our WAVE code, make sure your machine is set up with the following:
 
-- Python 3.7 or later, plus these packages installed with `pip3 install -U -r requirements.txt`:
-  - `numpy`
-  - `scipy`
-  - `torch` (version 0.4.0 or later)
-  - `tensorflow` (version 1.8.0 or later)
-  - `plotly` (optional, for visualization)
+- [Python](https://www.python.org/) 3.7 or later, plus these packages installed with `pip3 install -U -r requirements.txt`:
+  - [`numpy`](https://numpy.org/)
+  - [`scipy`](https://scipy.org/)
+  - [`torch`](https://pytorch.org/) (version 0.4.0 or later)
+  - [`tensorflow`](https://www.tensorflow.org/) (version 1.8.0 or later)
+  - [`plotly`](https://plotly.com/) (optional, for visualization)
 
-# 🏃 Run Instructions
+You can easily install the required packages using [pip](https://pip.pypa.io/en/stable/).
+
+## 🏃 Run Instructions
 
 You can run the WAVE models using the following scripts:
 
-- To use our PyTorch implementation, run `wave_pytorch.py`.
-- For TensorFlow users, you can run `wave_tf.py`.
-- If you're looking to deploy on Google Cloud Platform, explore `gcp/wave_pytorch_gcp.py`.
+- To use our [PyTorch](https://pytorch.org/) implementation, run `wave_pytorch.py`.
+- For [TensorFlow](https://www.tensorflow.org/) users, you can run `wave_tf.py`.
+- If you're looking to deploy on [Google Cloud Platform](https://cloud.google.com/), explore `gcp/wave_pytorch_gcp.py`.
 
-Explore the beauty of waveform signals and training process visualization with the images below:
+Explore the beauty of waveform signals and the training process visualization with the images below:
 
 ![Waveform Signals](https://github.com/ultralytics/wave/blob/main/data/waveforms.png) ![Training Visualization](https://github.com/ultralytics/wave/blob/main/data/wave.png)
 
-# 📜 Citation
+## 📜 Citation
 
 If you use this code in your research or wish to refer to the WAVE methodology, please cite the following paper:
 
 - Jocher, G., Nishimura, K., Koblanski, J. and Li, V. (2018). WAVE: Machine Learning for Full-Waveform Time-Of-Flight Detectors. Available at: [Arxiv.org](https://arxiv.org/abs/1811.05875).
 
-# 🤝 Contribute
+## 🤝 Contribute
 
-We value each contribution and invite you to participate in developing this pioneering ML approach for physics! Whether you're sharpening bugs, proposing new features, or enriching our documentation, find out how to contribute through our [Contributing Guide](https://docs.ultralytics.com/help/contributing/). Also, let us know your thoughts by completing our [Survey](https://www.ultralytics.com/survey?utm_source=github&utm_medium=social&utm_campaign=Survey). A massive thank you 🙏 to everyone involved!
+We value each contribution and invite you to participate in developing this pioneering ML approach for physics! Whether you're fixing bugs, proposing new features, or enriching our documentation, find out how to contribute through our [Contributing Guide](https://docs.ultralytics.com/help/contributing/). We also encourage you to share your thoughts by completing our [Survey](https://www.ultralytics.com/survey?utm_source=github&utm_medium=social&utm_campaign=Survey). A massive thank you 🙏 to everyone involved!
 
-![Ultralytics Open-Source Contributors](https://raw.githubusercontent.com/ultralytics/assets/main/im/image-contributors.png)
+[![Ultralytics open-source contributors](https://raw.githubusercontent.com/ultralytics/assets/main/im/image-contributors.png)](https://github.com/ultralytics/ultralytics/graphs/contributors)
 
-# 📄 License
+## 📄 License
 
-Ultralytics is pleased to offer dual licensing options to accommodate a wide range of uses:
+Ultralytics offers two licensing options to accommodate diverse use cases:
 
-- **AGPL-3.0 License**: Our default [open-source license](https://github.com/ultralytics/ultralytics/blob/main/LICENSE), which is OSI-approved and encourages open collaboration and knowledge sharing, is perfect for students, educators, and enthusiasts.
-- **Enterprise License**: For commercial applications that require a more flexible licensing arrangement, our enterprise license allows integration of Ultralytics software into proprietary products and services. Reach out through [Ultralytics Licensing](https://www.ultralytics.com/license) for more details.
+- **AGPL-3.0 License**: Ideal for students and enthusiasts, this [OSI-approved](https://opensource.org/license) [open-source license](https://github.com/ultralytics/ultralytics/blob/main/LICENSE) promotes open collaboration and knowledge sharing. See the [LICENSE](https://github.com/ultralytics/wave/blob/main/LICENSE) file for more details.
+- **Enterprise License**: Designed for commercial use, this license permits seamless integration of Ultralytics software and AI models into commercial products and services. For more information, please visit [Ultralytics Licensing](https://www.ultralytics.com/license).
 
-# 📬 Contact Us
+## 📬 Contact Us
 
-For bug reports, feature requests, and contributions, head to [GitHub Issues](https://github.com/ultralytics/velocity/issues). For questions and discussions about this project and other Ultralytics endeavors, join us on [Discord](https://discord.com/invite/ultralytics)!
+For bug reports, feature requests, and contributions, please visit [GitHub Issues](https://github.com/ultralytics/wave/issues). For broader questions and discussions about this project and other Ultralytics initiatives, join our vibrant community on [Discord](https://discord.com/invite/ultralytics)!
 
 <br>
 <div align="center">

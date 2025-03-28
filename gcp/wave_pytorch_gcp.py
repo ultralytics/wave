@@ -6,7 +6,6 @@ import time
 
 import scipy.io
 import torch
-
 from utils import *
 
 # set printoptions

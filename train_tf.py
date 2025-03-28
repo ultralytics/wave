@@ -7,7 +7,6 @@ import plotly.graph_objs as go
 import scipy.io
 import tensorflow as tf
 from plotly.offline import plot
-
 from utils.utils import *
 
 tf.enable_eager_execution()

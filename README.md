@@ -25,11 +25,11 @@ Before diving into waveform vector exploitation with WAVE, ensure your environme
 
 - [Python](https://www.python.org/) 3.7 or later.
 - Essential Python packages installed via `pip3 install -U -r requirements.txt`:
-    - `numpy`
-    - `scipy`
-    - `torch` (version 0.4.0 or later)
-    - `tensorflow` (version 1.8.0 or later)
-    - `plotly` (optional, for enhanced visualization)
+  - `numpy`
+  - `scipy`
+  - `torch` (version 0.4.0 or later)
+  - `tensorflow` (version 1.8.0 or later)
+  - `plotly` (optional, for enhanced visualization)
 
 You can easily install these packages using [pip](https://pip.pypa.io/en/stable/), the Python package installer.
 
@@ -50,7 +50,7 @@ Visualize the intricacies of waveform signals and the training process with thes
 
 If you utilize this code or the WAVE methodology in your research, please cite the original paper:
 
-- Jocher, G., Nishimura, K., Koblanski, J. and Li, V. (2018). WAVE: Machine Learning for Full-Waveform Time-Of-Flight Detectors. *arXiv preprint arXiv:1811.05875*. Available at: [https://arxiv.org/abs/1811.05875](https://arxiv.org/abs/1811.05875).
+- Jocher, G., Nishimura, K., Koblanski, J. and Li, V. (2018). WAVE: Machine Learning for Full-Waveform Time-Of-Flight Detectors. _arXiv preprint arXiv:1811.05875_. Available at: [https://arxiv.org/abs/1811.05875](https://arxiv.org/abs/1811.05875).
 
 ## 🤝 Contribute
 

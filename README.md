@@ -31,7 +31,6 @@ Before diving into waveform vector exploitation with WAVE, ensure your environme
   ```bash
   python -m pip install -U -r requirements.txt
   ```
-
   - `numpy`
   - `scipy`
   - `torch`

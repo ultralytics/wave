@@ -41,11 +41,11 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     mat = scipy.io.loadmat(pathd + data)
     x = mat["inputs"]  # inputs (nx512) [waveform1 waveform2]
     y = mat["outputs"][:, 1:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
-    nz, nx = x.shape
+    _nz, _nx = x.shape
     ny = y.shape[1]
 
     x, _, _ = normalize(x, 1)  # normalize each input row
-    y, ymu, ys = normalize(y, 0)  # normalize each output column
+    y, _ymu, ys = normalize(y, 0)  # normalize each output column
     x, y = torch.Tensor(x), torch.Tensor(y)
     x, y, xv, yv, xt, yt = splitdata(x, y, train=0.70, validate=0.15, test=0.15, shuffle=True)
     labels = ["train", "validate", "test"]
@@ -209,8 +209,7 @@ def tsnoact():  # TS activation function
 
 
 def tslr():  # TS learning rate
-    """Generate and save learning rate (LR) logs for time-series models with varying LRs using WAVE and TanH
-    activation.
+    """Generate and save learning rate (LR) logs for time-series models with varying LRs using WAVE and TanH activation.
     """
     tsv = np.logspace(-5, -2, 13)
     tsy = []
@@ -224,7 +223,7 @@ def tsams():  # TS AMSgrad
     tsv = [False, True]
     tsy = []
     for a in tsv:
-        tsy.extend(runexample(H, model=WAVE(H), str=f".TanhAMS{str(a)}", amsgrad=a) for _ in range(3))
+        tsy.extend(runexample(H, model=WAVE(H), str=f".TanhAMS{a!s}", amsgrad=a) for _ in range(3))
     scipy.io.savemat(f"{pathr}TS.AMSgrad.mat", dict(tsv=tsv, tsy=np.array(tsy)))
 
 

@@ -35,11 +35,11 @@ def train(H, model, str, lr=0.001):
     mat = scipy.io.loadmat(pathd + data)
     x = mat["inputs"][:]  # inputs (nx512) [waveform1 waveform2]
     y = mat["outputs"][:, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
-    nz, nx = x.shape
+    _nz, _nx = x.shape
     ny = y.shape[1]
 
     x, _, _ = normalize(x, 1)  # normalize each input row
-    y, ymu, ys = normalize(y, 0)  # normalize each output column
+    y, _ymu, ys = normalize(y, 0)  # normalize each output column
     x, y = torch.Tensor(x), torch.Tensor(y)
     x, y, xv, yv, xt, yt = splitdata(x, y, train=0.70, validate=0.15, test=0.15, shuffle=False)
 

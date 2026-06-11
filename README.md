@@ -26,12 +26,15 @@ The primary goal of this project is to develop and share advanced [Machine Learn
 
 Before diving into waveform vector exploitation with WAVE, ensure your environment meets the following prerequisites:
 
-- [Python](https://www.python.org/) 3.7 or later.
-- Essential Python packages installed via `pip3 install -U -r requirements.txt`:
+- A [Python](https://www.python.org/) environment compatible with the PyTorch and TensorFlow examples.
+- Essential Python packages installed from [`requirements.txt`](requirements.txt):
+  ```bash
+  python -m pip install -U -r requirements.txt
+  ```
   - `numpy`
   - `scipy`
-  - `torch` (version 0.4.0 or later)
-  - `tensorflow` (version 1.8.0 or later)
+  - `torch`
+  - `tensorflow` (the [`train_tf.py`](train_tf.py) example uses TensorFlow 1.x APIs)
   - `plotly` (optional, for enhanced visualization)
 
 You can easily install these packages using [pip](https://pip.pypa.io/en/stable/), the Python package installer.
@@ -40,14 +43,14 @@ You can easily install these packages using [pip](https://pip.pypa.io/en/stable/
 
 Execute the WAVE models using the provided scripts:
 
-- **PyTorch Implementation**: Run `wave_pytorch.py` for the [PyTorch](https://pytorch.org/)-based model.
-- **TensorFlow Implementation**: Use `wave_tf.py` if you prefer [TensorFlow](https://www.tensorflow.org/).
-- **Google Cloud Deployment**: Explore `gcp/wave_pytorch_gcp.py` for running on [Google Cloud Platform](https://cloud.google.com/).
+- **PyTorch Implementation**: Run `python train.py --epochs 5000 --var 3` for the [PyTorch](https://pytorch.org/)-based model. The script downloads `wavedata25ns.mat` into `data/` if it is missing.
+- **TensorFlow Implementation**: Use `python train_tf.py` in a TensorFlow 1.x environment if you prefer [TensorFlow](https://www.tensorflow.org/).
+- **Google Cloud Deployment**: Explore [`gcp/wave_pytorch_gcp.py`](gcp/wave_pytorch_gcp.py) and the helper scripts in [`gcp/`](gcp/) for running on [Google Cloud Platform](https://cloud.google.com/).
 
 Visualize the intricacies of waveform signals and the training process with these example images:
 
-![Waveform Signals](https://raw.githubusercontent.com/ultralytics/wave/main/data/waveforms.png)
-![Training Visualization](https://raw.githubusercontent.com/ultralytics/wave/main/data/wave.png)
+![Waveform Signals](data/waveforms.png)
+![Training Visualization](data/wave.png)
 
 ## 📜 Citation
 
@@ -65,7 +68,7 @@ We highly value community contributions and invite you to participate in advanci
 
 Ultralytics provides two licensing options to suit different needs:
 
-- **AGPL-3.0 License**: This [OSI-approved](https://opensource.org/license) [open-source license](https://github.com/ultralytics/wave/blob/main/LICENSE) is ideal for students and researchers, promoting open collaboration and knowledge sharing. See the [LICENSE](https://github.com/ultralytics/wave/blob/main/LICENSE) file for details.
+- **AGPL-3.0 License**: This [OSI-approved](https://opensource.org/license/agpl-3-0/) open-source license is ideal for students and researchers, promoting open collaboration and knowledge sharing. See the [LICENSE](LICENSE) file for details.
 - **Enterprise License**: Designed for commercial applications, this license allows for the integration of Ultralytics software and AI models into commercial products and services. Visit [Ultralytics Licensing](https://www.ultralytics.com/license) for more information.
 
 ## 📬 Contact Us

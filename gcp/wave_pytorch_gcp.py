@@ -4,17 +4,15 @@ import copy
 import os
 import time
 
+import numpy as np
 import scipy.io
 import torch
-import numpy as np
 
 from utils.utils import normalize, splitdata, stdpt
 
 # set printoptions
 torch.set_printoptions(linewidth=320, precision=8)
-np.set_printoptions(
-    linewidth=320, formatter={"float_kind": "{:11.5g}".format}
-)  # format short g, %precision=5
+np.set_printoptions(linewidth=320, formatter={"float_kind": "{:11.5g}".format})  # format short g, %precision=5
 
 pathd = "data/"
 pathr = "results/"
@@ -33,17 +31,11 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
 
     cuda = torch.cuda.is_available()
     os.makedirs(f"{pathr}models", exist_ok=True)
-    name = (
-        f"{data[:-4]}{H[:]}{lr:g}lr{str}".replace(", ", ".")
-        .replace("[", "_")
-        .replace("]", "_")
-    )
+    name = f"{data[:-4]}{H[:]}{lr:g}lr{str}".replace(", ", ".").replace("[", "_").replace("]", "_")
 
     tica = time.time()
     device = torch.device("cuda:0" if cuda else "cpu")
-    print(
-        f"Running {name} on {device.type}\n{torch.cuda.get_device_properties(0) if cuda else ''}"
-    )
+    print(f"Running {name} on {device.type}\n{torch.cuda.get_device_properties(0) if cuda else ''}")
 
     if not os.path.isfile(pathd + data):
         os.system(f"wget -P data/ https://storage.googleapis.com/ultralytics/{data}")
@@ -56,9 +48,7 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
     x, _, _ = normalize(x, 1)  # normalize each input row
     y, _ymu, ys = normalize(y, 0)  # normalize each output column
     x, y = torch.Tensor(x), torch.Tensor(y)
-    x, y, xv, yv, xt, yt = splitdata(
-        x, y, train=0.70, validate=0.15, test=0.15, shuffle=True
-    )
+    x, y, xv, yv, xt, yt = splitdata(x, y, train=0.70, validate=0.15, test=0.15, shuffle=True)
     labels = ["train", "validate", "test"]
 
     print(model)
@@ -102,17 +92,12 @@ def runexample(H, model, str, lr=0.001, amsgrad=False):
         loss.backward()
         optimizer.step()
     else:
-        print(
-            "WARNING: Validation loss still decreasing after %g epochs (train longer)."
-            % (i + 1)
-        )
+        print("WARNING: Validation loss still decreasing after %g epochs (train longer)." % (i + 1))
     # torch.save(best[2], pathr + 'models/' + name + '.pt')
     model.load_state_dict(best[2])
     dt = time.time() - tica
 
-    print(
-        f"\nFinished {i + 1:g} epochs in {dt:.3f}s ({i / dt:.3f} epochs/s)\nBest results from epoch {best[0]:g}:"
-    )
+    print(f"\nFinished {i + 1:g} epochs in {dt:.3f}s ({i / dt:.3f} epochs/s)\nBest results from epoch {best[0]:g}:")
     loss, std = np.zeros(3), np.zeros((3, ny))
     for i, (xi, yi) in enumerate(((x, y), (xv, yv), (xt, yt))):
         loss[i], std[i] = stdpt(model(xi) - yi, ys)
@@ -225,15 +210,12 @@ def tsnoact():  # TS activation function
 
 
 def tslr():  # TS learning rate
-    """Generate and save learning rate (LR) logs for time-series models with varying LRs using WAVE and TanH
-    activation.
+    """Generate and save learning rate (LR) logs for time-series models with varying LRs using WAVE and TanH activation.
     """
     tsv = np.logspace(-5, -2, 13)
     tsy = []
     for a in tsv:
-        tsy.extend(
-            runexample(H, model=WAVE(H), str=("." + "Tanh"), lr=a) for _ in range(10)
-        )
+        tsy.extend(runexample(H, model=WAVE(H), str=("." + "Tanh"), lr=a) for _ in range(10))
     scipy.io.savemat(f"{pathr}TS.lr.mat", dict(tsv=tsv, tsy=np.array(tsy)))
 
 
@@ -242,10 +224,7 @@ def tsams():  # TS AMSgrad
     tsv = [False, True]
     tsy = []
     for a in tsv:
-        tsy.extend(
-            runexample(H, model=WAVE(H), str=f".TanhAMS{a!s}", amsgrad=a)
-            for _ in range(3)
-        )
+        tsy.extend(runexample(H, model=WAVE(H), str=f".TanhAMS{a!s}", amsgrad=a) for _ in range(3))
     scipy.io.savemat(f"{pathr}TS.AMSgrad.mat", dict(tsv=tsv, tsy=np.array(tsy)))
 
 

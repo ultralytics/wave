@@ -8,9 +8,7 @@ import torch
 
 # Set printoptions
 torch.set_printoptions(linewidth=1320, precision=5, profile="long")
-np.set_printoptions(
-    linewidth=320, formatter={"float_kind": "{:11.5g}".format}
-)  # format short g, %precision=5
+np.set_printoptions(linewidth=320, formatter={"float_kind": "{:11.5g}".format})  # format short g, %precision=5
 
 
 def normalize(x, axis=None):  # normalize x mean and std by axis
@@ -32,9 +30,7 @@ def shuffledata(x, y):  # randomly shuffle x and y by same axis=0 indices
     return x[i], y[i]
 
 
-def splitdata(
-    x, y, train=0.7, validate=0.15, test=0.15, shuffle=False
-):  # split training data
+def splitdata(x, y, train=0.7, validate=0.15, test=0.15, shuffle=False):  # split training data
     """Splits data arrays x and y into training, validation, and test sets with optional shuffling."""
     n = x.shape[0]
     if shuffle:
@@ -73,13 +69,8 @@ def model_info(model):
     shape, mean, and std.
     """
     n_p = sum(x.numel() for x in model.parameters())  # number parameters
-    n_g = sum(
-        x.numel() for x in model.parameters() if x.requires_grad
-    )  # number gradients
-    print(
-        "\n%5s %40s %9s %12s %20s %10s %10s"
-        % ("layer", "name", "gradient", "parameters", "shape", "mu", "sigma")
-    )
+    n_g = sum(x.numel() for x in model.parameters() if x.requires_grad)  # number gradients
+    print("\n%5s %40s %9s %12s %20s %10s %10s" % ("layer", "name", "gradient", "parameters", "shape", "mu", "sigma"))
     for i, (name, p) in enumerate(model.named_parameters()):
         name = name.replace("module_list.", "")
         print(
@@ -119,9 +110,7 @@ class patienceStopper:
         self.num_bad_epochs += 1
         self.epoch += 1
         self.first(model) if self.epoch == 0 else None
-        self.printepoch(
-            self.epoch, loss, metrics
-        ) if self.epoch % self.printerval == 0 else None
+        self.printepoch(self.epoch, loss, metrics) if self.epoch % self.printerval == 0 else None
 
         if loss < self.bestloss:
             self.bestloss = loss
@@ -130,9 +119,7 @@ class patienceStopper:
             self.num_bad_epochs = 0
             if model:
                 if self.bestmodel:
-                    self.bestmodel.load_state_dict(
-                        model.state_dict()
-                    )  # faster than deepcopy
+                    self.bestmodel.load_state_dict(model.state_dict())  # faster than deepcopy
                 else:
                     self.bestmodel = copy.deepcopy(model)
 
@@ -140,9 +127,7 @@ class patienceStopper:
             self.final(f"{self.patience:g} Patience exceeded at epoch {self.epoch:g}.")
             return True
         elif self.epoch >= self.epochs:
-            self.final(
-                f"WARNING: {self.patience:g} Patience not exceeded by epoch {self.epoch:g} (train longer)."
-            )
+            self.final(f"WARNING: {self.patience:g} Patience not exceeded by epoch {self.epoch:g} (train longer).")
             return True
         else:
             return False

@@ -27,11 +27,7 @@ def train(H, model, str, lr=0.001):
 
     cuda = torch.cuda.is_available()
     os.makedirs(f"{pathr}models", exist_ok=True)
-    name = (
-        f"{data[:-4]}{H[:]}{lr:g}lr{str}".replace(", ", ".")
-        .replace("[", "_")
-        .replace("]", "_")
-    )
+    name = f"{data[:-4]}{H[:]}{lr:g}lr{str}".replace(", ", ".").replace("[", "_").replace("]", "_")
     print(f"Running {name}")
 
     device = select_device()
@@ -47,9 +43,7 @@ def train(H, model, str, lr=0.001):
     x, _, _ = normalize(x, 1)  # normalize each input row
     y, _ymu, ys = normalize(y, 0)  # normalize each output column
     x, y = torch.Tensor(x), torch.Tensor(y)
-    x, y, xv, yv, xt, yt = splitdata(
-        x, y, train=0.70, validate=0.15, test=0.15, shuffle=False
-    )
+    x, y, xv, yv, xt, yt = splitdata(x, y, train=0.70, validate=0.15, test=0.15, shuffle=False)
 
     # torch.nn.init.constant_(model.out.weight.data, ys.item(0))
     # torch.nn.init.constant_(model.out.bias.data, ymu.item(0))
@@ -160,24 +154,18 @@ class WAVE4(nn.Module):
         """Initializes the WAVE4 model with specified output layers and configurations for convolutional layers."""
         super().__init__()
         self.layer1 = nn.Sequential(
-            nn.Conv2d(
-                1, 32, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False
-            ),
+            nn.Conv2d(1, 32, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
             nn.BatchNorm2d(32),
             nn.LeakyReLU(0.1),
         )
         # nn.MaxPool2d(kernel_size=(1, 2), stride=1))
         self.layer2 = nn.Sequential(
-            nn.Conv2d(
-                32, 64, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False
-            ),
+            nn.Conv2d(32, 64, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
             nn.BatchNorm2d(64),
             nn.LeakyReLU(0.1),
         )
         # nn.MaxPool2d(kernel_size=(1, 2), stride=1))
-        self.layer3 = nn.Conv2d(
-            64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)
-        )
+        self.layer3 = nn.Conv2d(64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0))
 
     def forward(self, x):  # x.shape = [bs, 512]
         """Forward pass for processing input tensor through convolutional layers and reshaping output for
@@ -263,24 +251,18 @@ class WAVE2(nn.Module):
         """Initializes the WAVE2 model architecture components."""
         super().__init__()
         self.layer1 = nn.Sequential(
-            nn.Conv2d(
-                1, 32, kernel_size=(2, 30), stride=(1, 2), padding=(1, 15), bias=False
-            ),
+            nn.Conv2d(1, 32, kernel_size=(2, 30), stride=(1, 2), padding=(1, 15), bias=False),
             nn.BatchNorm2d(32),
             nn.LeakyReLU(0.1),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1),
         )
         self.layer2 = nn.Sequential(
-            nn.Conv2d(
-                32, 64, kernel_size=(2, 30), stride=(1, 2), padding=(0, 15), bias=False
-            ),
+            nn.Conv2d(32, 64, kernel_size=(2, 30), stride=(1, 2), padding=(0, 15), bias=False),
             nn.BatchNorm2d(64),
             nn.LeakyReLU(0.1),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1),
         )
-        self.layer3 = nn.Sequential(
-            nn.Conv2d(64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0))
-        )
+        self.layer3 = nn.Sequential(nn.Conv2d(64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)))
 
     def forward(self, x):  # x.shape = [bs, 512]
         """Forward pass for processing input tensor x through sequential layers, reshaping as needed for the model."""
@@ -297,12 +279,8 @@ H = [512, 64, 8, 2]
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--epochs", type=int, default=5000, help="number of epochs")
-    parser.add_argument(
-        "--batch-size", type=int, default=2000, help="size of each image batch"
-    )
-    parser.add_argument(
-        "--printerval", type=int, default=1, help="print results interval"
-    )
+    parser.add_argument("--batch-size", type=int, default=2000, help="size of each image batch")
+    parser.add_argument("--printerval", type=int, default=1, help="print results interval")
     parser.add_argument("--var", nargs="+", default=[3], help="debug list")
     opt = parser.parse_args()
     opt.var = [float(x) for x in opt.var]

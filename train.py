@@ -3,11 +3,13 @@
 import argparse
 import os
 
+import numpy as np
 import scipy.io
+import torch
 import torch.nn as nn
 
-from utils.torch_utils import *
-from utils.utils import *
+from utils.torch_utils import init_seeds, select_device
+from utils.utils import model_info, normalize, patienceStopper, splitdata
 
 torch.backends.cudnn.benchmark = True  # unsuitable for multiscale
 
@@ -25,7 +27,11 @@ def train(H, model, str, lr=0.001):
 
     cuda = torch.cuda.is_available()
     os.makedirs(f"{pathr}models", exist_ok=True)
-    name = f"{data[:-4]}{H[:]}{lr:g}lr{str}".replace(", ", ".").replace("[", "_").replace("]", "_")
+    name = (
+        f"{data[:-4]}{H[:]}{lr:g}lr{str}".replace(", ", ".")
+        .replace("[", "_")
+        .replace("]", "_")
+    )
     print(f"Running {name}")
 
     device = select_device()
@@ -35,13 +41,15 @@ def train(H, model, str, lr=0.001):
     mat = scipy.io.loadmat(pathd + data)
     x = mat["inputs"][:]  # inputs (nx512) [waveform1 waveform2]
     y = mat["outputs"][:, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
-    nz, nx = x.shape
+    _nz, _nx = x.shape
     ny = y.shape[1]
 
     x, _, _ = normalize(x, 1)  # normalize each input row
-    y, ymu, ys = normalize(y, 0)  # normalize each output column
+    y, _ymu, ys = normalize(y, 0)  # normalize each output column
     x, y = torch.Tensor(x), torch.Tensor(y)
-    x, y, xv, yv, xt, yt = splitdata(x, y, train=0.70, validate=0.15, test=0.15, shuffle=False)
+    x, y, xv, yv, xt, yt = splitdata(
+        x, y, train=0.70, validate=0.15, test=0.15, shuffle=False
+    )
 
     # torch.nn.init.constant_(model.out.weight.data, ys.item(0))
     # torch.nn.init.constant_(model.out.bias.data, ymu.item(0))
@@ -116,7 +124,10 @@ def train(H, model, str, lr=0.001):
             std[i] = r.std(0).cpu().numpy() * ys
         print(f"{loss[i]:.5f} {std[i, :]} {labels[i]}")
 
-    scipy.io.savemat(pathr + name + ".mat", dict(bestepoch=stopper.bestloss, loss=loss, std=std, L=L, name=name))
+    scipy.io.savemat(
+        pathr + name + ".mat",
+        dict(bestepoch=stopper.bestloss, loss=loss, std=std, L=L, name=name),
+    )
     # files.download(pathr + name + '.mat')
 
     return np.concatenate(([stopper.bestloss], np.array(loss), np.array(std.ravel())))
@@ -149,18 +160,24 @@ class WAVE4(nn.Module):
         """Initializes the WAVE4 model with specified output layers and configurations for convolutional layers."""
         super().__init__()
         self.layer1 = nn.Sequential(
-            nn.Conv2d(1, 32, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
+            nn.Conv2d(
+                1, 32, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False
+            ),
             nn.BatchNorm2d(32),
             nn.LeakyReLU(0.1),
         )
         # nn.MaxPool2d(kernel_size=(1, 2), stride=1))
         self.layer2 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False),
+            nn.Conv2d(
+                32, 64, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False
+            ),
             nn.BatchNorm2d(64),
             nn.LeakyReLU(0.1),
         )
         # nn.MaxPool2d(kernel_size=(1, 2), stride=1))
-        self.layer3 = nn.Conv2d(64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0))
+        self.layer3 = nn.Conv2d(
+            64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)
+        )
 
     def forward(self, x):  # x.shape = [bs, 512]
         """Forward pass for processing input tensor through convolutional layers and reshaping output for
@@ -185,20 +202,37 @@ class WAVE3(nn.Module):
         super().__init__()
         n = 32
         self.layer1 = nn.Sequential(
-            nn.Conv2d(in_channels=2, out_channels=n, kernel_size=(1, 33), stride=(1, 2), padding=(0, 16), bias=False),
+            nn.Conv2d(
+                in_channels=2,
+                out_channels=n,
+                kernel_size=(1, 33),
+                stride=(1, 2),
+                padding=(0, 16),
+                bias=False,
+            ),
             nn.BatchNorm2d(n),
             nn.LeakyReLU(0.1),
         )
         self.layer2 = nn.Sequential(
             nn.Conv2d(
-                in_channels=n, out_channels=n * 2, kernel_size=(1, 17), stride=(1, 2), padding=(0, 8), bias=False
+                in_channels=n,
+                out_channels=n * 2,
+                kernel_size=(1, 17),
+                stride=(1, 2),
+                padding=(0, 8),
+                bias=False,
             ),
             nn.BatchNorm2d(n * 2),
             nn.LeakyReLU(0.1),
         )
         self.layer3 = nn.Sequential(
             nn.Conv2d(
-                in_channels=n * 2, out_channels=n * 4, kernel_size=(1, 9), stride=(1, 2), padding=(0, 4), bias=False
+                in_channels=n * 2,
+                out_channels=n * 4,
+                kernel_size=(1, 9),
+                stride=(1, 2),
+                padding=(0, 4),
+                bias=False,
             ),
             nn.BatchNorm2d(n * 4),
             nn.LeakyReLU(0.1),
@@ -229,18 +263,24 @@ class WAVE2(nn.Module):
         """Initializes the WAVE2 model architecture components."""
         super().__init__()
         self.layer1 = nn.Sequential(
-            nn.Conv2d(1, 32, kernel_size=(2, 30), stride=(1, 2), padding=(1, 15), bias=False),
+            nn.Conv2d(
+                1, 32, kernel_size=(2, 30), stride=(1, 2), padding=(1, 15), bias=False
+            ),
             nn.BatchNorm2d(32),
             nn.LeakyReLU(0.1),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1),
         )
         self.layer2 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=(2, 30), stride=(1, 2), padding=(0, 15), bias=False),
+            nn.Conv2d(
+                32, 64, kernel_size=(2, 30), stride=(1, 2), padding=(0, 15), bias=False
+            ),
             nn.BatchNorm2d(64),
             nn.LeakyReLU(0.1),
             nn.MaxPool2d(kernel_size=(1, 2), stride=1),
         )
-        self.layer3 = nn.Sequential(nn.Conv2d(64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0)))
+        self.layer3 = nn.Sequential(
+            nn.Conv2d(64, n_out, kernel_size=(2, 64), stride=(1, 1), padding=(0, 0))
+        )
 
     def forward(self, x):  # x.shape = [bs, 512]
         """Forward pass for processing input tensor x through sequential layers, reshaping as needed for the model."""
@@ -257,8 +297,12 @@ H = [512, 64, 8, 2]
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--epochs", type=int, default=5000, help="number of epochs")
-    parser.add_argument("--batch-size", type=int, default=2000, help="size of each image batch")
-    parser.add_argument("--printerval", type=int, default=1, help="print results interval")
+    parser.add_argument(
+        "--batch-size", type=int, default=2000, help="size of each image batch"
+    )
+    parser.add_argument(
+        "--printerval", type=int, default=1, help="print results interval"
+    )
     parser.add_argument("--var", nargs="+", default=[3], help="debug list")
     opt = parser.parse_args()
     opt.var = [float(x) for x in opt.var]

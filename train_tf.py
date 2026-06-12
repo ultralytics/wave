@@ -3,12 +3,13 @@
 import os
 import time
 
+import numpy as np
 import plotly.graph_objs as go
 import scipy.io
 import tensorflow as tf
 from plotly.offline import plot
 
-from utils.utils import *
+from utils.utils import normalize, splitdata, stdtf
 
 tf.enable_eager_execution()
 
@@ -27,7 +28,11 @@ def runexample(H, model, str):
     tf.set_random_seed(1)
     path = "data/"
     os.makedirs(f"{path}models", exist_ok=True)
-    name = f"{data[:-4]}{H[:]}{lr:g}lr{eps:g}eps{str}".replace(", ", "_").replace("[", "_").replace("]", "_")
+    name = (
+        f"{data[:-4]}{H[:]}{lr:g}lr{eps:g}eps{str}".replace(", ", "_")
+        .replace("[", "_")
+        .replace("]", "_")
+    )
 
     tica = time.time()
     device = "/gpu:0" if cuda else "/cpu:0"
@@ -38,14 +43,16 @@ def runexample(H, model, str):
     mat = scipy.io.loadmat(path + data)
     x = mat["inputs"]  # inputs (nx512) [waveform1 waveform2]
     y = mat["outputs"][:, 0:2]  # outputs (nx4) [position(mm), time(ns), PE, E(MeV)]
-    nz, nx = x.shape
+    _nz, _nx = x.shape
     ny = y.shape[1]
 
     if model is None:
         # model = WAVE(nx, ny, H)
         model = tf.keras.Sequential(
             [
-                tf.keras.layers.Dense(H[0], activation=tf.tanh, input_shape=(512,)),  # must declare input shape
+                tf.keras.layers.Dense(
+                    H[0], activation=tf.tanh, input_shape=(512,)
+                ),  # must declare input shape
                 tf.keras.layers.Dense(H[1], activation=tf.tanh),
                 tf.keras.layers.Dense(
                     H[2],
@@ -56,8 +63,10 @@ def runexample(H, model, str):
         )
 
     x, _, _ = normalize(x, 1)  # normalize each input row
-    y, ymu, ys = normalize(y, 0)  # normalize each output column
-    x, y, xv, yv, xt, yt = splitdata(x, y, train=0.70, validate=0.15, test=0.15, shuffle=False)
+    y, _ymu, ys = normalize(y, 0)  # normalize each output column
+    x, y, xv, yv, xt, yt = splitdata(
+        x, y, train=0.70, validate=0.15, test=0.15, shuffle=False
+    )
     labels = ["train", "validate", "test"]
 
     print(model)
@@ -82,7 +91,9 @@ def runexample(H, model, str):
             with tf.GradientTape() as tape:
                 y_pred = model(x)
                 loss = criteria(y_pred, y)
-            grads = tape.gradient(loss, model.variables)  # DO NOT INDENT, not inside tf.GradientTape context manager
+            grads = tape.gradient(
+                loss, model.variables
+            )  # DO NOT INDENT, not inside tf.GradientTape context manager
             y_predv = model(xv)
 
             # Compute and print loss
@@ -94,7 +105,9 @@ def runexample(H, model, str):
                 if L[i, 1] < best[1]:
                     best = (i, L[i, 1], None)
                 if (i - best[0]) > validations:
-                    print(f"\n{validations:g} validation checks exceeded at epoch {i:g}.")
+                    print(
+                        f"\n{validations:g} validation checks exceeded at epoch {i:g}."
+                    )
                     break
 
             if i % printInterval == 0:  # print and save progress
@@ -104,14 +117,22 @@ def runexample(H, model, str):
                 ticb = time.time()
 
             # Apply the gradient to the model
-            optimizer.apply_gradients(zip(grads, model.variables), global_step=tf.train.get_or_create_global_step())
+            optimizer.apply_gradients(
+                zip(grads, model.variables),
+                global_step=tf.train.get_or_create_global_step(),
+            )
         else:
-            print("WARNING: Validation loss still decreasing after %g epochs (train longer)." % (i + 1))
+            print(
+                "WARNING: Validation loss still decreasing after %g epochs (train longer)."
+                % (i + 1)
+            )
         # torch.save(best[2], path + 'models/' + name + '.pt')
         # model.load_state_dict(best[2])
         dt = time.time() - tica
 
-    print(f"\nFinished {i + 1:g} epochs in {dt:.3f}s ({i / dt:.3f} epochs/s)\nBest results from epoch {best[0]:g}:")
+    print(
+        f"\nFinished {i + 1:g} epochs in {dt:.3f}s ({i / dt:.3f} epochs/s)\nBest results from epoch {best[0]:g}:"
+    )
     loss, std = np.zeros(3), np.zeros((3, ny))
     for i, (xi, yi) in enumerate(((x, y), (xv, yv), (xt, yt))):
         loss[i], std[i] = stdtf(model(xi) - yi, ys)
@@ -121,8 +142,13 @@ def runexample(H, model, str):
 
     data = []
     for i, s in enumerate(labels):
-        data.append(go.Scatter(x=np.arange(epochs), y=L[:, i], mode="markers+lines", name=s))
-    layout = go.Layout(xaxis=dict(type="linear", autorange=True), yaxis=dict(type="log", autorange=True))
+        data.append(
+            go.Scatter(x=np.arange(epochs), y=L[:, i], mode="markers+lines", name=s)
+        )
+    layout = go.Layout(
+        xaxis=dict(type="linear", autorange=True),
+        yaxis=dict(type="log", autorange=True),
+    )
     # configure_plotly_browser_state()
     plot(go.Figure(data=data, layout=layout))
 
@@ -130,4 +156,4 @@ def runexample(H, model, str):
 if __name__ == "__main__":
     H = [128, 32, 8]
     for i in range(1):
-        runexample(H, None, f".{str(i)}")
+        runexample(H, None, f".{i!s}")

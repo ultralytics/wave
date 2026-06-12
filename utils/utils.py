@@ -38,7 +38,14 @@ def splitdata(x, y, train=0.7, validate=0.15, test=0.15, shuffle=False):  # spli
     i = round(n * train)  # train
     j = round(n * validate) + i  # validate
     k = round(n * test) + j  # test
-    return x[:i], y[:i], x[i:j], y[i:j], x[j:k], y[j:k]  # xy train, xy validate, xy test
+    return (
+        x[:i],
+        y[:i],
+        x[i:j],
+        y[i:j],
+        x[j:k],
+        y[j:k],
+    )  # xy train, xy validate, xy test
 
 
 def stdpt(r, ys):  # MSE loss + standard deviation (pytorch)

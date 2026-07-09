@@ -210,8 +210,7 @@ def tsnoact():  # TS activation function
 
 
 def tslr():  # TS learning rate
-    """Generate and save learning rate (LR) logs for time-series models with varying LRs using WAVE and TanH activation.
-    """
+    """Generate and save learning rate (LR) logs for time-series models with varying LRs using WAVE and TanH activation."""
     tsv = np.logspace(-5, -2, 13)
     tsy = []
     for a in tsv:

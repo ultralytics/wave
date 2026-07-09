@@ -28,6 +28,7 @@ Before diving into waveform vector exploitation with WAVE, ensure your environme
 
 - A [Python](https://www.python.org/) environment compatible with the PyTorch and TensorFlow examples.
 - Essential Python packages installed from [`requirements.txt`](requirements.txt):
+
   ```bash
   python -m pip install -U -r requirements.txt
   ```

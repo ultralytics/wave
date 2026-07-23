@@ -127,8 +127,8 @@ def runexample(H, model, str):
     for i, s in enumerate(labels):
         data.append(go.Scatter(x=np.arange(epochs), y=L[:, i], mode="markers+lines", name=s))
     layout = go.Layout(
-        xaxis=dict(type="linear", autorange=True),
-        yaxis=dict(type="log", autorange=True),
+        xaxis={"type": "linear", "autorange": True},
+        yaxis={"type": "log", "autorange": True},
     )
     # configure_plotly_browser_state()
     plot(go.Figure(data=data, layout=layout))

@@ -6,7 +6,7 @@ import os
 import numpy as np
 import scipy.io
 import torch
-import torch.nn as nn
+from torch import nn
 
 from utils.torch_utils import init_seeds, select_device
 from utils.utils import model_info, normalize, patienceStopper, splitdata
@@ -120,7 +120,7 @@ def train(H, model, str, lr=0.001):
 
     scipy.io.savemat(
         pathr + name + ".mat",
-        dict(bestepoch=stopper.bestloss, loss=loss, std=std, L=L, name=name),
+        {"bestepoch": stopper.bestloss, "loss": loss, "std": std, "L": L, "name": name},
     )
     # files.download(pathr + name + '.mat')
 

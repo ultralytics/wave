@@ -162,10 +162,10 @@ def tsact():  # TS activation function
     for a in tsv:
 
         class LinearAct(torch.nn.Module):
-            def __init__(self, nx, ny):
+            def __init__(self, nx, ny, activation=a):
                 super().__init__()
                 self.Linear1 = torch.nn.Linear(nx, ny)
-                self.act = eval(f"torch.nn.{a}()")
+                self.act = getattr(torch.nn, activation)()
 
             def forward(self, x):
                 return self.act(self.Linear1(x))
@@ -182,7 +182,7 @@ def tsact():  # TS activation function
 
         for _ in range(10):
             tsy.append(runexample(H, model=WAVE(H), str=f".{a}"))
-    scipy.io.savemat(f"{pathr}TS.sigmoid.mat", dict(tsv=tsv, tsy=np.array(tsy)))
+    scipy.io.savemat(f"{pathr}TS.sigmoid.mat", {"tsv": tsv, "tsy": np.array(tsy)})
 
 
 def tsnoact():  # TS activation function
@@ -206,7 +206,7 @@ def tsnoact():  # TS activation function
 
         for _ in range(10):
             tsy.append(runexample(H, model=WAVE(H), str=f".{a}"))
-    scipy.io.savemat(f"{pathr}TS.noact.mat", dict(tsv=tsv, tsy=np.array(tsy)))
+    scipy.io.savemat(f"{pathr}TS.noact.mat", {"tsv": tsv, "tsy": np.array(tsy)})
 
 
 def tslr():  # TS learning rate
@@ -215,7 +215,7 @@ def tslr():  # TS learning rate
     tsy = []
     for a in tsv:
         tsy.extend(runexample(H, model=WAVE(H), str=("." + "Tanh"), lr=a) for _ in range(10))
-    scipy.io.savemat(f"{pathr}TS.lr.mat", dict(tsv=tsv, tsy=np.array(tsy)))
+    scipy.io.savemat(f"{pathr}TS.lr.mat", {"tsv": tsv, "tsy": np.array(tsy)})
 
 
 def tsams():  # TS AMSgrad
@@ -224,7 +224,7 @@ def tsams():  # TS AMSgrad
     tsy = []
     for a in tsv:
         tsy.extend(runexample(H, model=WAVE(H), str=f".TanhAMS{a!s}", amsgrad=a) for _ in range(3))
-    scipy.io.savemat(f"{pathr}TS.AMSgrad.mat", dict(tsv=tsv, tsy=np.array(tsy)))
+    scipy.io.savemat(f"{pathr}TS.AMSgrad.mat", {"tsv": tsv, "tsy": np.array(tsy)})
 
 
 def tsshape():  # TS network shape
@@ -326,7 +326,7 @@ def tsshape():  # TS network shape
 
     for _ in range(10):
         tsy.append(runexample(H, model=WAVE(H), str=("." + "Tanh")))
-    scipy.io.savemat(f"{pathr}TS.shape.mat", dict(tsv=tsv, tsy=np.array(tsy)))
+    scipy.io.savemat(f"{pathr}TS.shape.mat", {"tsv": tsv, "tsy": np.array(tsy)})
 
 
 if __name__ == "__main__":

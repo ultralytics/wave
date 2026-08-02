@@ -66,9 +66,7 @@ def train(H, model, str, lr=0.001):
 
     # Scheduler
     stopper = patienceStopper(epochs=opt.epochs, patience=24, printerval=opt.printerval)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, patience=20, factor=0.1, min_lr=1e-5, verbose=True
-    )
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=20, factor=0.1, min_lr=1e-5)
 
     lossv = 1e6
     bs = opt.batch_size
@@ -104,7 +102,7 @@ def train(H, model, str, lr=0.001):
         if i % opt.printerval == 0:
             std = (yv_ - yv).std(0).detach().cpu().numpy() * ys
 
-        if stopper.step(lossv, model=None, metrics=std):
+        if stopper.step(lossv, model=model, metrics=std):
             break
 
     # Print and save final results

@@ -31,9 +31,9 @@ After opening a PR:
 ## Commands
 
 ```bash
-python -m pip install -U -r requirements.txt  # numpy, scipy, torch, tensorflow, plotly
-python train.py --epochs 5000 --var 3         # PyTorch training; --var selects the model (0=WAVE, 2/3/4=WAVE2/3/4)
-python train_tf.py                            # TensorFlow 1.x equivalent, requires eager-execution TF 1.x
+python -m pip install -U -r requirements.txt # numpy, scipy, torch, tensorflow, plotly
+python train.py --epochs 5000 --var 3        # PyTorch training; --var selects the model (0=WAVE, 2/3/4=WAVE2/3/4)
+python train_tf.py                           # TensorFlow 1.x equivalent, requires eager-execution TF 1.x
 ```
 
 `train.py` downloads `data/wavedata25ns.mat` with `wget` from `https://storage.googleapis.com/ultralytics/` on first run and writes `results/<name>.mat`. There is no test suite; CI is `.github/workflows/format.yml` (Ruff, docformatter, Prettier, codespell auto-applied to PR branches) and `cla.yml`.

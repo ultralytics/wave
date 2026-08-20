@@ -1,4 +1,4 @@
-<a href="https://www.ultralytics.com/"><img src="https://raw.githubusercontent.com/ultralytics/assets/main/logo/Ultralytics_Logotype_Original.svg" width="320" alt="Ultralytics logo"></a>
+<a href="https://www.ultralytics.com"><img src="https://raw.githubusercontent.com/ultralytics/assets/main/logo/Ultralytics_Logotype_Original.svg" width="320" alt="Ultralytics logo"></a>
 
 # 🌊 Introduction
 
@@ -8,7 +8,7 @@ Here, we introduce **WA**veform **V**ector **E**xploitation (WAVE), a novel appr
 
 [![Ultralytics Actions](https://github.com/ultralytics/wave/actions/workflows/format.yml/badge.svg)](https://github.com/ultralytics/wave/actions/workflows/format.yml)
 [![Ultralytics Discord](https://img.shields.io/discord/1089800235347353640?logo=discord&logoColor=white&label=Discord&color=blue)](https://discord.com/invite/ultralytics)
-[![Ultralytics Forums](https://img.shields.io/discourse/users?server=https%3A%2F%2Fcommunity.ultralytics.com&logo=discourse&label=Forums&color=blue)](https://community.ultralytics.com/)
+[![Ultralytics Forums](https://img.shields.io/discourse/users?server=https%3A%2F%2Fcommunity.ultralytics.com&logo=discourse&label=Forums&color=blue)](https://community.ultralytics.com)
 [![Ultralytics Reddit](https://img.shields.io/reddit/subreddit-subscribers/ultralytics?style=flat&logo=reddit&logoColor=white&label=Reddit&color=blue)](https://reddit.com/r/ultralytics)
 
 ## 🚀 Project Objectives
@@ -62,7 +62,7 @@ If you utilize this code or the WAVE methodology in your research, please cite t
 
 ## 💡 Contribute
 
-We highly value community contributions and invite you to participate in advancing this pioneering ML approach for physics! Whether it's fixing bugs, proposing new features, or improving documentation, your input is welcome. Learn how to contribute by reading our [Contributing Guide](https://docs.ultralytics.com/help/contributing/). We also encourage you to share your feedback through our [Survey](https://www.ultralytics.com/survey?utm_source=github&utm_medium=social&utm_campaign=Survey). A huge thank you 🙏 to all our contributors!
+We highly value community contributions and invite you to participate in advancing this pioneering ML approach for physics! Whether it's fixing bugs, proposing new features, or improving documentation, your input is welcome. Learn how to contribute by reading our [Contributing Guide](https://docs.ultralytics.com/help/contributing). We also encourage you to share your feedback through our [Survey](https://www.ultralytics.com/survey?utm_source=github&utm_medium=social&utm_campaign=Survey). A huge thank you 🙏 to all our contributors!
 
 [![Ultralytics open-source contributors](https://raw.githubusercontent.com/ultralytics/assets/main/im/image-contributors.png)](https://github.com/ultralytics/ultralytics/graphs/contributors)
 
@@ -70,7 +70,7 @@ We highly value community contributions and invite you to participate in advanci
 
 Ultralytics provides two licensing options to suit different needs:
 
-- **AGPL-3.0 License**: This [OSI-approved](https://opensource.org/license/agpl-3-0/) open-source license is ideal for students and researchers, promoting open collaboration and knowledge sharing. See the [LICENSE](LICENSE) file for details.
+- **AGPL-3.0 License**: This [OSI-approved](https://opensource.org/license/agpl-3-0) open-source license is ideal for students and researchers, promoting open collaboration and knowledge sharing. See the [LICENSE](LICENSE) file for details.
 - **Enterprise License**: Designed for commercial applications, this license allows for the integration of Ultralytics software and AI models into commercial products and services. Visit [Ultralytics Licensing](https://www.ultralytics.com/license) for more information.
 
 ## 📮 Contact
